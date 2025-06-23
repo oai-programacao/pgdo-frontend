@@ -1,0 +1,182 @@
+<div class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
+
+    <p-fieldset [toggleable]="true" [collapsed]="true" styleClass="mb-6 filter-fieldset">
+    <ng-template pTemplate="header">
+      <div class="flex items-center gap-2">
+        <i class="pi pi-filter"></i>
+        <span class="font-bold text-md">Filtros de Pesquisa</span>
+        </div>
+    </ng-template>
+    
+    <form [formGroup]="filterForm">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-6 p-fluid">
+        
+        <div>
+          <label for="contractNumber" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Nº Contrato</label>
+          <p-inputNumber inputId="contractNumber" formControlName="contractNumber" mode="decimal" [useGrouping]="false" placeholder="Digite o número"></p-inputNumber>
+        </div>
+        <div>
+          <label for="clientName" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Nome do Cliente</label>
+          <input id="clientName" type="text" pInputText formControlName="clientName" placeholder="Busque por nome"/>
+        </div>
+        <div>
+          <label for="technicianId" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Técnico</label>
+          <p-select inputId="technicianId" [options]="technicianOptions" formControlName="technicianId" placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full" appendTo="body"/>
+        </div>
+    
+        <div>
+          <label for="startDate" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Agendado De</label>
+          <p-datepicker inputId="startDate" formControlName="startDate" dateFormat="dd/mm/yy" [showIcon]="true" placeholder="dd/mm/aaaa" showClear appendTo="body"/>
+        </div>
+        <div>
+          <label for="endDate" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Agendado Até</label>
+          <p-datepicker inputId="endDate" formControlName="endDate" dateFormat="dd/mm/yy" [showIcon]="true" placeholder="dd/mm/aaaa" showClear appendTo="body" />
+        </div>
+        <div>
+          <label for="periods" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Períodos</label>
+          <p-multiSelect inputId="periods" [options]="periodOptions" formControlName="periods" placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full"  />
+        </div>
+        <div>
+          <label for="statuses" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Status da OS</label>
+          <p-multiSelect inputId="statuses" [options]="statusOptions" formControlName="statuses" placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full" />
+        </div>
+        <div>
+          <label for="typesOfOS" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Tipo de OS</label>
+          <p-multiSelect inputId="typesOfOS" [options]="serviceOrderTypeOptions" formControlName="typesOfOS" placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full" />
+        </div>
+         <div>
+          <label for="cities" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Cidades</label>
+          <p-multiSelect inputId="cities" [options]="cityOptions" formControlName="cities" placeholder="Todas" optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full" />
+        </div>
+      </div>
+
+      <div class="flex justify-end items-center gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+        <button pButton type="button" label="Limpar Filtros" icon="pi pi-filter-slash" class="p-button-outlined p-button-secondary" (click)="clearFilters()"></button>
+        <button pButton type="button" label="Pesquisar" icon="pi pi-search" class="p-button-outlined p-button-primary" (click)="applyFilters()"></button>
+    </div>
+    </form>
+  </p-fieldset>
+
+    <div *ngIf="!isLoading; else loadingTemplate">
+        <form [formGroup]="osGroup" class="p-fluid">
+            <p-table
+                #dt
+                [rowTrackBy]="trackById"
+                dataKey="id"
+                [value]="os"
+                [loading]="isLoading"
+                styleClass="text-sm"
+                [paginator]="true"
+                [rows]="rows"
+                [totalRecords]="totalRecords"
+                (onPage)="loadServiceOrders($event)"
+                [lazy]="true"
+                [rowsPerPageOptions]="[1, 20, 30, 50, 100]"
+                stripedRows
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} OS"
+                formArrayName="orders"
+            >
+                <ng-template #header>
+                    <tr>
+                        <th>Contrato</th>
+                        <th>Cliente / Endereço</th>
+                        <th>Tipo OS</th>
+                        <th class="w-38">Data Agend.</th>
+                        <th class="w-24">Período</th>
+                        <th class="w-48">Técnico</th>
+                        <th class="w-26">Início</th>
+                        <th class="w-26">Fim</th>
+                        <th class="w-24">Duração</th>
+                        <th class="w-50">Status</th>
+                        <th style="width:12rem" class="text-center">Ações</th>
+                    </tr>
+                </ng-template>
+                <ng-template #body let-os let-i="rowIndex">
+                    <tr [formGroupName]='i'>
+                        <td>{{os.contractNumber}}</td>
+                        <td>
+                            <div class="font-medium truncate w-fit">{{ os.clientName }}</div>
+                            <div class="text-xs text-slate-500 truncate w-fit">{{ os.address }}</div>
+                            <div class="text-xs text-slate-500 truncate w-fit">Telefone - {{ os.phone1 | phones}}</div>
+                        </td>
+                        <td>{{ getTypeOfOsLabel(os.typeOfOs) }}</td>
+                        <td>
+                            <p-datepicker
+                            formControlName="scheduleDate"
+                            dateFormat="dd/mm/yy"
+                            dataType="string"
+                            appendTo="body"
+                            styleClass="min-w-full"
+                            fluid
+                            [disabledDays]="[0]"
+                            id="scheduleDate-{{i}}"
+                            />
+                        </td>
+                        <td>
+                            <p-select
+                                [options]="periodOptions"
+                                formControlName="period"
+                                appendTo="body"
+                                styleClass="min-w-full max-w-[100%]"
+                            />
+                        </td>
+                        <td>
+                            <p-select
+                                [options]="technicianOptions"
+                                formControlName="technician"
+                                optionLabel="label"
+                                optionValue="value"
+                                appendTo="body"
+                                styleClass="min-w-[150px] max-w-[150px]"
+                                id="technician"
+                            />
+                        </td>
+                        <td>
+                            <p-datepicker formControlName="startOfOs" styleClass="min-w-full" [timeOnly]="true" dataType="string" dateFormat="HH:mm" hourFormat="24" appendTo="body" />
+                        </td>
+                        <td>
+                            <p-datepicker formControlName="endOfOs" styleClass="min-w-full" [timeOnly]="true" dataType="string" dateFormat="HH:mm" hourFormat="24" appendTo="body" />
+                        </td>
+                        <td>
+                            {{ os.durationOfOs | formatDuration }}
+                        </td>
+                        <td>
+                            <p-select
+                                [options]="statusOptions"
+                                formControlName="status"
+                                optionLabel="label"
+                                optionValue="value"
+                                appendTo="body"
+                                styleClass="min-w-full"
+                            />
+                        </td>
+                        <td>
+                            <div class="flex justify-center gap-2">
+                                <button
+                                    type="button"
+                                    pButton
+                                    icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-text p-button-warning"
+                                ></button>
+                                <button
+                                    type="button"
+                                    pButton
+                                    icon="pi pi-info-circle"
+                                    class="p-button-rounded p-button-text p-button-info"
+                                ></button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </form>
+    </div>
+</div>
+
+<ng-template #loadingTemplate>
+    <div class="flex justify-center items-center p-8">
+        <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+        <span class="ml-2">Carregando Ordens de Serviço...</span>
+    </div>
+</ng-template>

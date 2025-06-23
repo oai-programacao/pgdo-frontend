@@ -1,0 +1,93 @@
+<div class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
+  <p-toast></p-toast>
+  
+  <p-toolbar styleClass="mb-6 rounded-lg bg-slate-50 dark:bg-slate-800 border dark:border-slate-700">
+    <ng-template pTemplate="left">
+      <h1 class="text-2xl font-semibold text-slate-800 dark:text-slate-100 my-auto">
+        Gerenciamento de Avisos do Sistema
+      </h1>
+    </ng-template>
+    <ng-template pTemplate="right">
+      <button pButton label="Novo Aviso" icon="pi pi-plus" class="p-button-success" (click)="openCreateDialog()"></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table [value]="warnings" [loading]="isLoading" styleClass="p-datatable-striped p-datatable-gridlines text-sm" responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 25%;">Título</th>
+        <th style="width: 40%;">Descrição</th>
+        <th class="text-center" style="width: 10%;">Status</th>
+        <th style="width: 15%;">Criado Por</th>
+        <th style="width: 10%;" class="text-center">Ações</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-warning>
+      <tr>
+        <td class="font-medium">{{ warning.title }}</td>
+        <td class="truncate max-w-md" [pTooltip]="warning.description">{{ warning.description }}</td>
+        <td class="text-center">
+          <p-tag [value]="warning.isActive ? 'Ativo' : 'Inativo'" [severity]="getSeverityForStatus(warning.isActive)"></p-tag>
+        </td>
+        <td>{{ warning.createdBy }}<br><small class="text-slate-500">{{ warning.createdAt | date:'dd/MM/yy HH:mm' }}</small></td>
+        <td class="text-center">
+          <button pButton type="button" icon="pi pi-pencil" class="p-button-rounded p-button-warning p-button-outlined" 
+                  pTooltip="Editar Aviso" tooltipPosition="top" (click)="openUpdateDialog(warning)"></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="text-center p-6">Nenhum aviso encontrado. Clique em "Novo Aviso" para criar o primeiro.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+
+<p-dialog header="Criar Novo Aviso do Sistema" [(visible)]="displayCreateDialog" [modal]="true" [style]="{width: '50vw', minWidth: '450px'}" [draggable]="false">
+  <form [formGroup]="createForm" (ngSubmit)="submitCreateForm()" class="p-fluid space-y-6 pt-4">
+    <div>
+      <label for="create-title" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Título <span class="text-red-500">*</span></label>
+      <input id="create-title" type="text" pInputText formControlName="title" />
+      <small *ngIf="createForm.get('title')?.invalid && createForm.get('title')?.touched" class="p-error block mt-1.5 text-xs">Título é obrigatório.</small>
+    </div>
+    <div>
+      <label for="create-description" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Descrição <span class="text-red-500">*</span></label>
+      <textarea id="create-description" pTextarea [rows]="5" formControlName="description" fluid></textarea>
+      <small *ngIf="createForm.get('description')?.invalid && createForm.get('description')?.touched" class="p-error block mt-1.5 text-xs">Descrição é obrigatória.</small>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="displayCreateDialog=false"></button>
+    <button pButton type="submit" label="Salvar Aviso" icon="pi pi-check" [loading]="isCreating" [disabled]="createForm.invalid || isCreating" (click)="submitCreateForm()"></button>
+  </ng-template>
+</p-dialog>
+
+
+<p-dialog header="Editar Aviso do Sistema" [(visible)]="displayUpdateDialog" [modal]="true" [style]="{width: '50vw', minWidth: '450px'}" [draggable]="false">
+  <form *ngIf="selectedWarning" [formGroup]="updateForm" (ngSubmit)="submitUpdateForm()" class="p-fluid space-y-6 pt-4">
+    <div>
+      <label for="update-title" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Título <span class="text-red-500">*</span></label>
+      <input id="update-title" type="text" pInputText formControlName="title" />
+      <small *ngIf="updateForm.get('title')?.invalid && updateForm.get('title')?.touched" class="p-error block mt-1.5 text-xs">Título é obrigatório.</small>
+    </div>
+    <div>
+      <label for="update-description" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Descrição <span class="text-red-500">*</span></label>
+      <textarea id="update-description" pTextarea [rows]="5" formControlName="description" fluid></textarea>
+      <small *ngIf="updateForm.get('description')?.invalid && updateForm.get('description')?.touched" class="p-error block mt-1.5 text-xs">Descrição é obrigatória.</small>
+    </div>
+    <div class="field-checkbox">
+      <label for="update-isActive" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Aviso Ativo</label>
+        <p-toggleswitch  formControlName="isActive" inputId="update-isActive">
+            <ng-template #handle let-checked="checked">
+                <i [ngClass]="['!text-xs', 'pi', checked ? 'pi-check' : 'pi-times']"></i>
+            </ng-template>
+        </p-toggleswitch>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="displayUpdateDialog=false"></button>
+    <button pButton type="submit" label="Salvar Alterações" icon="pi pi-save" [loading]="isUpdating" [disabled]="updateForm.invalid || isUpdating" (click)="submitUpdateForm()"></button>
+  </ng-template>
+</p-dialog>

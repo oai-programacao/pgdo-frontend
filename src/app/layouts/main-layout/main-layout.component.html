@@ -1,0 +1,15 @@
+<div class="flex h-screen bg-slate-100 dark:bg-slate-900">
+    <app-sidebar
+      [allMenuItems]="menuItems"
+      [isCollapsed]="isSidebarCollapsed"
+      (toggleCollapse)="toggleSidebar()"
+      (logoutClicked)="logoutAction()"
+      appName="PGDO">
+    </app-sidebar>
+  
+    <main
+      class="flex-1 p-4 sm:p-6 overflow-y-auto transition-all duration-300 ease-in-out"
+      [ngClass]="isSidebarCollapsed ? 'ml-20' : 'ml-64'">
+      <router-outlet></router-outlet>
+    </main>
+  </div>

@@ -1,0 +1,111 @@
+
+<div class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
+  <p-toast></p-toast>
+  
+  <div *ngIf="!selectedClient; else detailsView" class="min-h-full">
+    <p-panel header="Consulta Financeira de Cliente" styleClass="dark:border dark:border-slate-700">
+      <div class="field">
+        <label for="client-search" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+          Buscar por Nome ou CPF/CNPJ
+        </label>
+        <p-iconfield>
+          <p-inputicon *ngIf="!isLoadingSearch" styleClass="pi pi-search" />
+          <p-inputicon *ngIf="isLoadingSearch" styleClass="pi pi-spinner pi-spin" />
+          <input id="client-search" type="text" pInputText [formControl]="searchControl" placeholder="Digite 3 ou mais caracteres..." class="w-full" />
+        </p-iconfield>
+      </div>
+
+      <div *ngIf="(searchResults$ | async) as results" class="mt-4 max-h-[70vh] overflow-y-auto">
+        <ul *ngIf="results.length > 0; else noResults" class="space-y-2">
+          <li *ngFor="let client of results" 
+              class="p-3 flex justify-between items-center bg-slate-50 dark:bg-slate-700/50 rounded-md dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+            <div>
+              <div class="font-semibold text-slate-800 dark:text-slate-100">{{ client.nome }}</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400">CPF/CNPJ: {{ client.cpfCnpj }} | Código: {{ client.codigo }}</div>
+            </div>
+            <button pButton label="Ver Faturas" icon="pi pi-chevron-right" iconPos="right" class="p-button-sm p-button-outlined" (click)="selectClient(client)"></button>
+          </li>
+        </ul>
+        <ng-template #noResults>
+          <p *ngIf="searchControl.value && searchControl.value.length >= 3 && !isLoadingSearch" class="text-center text-slate-500 p-4">Nenhum cliente encontrado.</p>
+        </ng-template>
+      </div>
+    </p-panel>
+  </div>
+
+  <ng-template #detailsView>
+    <p-toolbar styleClass="mb-6 rounded-lg bg-slate-50 dark:bg-slate-800 border dark:border-slate-700">
+      <ng-template pTemplate="left">
+        <button pButton icon="pi pi-arrow-left" class="p-button-text mr-2" (click)="backToSearch()" pTooltip="Voltar para a busca"></button>
+        <div class="flex flex-col" *ngIf="selectedClient">
+          <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100">{{ selectedClient.nome }}</h2>
+          <span class="text-sm text-slate-500 dark:text-slate-400">Código: {{ selectedClient.codigo }}</span>
+        </div>
+      </ng-template>
+    </p-toolbar>
+
+    <div *ngIf="isLoadingDetails" class="flex justify-center items-center h-64">
+      <p-progressSpinner styleClass="w-12 h-12" strokeWidth="6" animationDuration=".8s"></p-progressSpinner>
+    </div>
+    
+    <p-accordion *ngIf="!isLoadingDetails && clientDetails" [multiple]="true" [activeIndex]="[0]">
+      <p-accordionTab *ngFor="let contract of clientDetails?.contratoDados" 
+                      [header]="'Contrato: ' + contract.numeroContrato + ' (' + contract.planoDescricao + ')'">
+        <p-table [value]="contract.mensalidadesEmAberto" styleClass="p-datatable-sm">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Vencimento</th>
+              <th>Descrição</th>
+              <th>Valor Original</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-bill>
+            <tr>
+              <td>{{ bill.vencimento  }}</td>
+              <td>{{ bill.historico }}</td>
+              <td>{{ bill.valor | currency:'BRL' }}</td>
+              <td class="text-center space-x-2">
+                <button pButton icon="pi pi-qrcode" pTooltip="Gerar PIX" class="p-button-rounded p-button-success" (click)="generatePix(bill)"></button>
+                <button pButton icon="pi pi-download" pTooltip="Baixar PDF" class="p-button-rounded p-button-secondary" (click)="downloadPdf(bill)"></button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr><td colspan="4" class="text-center p-4">Nenhuma fatura em aberto para este contrato.</td></tr>
+          </ng-template>
+        </p-table>
+      </p-accordionTab>
+    </p-accordion>
+  </ng-template>
+</div>
+
+<p-dialog header="Pagamento via PIX" [(visible)]="displayPixModal" [modal]="true" [style]="{width: '90vw', maxWidth: '500px'}" [draggable]="false" (onHide)="pixData = null">
+  <div class="text-center p-4 flex flex-col items-center">
+    <div *ngIf="isLoadingPix" class="flex justify-center items-center h-64">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+    <ng-container *ngIf="!isLoadingPix && pixData">
+      <h3 class="text-lg font-semibold mb-2">{{ pixData.nomeCliente }}</h3>
+      <p class="text-2xl font-bold mb-4">{{ pixData.valor | currency:'BRL' }}</p>
+      <p class="text-xl text-slate-500 dark:text-slate-400 mb-4">Vencimento: {{ pixData.vencimento | date: 'dd/MM/yyyy HH:mm:ss'}}</p>
+      
+      <qr-code
+        [value]="pixData.textoImagemQRcode"
+        [size]="256"
+        [errorCorrectionLevel]="'M'"
+        styleClass="w-full justify-center items-center rounded-lg bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+        >
+      </qr-code>
+
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-4">Copie o código abaixo ou escaneie o QR Code com o app do seu banco.</p>
+      <div class="relative mt-2 w-full">
+        <textarea pTextarea fluid [rows]="5" [value]="pixData.textoImagemQRcode" autoResize="false" readonly class="w-full text-xs !bg-slate-100 dark:!bg-slate-700 pr-10"></textarea>
+        <button pButton icon="pi pi-copy" class="p-button-text absolute top-1 right-1" (click)="copyPixCode(pixData.textoImagemQRcode)" pTooltip="Copiar Código"></button>
+      </div>
+    </ng-container>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton label="Fechar" (click)="displayPixModal=false" class="p-button-text"></button>
+  </ng-template>
+</p-dialog>

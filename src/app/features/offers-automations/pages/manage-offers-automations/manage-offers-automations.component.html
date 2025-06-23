@@ -1,0 +1,102 @@
+<div class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
+  <p-toast></p-toast>
+  
+  <p-toolbar styleClass="mb-6 rounded-lg bg-slate-50 dark:bg-slate-800 border dark:border-slate-700">
+    <ng-template pTemplate="left">
+      <h1 class="text-2xl font-semibold text-slate-800 dark:text-slate-100 my-auto">
+        Automação de Ofertas
+      </h1>
+    </ng-template>
+    <ng-template pTemplate="right">
+      <button pButton label="Nova Automação" icon="pi pi-plus" class="p-button-success" (click)="openCreateDialog()"></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table [value]="automations" [loading]="isLoading" styleClass="p-datatable-striped p-datatable-gridlines text-sm" [paginator]="true" [rows]="10">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Descrição</th>
+        <th>Tipo</th>
+        <th>Qtd.</th>
+        <th>Cidades</th>
+        <th>Períodos</th>
+        <th>Tipos de OS</th>
+        <th class="text-center">Status</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-automation>
+      <tr>
+        <td class="font-medium max-w-xs truncate" [pTooltip]="automation.description">{{ automation.description }}</td>
+        <td>{{ getOfferAutomationTypeLabel(automation.offerAutomationType) }}</td>
+        <td class="text-center">{{ automation.quantity }}</td>
+        <td>
+          <div class="flex flex-wrap gap-1">
+            <p-tag *ngFor="let city of automation.cities" [value]="getCityLabel(city)"></p-tag>
+          </div>
+        </td>
+        <td>
+          <div class="flex flex-wrap gap-1">
+            <p-tag *ngFor="let period of automation.periods" [value]="getPeriodLabel(period)" severity="info"></p-tag>
+          </div>
+        </td>
+        <td>
+          <div class="flex flex-wrap gap-1">
+            <p-tag *ngFor="let type of automation.serviceOrderTypes" [value]="getTypeOfOsLabel(type)" severity="warn"></p-tag>
+          </div>
+        </td>
+        <td class="text-center">
+          <p-toggleswitch  [ngModel]="automation.isActive" (onChange)="onStatusChange(automation, $event.checked)">
+          </p-toggleswitch >
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr><td colspan="7" class="text-center p-6">Nenhuma automação encontrada.</td></tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog header="Criar Nova Automação de Ofertas" [(visible)]="displayCreateDialog" [modal]="true" [style]="{width: '60vw', minWidth: '500px'}" [draggable]="false">
+  <form [formGroup]="createForm" (ngSubmit)="submitCreateForm()" class="p-fluid space-y-6 pt-4">
+    <div class="w-1/2">
+      <label for="create-desc" class="block text-sm font-medium mb-1.5">Descrição <span class="text-red-500">*</span></label>
+      <input id="create-desc" type="text" pInputText formControlName="description" placeholder="Ex: Ofertas de Instalação para Assis" class="w-full"/>
+      <div class="h-5 mt-1.5"><small *ngIf="createForm.get('description')?.invalid && createForm.get('description')?.touched" class="p-error block text-xs">Descrição é obrigatória.</small></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+      <div>
+        <label for="create-cities" class="block text-sm font-medium mb-1.5">Cidades <span class="text-red-500">*</span></label>
+        <p-multiSelect inputId="create-cities" [options]="cityOptions" formControlName="cities" placeholder="Selecione as cidades" display="chip" styleClass="w-full"></p-multiSelect>
+        <div class="h-5 mt-1.5"><small *ngIf="createForm.get('cities')?.invalid && createForm.get('cities')?.touched" class="p-error block text-xs">Selecione ao menos uma cidade.</small></div>
+      </div>
+      <div>
+        <label for="create-types" class="block text-sm font-medium mb-1.5">Tipos de OS <span class="text-red-500">*</span></label>
+        <p-multiSelect inputId="create-types" [options]="typeOfOsOptions" formControlName="serviceOrderTypes" placeholder="Selecione os tipos" display="chip" styleClass="w-full"></p-multiSelect>
+        <div class="h-5 mt-1.5"><small *ngIf="createForm.get('serviceOrderTypes')?.invalid && createForm.get('serviceOrderTypes')?.touched" class="p-error block text-xs">Selecione ao menos um tipo.</small></div>
+      </div>
+      <div>
+        <label for="create-periods" class="block text-sm font-medium mb-1.5">Períodos <span class="text-red-500">*</span></label>
+        <p-multiSelect inputId="create-periods" [options]="periodOptions" formControlName="periods" placeholder="Selecione os períodos" display="chip" styleClass="w-full" appendTo="body"></p-multiSelect>
+        <div class="h-5 mt-1.5"><small *ngIf="createForm.get('periods')?.invalid && createForm.get('periods')?.touched" class="p-error block text-xs">Selecione ao menos um período.</small></div>
+      </div>
+      <div>
+        <label for="create-quantity" class="block text-sm font-medium mb-1.5">Quantidade por dia <span class="text-red-500">*</span></label>
+        <p-inputNumber inputId="create-quantity" formControlName="quantity" mode="decimal" [min]="1" [showButtons]="true"></p-inputNumber>
+        <div class="h-5 mt-1.5"><small *ngIf="createForm.get('quantity')?.invalid && createForm.get('quantity')?.touched" class="p-error block text-xs">Quantidade deve ser no mínimo 1.</small></div>
+      </div>
+    </div>
+    
+    <div>
+      <label class="block text-sm font-medium mb-1.5">Tipo de Automação <span class="text-red-500">*</span></label>
+      <p-selectButton [options]="automationTypeOptions" formControlName="offerAutomationType" optionLabel="label" optionValue="value"></p-selectButton>
+      <div class="h-5 mt-1.5"><small *ngIf="createForm.get('offerAutomationType')?.invalid && createForm.get('offerAutomationType')?.touched" class="p-error block text-xs">Selecione um tipo de automação.</small></div>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-3">
+      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="displayCreateDialog=false"></button>
+      <button pButton type="submit" label="Salvar Automação" icon="pi pi-check" [loading]="isSubmitting" [disabled]="createForm.invalid || isSubmitting" (click)="submitCreateForm()"></button>
+    </div>
+  </ng-template>
+</p-dialog>

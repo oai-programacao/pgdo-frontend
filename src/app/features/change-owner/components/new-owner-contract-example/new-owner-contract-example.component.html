@@ -1,0 +1,110 @@
+<div class="content-box">
+    <app-text-holders />
+    <div class="holder-container">
+    <div class="header">
+        <span class="header-title"> Dados do Novo Titular </span>
+    </div>
+
+    <div class="info-section">
+        <div class="info-box">
+        <div class="info-content">
+            <span class="label">Login / Identificação:</span>
+            <span class="value">
+            {{ newClientInfo?.Codigo }}
+            </span>
+        </div>
+        </div>
+
+        <div class="info-box">
+        <div class="info-content">
+            <span class="label">Contrato:</span>
+            <span class="value">
+            {{ newClientContract }}
+            </span>
+        </div>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-content">
+        <span class="label">Nome Completo / Nome Empresarial:</span>
+        <span class="value">
+            {{ newClientInfo?.Nome }}
+        </span>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <div class="info-box">
+        <div class="info-content">
+            <span class="label">CPF / CNPJ:</span>
+            <span class="value">
+            {{ newClientInfo?.CNPJ_CNPF! | cpfCnpj  }}
+            </span>
+        </div>
+        </div>
+
+        <div class="info-box">
+        <div class="info-content">
+            <span class="label">RG / IE:</span>
+            <span class="value">
+            {{ newClientInfo?.RG_IE! | rg }}
+            </span>
+        </div>
+        </div>
+
+        <div class="info-box">
+        <div class="info-content">
+            <span class="label">Data de Nascimento:</span>
+            <span class="value">
+            {{ newClientInfo?.Nascimento! | date: 'dd/MM/yyyy' }}
+            </span>
+        </div>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-content">
+        <span class="label">Endereço: </span>
+        <span class="value">
+            {{  newClientInfo?.Endereco  }}, {{ newClientInfo?.Numero }} {{ newClientInfo?.Complemento }} - {{ newClientInfo?.Bairro }} - {{ newClientInfo?.Cidade }}
+        </span>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <div class="info-box">
+        <div class="info-content">
+            <span class="label">Telefone Residencial/Comercial:</span>
+            <span class="value">
+            {{ newClientInfo?.TelResidencial! | phones }}
+            </span>
+        </div>
+        </div>
+
+        <div class="info-box">
+        <div class="info-content">
+            <span class="label">Telefone Celular:</span>
+            <span class="value">
+            {{ newClientInfo?.TelCelular! | phones  }}
+            </span>
+        </div>
+        </div>
+
+        <div class="info-box">
+        <div class="info-content">
+            <span class="label">E-mail:</span>
+            <span class="value">
+            {{ newClientInfo?.Email }}
+            </span>
+        </div>
+        </div>
+    </div>
+</div>
+  <app-new-holder-contract-clauses
+    [newClient]="currentClientInfo"
+    [newClientContract]="newClientContract"
+    [signedDate]="date"
+  />
+</div>
+

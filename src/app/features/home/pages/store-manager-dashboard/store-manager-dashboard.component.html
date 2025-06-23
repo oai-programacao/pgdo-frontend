@@ -1,0 +1,48 @@
+<div>
+    <h2 class="text-xl font-semibold mb-4 text-slate-700 dark:text-slate-200">Dashboard</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+      <app-card-widget title="Vendas" [value]="totalUsers" icon="pi pi-users" variant="primary" footerText="Esse mês até o dia atual"/>
+      <app-card-widget title="Downgrades" [value]="59" icon="pi pi-users" variant="primary" footerText="Esse mês até o dia atual"/>
+      <app-card-widget title="Upgrades" [value]="256" icon="pi pi-users" variant="primary" footerText="Esse mês até o dia atual"/>
+      <app-card-widget title="Cancelamentos" [value]="50" icon="pi pi-chart-line" variant="danger" footerText="Esse mês até o dia atual" />
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-6">
+        <app-content-panel title="Vendedores" icon="pi pi-info-circle">
+            <p>Este é um painel de conteúdo dinâmico. Você pode colocar qualquer coisa aqui dentro.</p>
+          </app-content-panel>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 mt-4">
+
+        <app-dashboard-chart
+          title="Ordens de Serviço Mensais"
+          chartType="bar"
+          [chartData]="vendasMensaisData"
+          [chartOptions]="opcoesGraficoBarra"
+          height="350px"
+          [isLoading]="loadingVendas">
+        </app-dashboard-chart>
+      
+        <app-dashboard-chart
+          title="Acessos por Dispositivo"
+          chartType="doughnut"
+          [chartData]="acessosDispositivoData"
+          [chartOptions]="opcoesGraficoRosca"
+          height="350px"
+          [isLoading]="loadingAcessos">
+        </app-dashboard-chart>
+      
+        <app-dashboard-chart
+          title="Progressão de Receita (Últimos 6 meses)"
+          chartType="line"
+          [chartData]="receitaData"
+          [chartOptions]="opcoesGraficoLinha"
+          height="280px"
+          class="md:col-span-2 xl:col-span-2"> 
+        </app-dashboard-chart>
+      
+      </div>
+
+</div>

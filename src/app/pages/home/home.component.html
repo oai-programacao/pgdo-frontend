@@ -1,0 +1,14 @@
+<div class="fade-in"> <ng-container *ngIf="userRoles$ | async as roles">
+  <app-admin-dashboard *ngIf="userHasRole(roles, 'ROLE_ADMIN')"></app-admin-dashboard>
+  <app-store-manager-dashboard *ngIf="userHasRole(roles, 'ROLE_STORE_MANAGER')"></app-store-manager-dashboard>
+
+  <div *ngIf="roles && roles.length === 0"> <p class="p-4 text-slate-700 dark:text-slate-300">Bem-vindo(a)! Seu painel personalizado está sendo preparado.</p>
+  </div>
+
+</ng-container>
+
+<div *ngIf="!(userRoles$ | async)" class="flex justify-center items-center h-64">
+  <i class="pi pi-spin pi-spinner text-3xl text-blue-500"></i>
+  <p class="ml-2 text-slate-600 dark:text-slate-300">Carregando seu dashboard...</p>
+</div>
+</div>

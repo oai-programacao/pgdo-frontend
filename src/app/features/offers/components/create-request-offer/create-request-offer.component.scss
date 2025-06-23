@@ -1,0 +1,42 @@
+.create-offer-form-container {
+    width: 100%; // Garante que o container use o espaço disponível
+
+    // Estilos específicos quando o formulário está dentro de um p-dialog
+    // :host-context é uma forma de aplicar estilos baseado no contexto do elemento host.
+    // Se app-create-request-offer estiver diretamente dentro de .p-dialog-content
+    :host-context(.p-dialog-content) & {
+        padding: 0.5rem; // Um padding menor dentro do modal, já que o p-dialog-content pode ter o seu
+
+        // Se o modal for muito estreito, você pode querer forçar uma coluna sempre.
+        // Mas com `md:grid-cols-2`, ele já será uma coluna em telas/modais < 768px.
+        // Se você quiser que seja duas colunas apenas em modais realmente largos:
+        // @media (min-width: 600px) { // Ajuste este breakpoint conforme necessário para o modal
+        //   form {
+        //     grid-template-columns: repeat(2, minmax(0, 1fr));
+        //   }
+        //   .button-container-class { // Se você der uma classe ao div dos botões
+        //      grid-column: span 2 / span 2;
+        //   }
+        // }
+    }
+
+    // Estilos para quando o formulário está em uma página dedicada
+    :host-context(app-pagina-dedicada) & {
+        // Supondo que o componente pai da página tem uma classe ou é um seletor específico
+        padding: 1.5rem;
+        max-width: 900px; // Limita a largura em telas grandes para melhor legibilidade
+        margin: 1rem auto; // Centraliza na página
+        // background-color: var(--surface-b); // Ou var(--surface-card)
+        // border-radius: var(--border-radius);
+        // box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    }
+
+    .field {
+        // Se precisar de ajustes adicionais nos campos individuais
+        margin-bottom: 0.25rem; // Reduz um pouco a margem inferior padrão do .field se houver, pois gap-y já controla
+    }
+
+    // Ajuste para o ícone do p-calendar ficar bem alinhado
+    :host ::ng-deep .p-calendar .p-button {
+        height: auto; // Ou ajuste para a altura do seu input
+    } }

@@ -1,0 +1,46 @@
+.term-title {
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.container {
+    margin: 1rem;
+}
+
+.surface-box {
+    background-color: #f5f5f5; // Assuming surface-200 is a light gray
+    width: 13rem;
+    padding: 0.5rem;
+}
+
+.bold-text {
+    font-weight: bold;
+}
+
+.border-box {
+    border-color: #dcdcdc; // Assuming border-200 is a light gray
+    border-width: 1px;
+    border-style: solid;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.flex-grow {
+    flex-grow: 1;
+    padding: 0.5rem;
+}
+
+.mb-1 {
+    margin-bottom: 0.25rem;
+}

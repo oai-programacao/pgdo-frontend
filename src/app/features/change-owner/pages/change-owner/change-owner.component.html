@@ -1,0 +1,67 @@
+<div class="container-grid">
+  <div class="column">
+    <div class="btn_">
+      <p-button
+        label="Buscar Clientes"
+        icon="pi pi-search"
+        severity="warn"
+        rounded
+        (onClick)="displayDialog = true"
+      >
+      </p-button>
+
+      <div>
+        <p-dialog #dialog header="Buscar Clientes" [(visible)]="displayDialog"
+          [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="10000" (onHide)="displayDialog = false; clearFormFields()"
+          [closeOnEscape]="true" [dismissableMask]="true" [resizable]="false" [draggable]="false">
+          <app-search-owners #searchClient
+            (oldClient)="setOldClient($event!)"
+            (oldClientContract)="setOldClientContract($event)"
+            (signedDate)="setSignedDate($event)"
+            (newClient)="setNewClient($event!)"
+            (newClientContract)="setNewClientContract($event)"
+            (searchCompleted)="displayDialog = false; clearFormFields()"
+          />
+        </p-dialog>
+        <p-button
+          label="Imprimir"
+          icon="pi pi-print"
+          rounded
+          severity="success"
+          [disabled]="!oldClient || !oldClientContract || !signedDate || !newClient || !newClientContract"
+          (onClick)="printOldClientTerm(); printNewClientTerm()"
+        />
+      </div>
+    </div>
+
+    <div class="column">
+      <div class="content-box-wrapper" >
+        @if(oldClient && oldClientContract && signedDate && newClient &&
+        newClientContract) {
+        <div #oldClientTerm>
+          <app-old-owner-contract-example
+            [oldClientInfo]="oldClient"
+            [oldClientContract]="oldClientContract"
+            [date]="signedDate"
+            [newClientInfo]="newClient"
+            [newClientContract]="newClientContract"
+          />
+        </div>
+        }
+        <div>
+          @if(newClient && newClientContract && signedDate){
+          <div #newClientTerm>
+            <app-new-owner-contract-example
+              [newClientInfo]="newClient"
+              [newClientContract]="newClientContract"
+              [date]="signedDate"
+              [currentClientInfo]="newClient"
+              [currentClientContract]="newClientContract"
+            />
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

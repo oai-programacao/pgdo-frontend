@@ -1,0 +1,134 @@
+<div class="create-offer-form-container">
+    <p-toast></p-toast>
+
+    <div *ngIf="activeBlock" class="p-3 mb-5 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 text-blue-800 dark:text-blue-200 text-sm rounded-r-lg">
+      <p>
+        <i class="pi pi-info-circle mr-2"></i>
+        Lembrete: As solicitações de oferta estão liberadas a partir de
+        <strong>{{ activeBlock.initialDate }}</strong> no período
+        <strong>{{ getOfferBlockPeriodLabel(activeBlock.periodOffer) }}</strong>.
+      </p>
+    </div>
+  
+    <form [formGroup]="createOfferForm" (ngSubmit)="onSubmit()"
+          class="p-fluid grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+          <div class="field flex flex-col"> <label for="typeOfOs" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+          Tipo de OS <span class="text-red-500 dark:text-red-400">*</span>
+        </label>
+        <p-select
+          id="typeOfOs"
+          [options]="typeOfOsOptions"
+          formControlName="typeOfOs"
+          placeholder="Selecione o Tipo de OS"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+          [ngClass]="{'ng-invalid ng-dirty': f['typeOfOs'].invalid && f['typeOfOs'].touched}">
+        </p-select>
+        <div class="h-5 mt-1.5">
+          <small *ngIf="f['typeOfOs'].invalid && f['typeOfOs'].touched" class="p-error block mt-1.5 text-xs">
+            Tipo de OS é obrigatório.
+          </small>
+        </div>
+      </div>
+  
+      <div class="field flex flex-col">
+        <label for="city" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+          Cidade <span class="text-red-500 dark:text-red-400">*</span>
+        </label>
+        <p-select
+          id="city"
+          [options]="cityOptions"
+          formControlName="city"
+          placeholder="Selecione a Cidade"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+          [ngClass]="{'ng-invalid ng-dirty': f['city'].invalid && f['city'].touched}">
+        </p-select>
+        <div class="h-5 mt-1.5">
+          <small *ngIf="f['city'].invalid && f['city'].touched" class="p-error block mt-1.5 text-xs">
+            Cidade é obrigatória.
+          </small>  
+        </div>
+      </div>
+  
+      <div class="field flex flex-col">
+        <label for="period" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+          Período <span class="text-red-500 dark:text-red-400">*</span>
+        </label>
+        <p-select
+          id="period"
+          [options]="periodOptions"
+          formControlName="period"
+          placeholder="Selecione o Período"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+          [ngClass]="{'ng-invalid ng-dirty': f['period'].invalid && f['period'].touched}">
+        </p-select>
+        <div class="h-5 mt-1.5">
+          <small *ngIf="f['period'].invalid && f['period'].touched" class="p-error block mt-1.5 text-xs">
+            Período é obrigatório.
+          </small>
+        </div>
+      </div>
+  
+      <div class="field flex flex-col">
+        <label for="date" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+          Data da OS <span class="text-red-500 dark:text-red-400">*</span>
+        </label>
+        <p-datepicker
+          id="date"
+          formControlName="date"
+          dateFormat="dd/mm/yy"
+          [minDate]="minDateValue"
+          [showIcon]="true"
+          [disabledDays]="[0]"
+          dataType="string"
+          placeholder="Selecione a Data"
+          appendTo="body"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+          [ngClass]="{'ng-invalid ng-dirty': f['date'].invalid && f['date'].touched}">
+        </p-datepicker>
+        <div class="h-5 mt-1.5">
+          <small *ngIf="f['date'].invalid && f['date'].touched" class="p-error block mt-1.5 text-xs">
+            Data da OS é obrigatória.
+          </small>
+        </div>
+      </div>
+
+      <div *ngIf="createOfferForm.errors && (f['date'].touched || f['period'].touched)" 
+          class="md:col-span-2 p-3 bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 text-red-800 dark:text-red-200 text-sm rounded-r-lg">
+          <p>
+            <i class="pi pi-ban mr-2"></i>
+            {{ createOfferForm.errors['dateIsBeforeRelease'] || createOfferForm.errors['periodNotAllowed'] }}
+          </p>
+      </div>
+  
+      <div class="md:col-span-2 flex justify-end items-center space-x-3 mt-5 pt-5 border-t border-slate-200 dark:border-slate-700">
+        <button
+          *ngIf="showCancelButton"
+          pButton
+          type="button"
+          label="Cancelar"
+          (click)="onCancel()"
+          icon="pi pi-times"
+          class="p-button-text p-button-secondary dark:text-slate-300 hover:dark:bg-slate-700">
+        </button>
+        <button
+          pButton
+          type="submit"
+          label="Solicitar Oferta"
+          icon="pi pi-check"
+          [loading]="isSubmitting"
+          [disabled]="createOfferForm.invalid || isSubmitting"
+          class="p-button-success">
+        </button>
+      </div>
+    </form>
+  </div>

@@ -1,0 +1,38 @@
+
+.custom-margin-horizontal {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.custom-margin-vertical {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.custom-flex {
+  display: flex;
+}
+
+.custom-flex-column {
+  flex-direction: column;
+}
+
+.custom-justify-center {
+  justify-content: center;
+}
+
+.custom-font-semibold {
+  font-weight: 600;
+}
+
+.custom-font-bold {
+  font-weight: bold;
+}
+
+.custom-gap {
+  gap: 1rem;
+}
+
+.custom-border-bottom {
+  border-bottom: 2px solid #d3d3d3;
+}

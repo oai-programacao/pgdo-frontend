@@ -1,0 +1,99 @@
+<div class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+        <h1 class="text-2xl font-semibold text-slate-800 dark:text-slate-100">
+            Gerenciamento de Chamados
+        </h1>
+    </div>
+
+    <form [formGroup]="filterForm" class="mb-6 p-4 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-4 p-fluid">
+            <div>
+                <label for="filterStatus" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Status</label>
+                <p-dropdown inputId="filterStatus" [options]="statusOptions" formControlName="status" placeholder="Todos os Status" optionLabel="label" optionValue="value" [showClear]="true" 
+                styleClass="w-full"></p-dropdown>
+            </div>
+            <div>
+                <label for="filterTopic" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tópico</label>
+                <p-dropdown inputId="filterTopic" [options]="topicOptions" formControlName="topic" placeholder="Todos os Tópicos" optionLabel="label" optionValue="value" [showClear]="true" styleClass="w-full"></p-dropdown>
+            </div>
+            <div class="flex items-end">
+                <button pButton type="button" label="Limpar Filtros" icon="pi pi-filter-slash" class="p-button-outlined p-button-secondary w-full sm:w-auto" (click)="clearFilters()"></button>
+            </div>
+        </div>
+  </form>
+
+    <p-table
+    [value]="tickets"
+      [loading]="loading"
+      styleClass="p-datatable-striped p-datatable-gridlines text-sm"
+      [paginator]="true"
+      [rows]="rows"
+      [totalRecords]="totalRecords"
+      (onPage)="loadTickets($event)"
+      [lazy]="true"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} chamados"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [showCurrentPageReport]="true"
+      responsiveLayout="scroll">
+        
+        <ng-template #header>
+            <tr>
+                <th class="w-1/5">Tópico</th>
+                <th class="w-1/5">Descrição</th>
+                <th class="w-1/5">Data de Abertura</th>
+                <th class="w-1/5">Solicitado Por</th>
+                <th class="w-1/5">Status</th>
+                <th class="w-1/5">Ações</th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-ticket>
+            <tr>
+                <td>{{ getTopicLabel(ticket.topic) }}</td>
+                <td>{{ ticket.description }}</td>
+                <td>{{ ticket.createdAt }}</td>
+                <td>{{ ticket.requestBy.name }}</td>
+                <td>
+                    <p-tag 
+                        [value]="getStatusLabel(ticket.status)" 
+                        [severity]="getStatusTagSeverity(ticket.status)"
+                    ></p-tag>
+                </td>
+                <td class="space-x-2">
+                <button pButton type="button" icon="pi pi-pencil" 
+                  class="p-button-rounded p-button-warning p-button-outlined" 
+                  pTooltip="Atualizar Chamado" tooltipPosition="top"
+                  (click)="openUpdateModal(ticket)">
+                </button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+            <tr>
+                <td colspan="5" class="text-center text-gray-500">Nenhum chamado encontrado.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+</div>
+
+<p-dialog header="Atualizar Chamado #{{ selectedTicket?.id | slice:0:8 }}" 
+          [(visible)]="displayUpdateModal" 
+          [modal]="true" 
+          [style]="{width: '50vw', minWidth: '450px'}" 
+          (onHide)="selectedTicket = null"
+          [draggable]="false">
+  <form [formGroup]="updateTicketForm" (ngSubmit)="onUpdateSubmit()" class="p-fluid space-y-6 pt-4">
+    <div>
+      <label for="update-status" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Novo Status <span class="text-red-500">*</span></label>
+      <p-dropdown inputId="update-status" [options]="statusOptions" formControlName="status" placeholder="Selecione um status" optionLabel="label" optionValue="value" styleClass="w-full"></p-dropdown>
+    </div>
+    <div>
+      <label for="update-resolution" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Resolução <span class="text-red-500">*</span></label>
+      <textarea id="update-resolution" pTextarea [rows]="5" formControlName="resolution" class="w-full" placeholder="Descreva a solução aplicada para este chamado."></textarea>
+    </div>
+    <div class="flex justify-end space-x-3 pt-4">
+      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="displayUpdateModal=false"></button>
+      <button pButton type="submit" label="Salvar Atualização" icon="pi pi-save" [loading]="isUpdating" [disabled]="updateTicketForm.invalid || isUpdating" class="p-button-success"></button>
+    </div>
+  </form>
+</p-dialog>

@@ -1,0 +1,108 @@
+<div class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
+  <p-toast></p-toast>
+  
+  <p-toolbar styleClass="mb-6 rounded-lg bg-slate-50 dark:bg-slate-800 border dark:border-slate-700">
+    <ng-template pTemplate="left">
+      <h1 class="text-2xl font-semibold text-slate-800 dark:text-slate-100 my-auto">
+        Gerenciamento de Anotações de Colaboradores
+      </h1>
+    </ng-template>
+    <ng-template pTemplate="right">
+      <button pButton label="Nova Anotação" icon="pi pi-plus" class="p-button-success" (click)="openCreateDialog()"></button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-fieldset legend="Filtros" [toggleable]="true" [collapsed]="true" styleClass="mb-6 filter-fieldset">
+    <form [formGroup]="filterForm" class="p-fluid grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5 pt-4">
+      <div>
+        <label for="filter-employee" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Colaborador</label>
+        <p-select inputId="filter-employee" [options]="employeesAndTechnicians" [loading]="isLoadingDropdown" formControlName="employeeId" 
+                  placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" styleClass="w-full"></p-select>
+      </div>
+      <div>
+        <label for="filter-creator" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Criado Por</label>
+        <p-select inputId="filter-creator" [options]="employeesAndTechnicians"  [loading]="isLoadingDropdown" formControlName="creatorId" 
+                    placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" styleClass="w-full"></p-select>
+      </div>
+      <div>
+        <label for="filter-type" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Tipo</label>
+        <p-select inputId="filter-type" [options]="annotationTypeOptions" formControlName="type" 
+                    placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" styleClass="w-full"></p-select>
+      </div>
+      <div class="md:col-span-3 flex justify-end">
+        <button pButton type="button" label="Limpar Filtros" icon="pi pi-filter-slash" class="p-button-outlined p-button-secondary" (click)="clearFilters()"></button>
+      </div>
+    </form>
+  </p-fieldset>
+
+  <p-table [value]="annotations" [loading]="isLoading" #dt styleClass="p-datatable-striped p-datatable-gridlines text-sm"
+      [paginator]="true" [rows]="rows" [totalRecords]="totalRecords" (onPage)="loadAnnotations($event)" [lazy]="true"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} anotações">
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="w-1/6">Colaborador</th>
+        <th class="w-1/6">Tipo</th>
+        <th class="w-1/4">Descrição</th>
+        <th class="w-1/6">Período da Anotação</th>
+        <th class="w-1/6">Criado Por</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-annotation>
+      <tr>
+        <td>{{ annotation.employee.name }}</td>
+        <td><p-tag [value]="getAnnotationTypeLabel(annotation.type)"></p-tag></td>
+        <td class="truncate max-w-sm" [pTooltip]="annotation.description">{{ annotation.description }}</td>
+        <td>
+          {{ annotation.startDate }} até 
+          {{ annotation.endDate }}
+          <div class="text-xs text-slate-500">
+            Duração: {{ annotation.durationInSeconds | formatDuration }}
+          </div>
+        </td>
+        <td>{{ annotation.creator.name }}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr><td colspan="5" class="text-center p-6">Nenhuma anotação encontrada.</td></tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog header="Criar Nova Anotação" [(visible)]="displayCreateDialog" [modal]="true" [style]="{width: '50vw', minWidth: '500px'}" [draggable]="false">
+  <form [formGroup]="createForm" (ngSubmit)="submitCreateForm()" class="p-fluid space-y-6 pt-4">
+    <div>
+      <label for="create-employee" class="block text-sm font-medium mb-1.5">Colaborador <span class="text-red-500">*</span></label>
+      <p-select inputId="create-employee" [options]="employeesAndTechnicians" formControlName="employeeId" [loading]="isLoadingDropdown"
+                  placeholder="Selecione um colaborador" optionLabel="label" optionValue="value" styleClass="w-1/2" panelStyleClass="w-1/2"></p-select>
+      <div class="h-5 mt-1.5"><small *ngIf="createForm.get('employeeId')?.invalid && createForm.get('employeeId')?.touched" class="p-error block text-xs">Selecione um colaborador.</small></div>
+    </div>
+    <div>
+      <label for="create-type" class="block text-sm font-medium mb-1.5">Tipo de Anotação <span class="text-red-500">*</span></label>
+      <p-select inputId="create-type" [options]="annotationTypeOptions" formControlName="type" placeholder="Selecione um tipo" styleClass="w-1/2" panelStyleClass="w-1/2"></p-select>
+      <div class="h-5 mt-1.5"><small *ngIf="createForm.get('type')?.invalid && createForm.get('type')?.touched" class="p-error block text-xs">Selecione um tipo.</small></div>
+    </div>
+    <div class="grid grid-cols-2 gap-x-6">
+      <div>
+        <label for="create-startDate" class="block text-sm font-medium mb-1.5">Início <span class="text-red-500">*</span></label>
+        <p-datepicker inputId="create-startDate" appendTo="body" formControlName="startDate" [showTime]="true" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa hh:mm" styleClass="w-full" ></p-datepicker>
+        <div class="h-5 mt-1.5"><small *ngIf="createForm.get('startDate')?.invalid && createForm.get('startDate')?.touched" class="p-error block text-xs">Data de início é obrigatória.</small></div>
+      </div>
+      <div>
+        <label for="create-endDate" class="block text-sm font-medium mb-1.5">Fim <span class="text-red-500">*</span></label>
+        <p-datepicker inputId="create-endDate" appendTo="body" formControlName="endDate" [showTime]="true" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa hh:mm" styleClass="w-full"></p-datepicker>
+        <div class="h-5 mt-1.5"><small *ngIf="createForm.get('endDate')?.invalid && createForm.get('endDate')?.touched" class="p-error block text-xs">Data de fim é obrigatória.</small></div>
+      </div>
+    </div>
+    <div>
+      <label for="create-description" class="block text-sm font-medium mb-1.5">Descrição <span class="text-red-500">*</span></label>
+      <textarea id="create-description" pTextarea [rows]="4" formControlName="description" fluid></textarea>
+      <div class="h-5 mt-1.5"><small *ngIf="createForm.get('description')?.invalid && createForm.get('description')?.touched" class="p-error block text-xs">Descrição é obrigatória.</small></div>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-3">
+      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="displayCreateDialog=false"></button>
+      <button pButton type="submit" label="Salvar Anotação" icon="pi pi-check" [loading]="isSubmitting" [disabled]="createForm.invalid || isSubmitting" (click)="submitCreateForm()"></button>
+    </div>
+  </ng-template>
+</p-dialog>

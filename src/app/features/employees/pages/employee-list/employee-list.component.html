@@ -1,0 +1,193 @@
+<div class="p-4 md:p-6 bg-white dark:bg-slate-900 rounded-lg shadow">
+    <p-toast position="bottom-right"></p-toast>
+    <p-confirmDialog [style]="{width: '50vw'}" acceptButtonStyleClass="p-button-success" rejectButtonStyleClass="p-button-outlined p-button-secondary"></p-confirmDialog>
+  
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+      <h1 class="text-2xl font-semibold text-slate-800 dark:text-slate-100">Gerenciamento de Colaboradores</h1>
+      <button pButton label="Novo Colaborador" icon="pi pi-plus" (click)="showCreateDialog()" class="p-button-success"></button>
+    </div>
+  
+    <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800">
+      <div>
+        <label for="filterStatus" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Status</label>
+        <p-select
+          appendTo="body"
+          id="filterStatus"
+          [options]="filterIsActiveOptions" 
+          [(ngModel)]="selectedIsActive" 
+          optionLabel="label"
+          placeholder="Todos os Status" 
+          (onChange)="onFilterChange()"
+          styleClass="w-full"
+          panelStyleClass="min-w-full"
+          [showClear]="false" 
+        />
+      </div>
+      <div>
+        <label for="filterRole" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Papel</label>
+        <p-select
+          appendTo="body" 
+          id="filterRole"
+          [options]="employeeRoleOptions" 
+          [(ngModel)]="selectedRole" 
+          optionLabel="label" 
+          optionValue="value"
+          placeholder="Todos os Papéis" 
+          (onChange)="onFilterChange()"
+          styleClass="w-full"
+          panelStyleClass="min-w-full"
+          [showClear]="true"
+        />
+      </div>
+    </div>
+  
+    <p-table 
+        [value]="employees" 
+        [loading]="isLoading" 
+        responsiveLayout="scroll" 
+        styleClass="p-datatable-striped p-datatable-gridlines"
+        [paginator]="true" 
+        [rows]="10" 
+        [rowsPerPageOptions]="[10, 25, 50]"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} colaboradores"
+        [showCurrentPageReport]="true">
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Nome</th>
+          <th class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Email</th>
+          <th class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Papel</th>
+          <th class="p-4 text-center w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Status</th>
+          <th class="p-4 text-center w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Ações</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-employee>
+        <tr>
+          <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">{{ employee.name }}</td>
+          <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">{{ employee.email }}</td>
+          @switch (employee.role) {
+            @case ('ADMIN') {
+              <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">Administrador</td>
+            }
+            @case ('STORE_MANAGER') {
+              <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">Gerente de Loja</td>
+            }
+            @case ('STORE_EMPLOYEE') {
+              <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">Colaborador de Loja</td>
+            }
+            @case ('CALL_CENTER') {
+              <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">Atendente de Call Center</td>
+            }
+            @case ('CDS') {
+              <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">Colaborador de CDS</td>
+            }
+            @case ('ANALYST') {
+              <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">Analista</td>
+            }
+            @case ('MAINTENANCE') {
+              <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">Manutenção</td>
+            }
+            @default {
+              <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">Desconhecido</td>
+            }
+          }
+          <td class="p-4 whitespace-nowrap text-sm text-center">
+            <p-tag [value]="employee.isActive ? 'Ativo' : 'Inativo'" [severity]="getSeverityForStatus(employee.isActive)"></p-tag>
+          </td>
+          <td class="p-4 whitespace-nowrap text-sm text-center space-x-2">
+            <button pButton type="button" icon="pi pi-pencil" class="p-button-rounded p-button-info p-button-outlined" (click)="showUpdateDialog(employee)" pTooltip="Editar Colaborador" tooltipPosition="top"></button>
+
+            <button *ngIf="!employee.isActive" pButton type="button" icon="pi pi-check-circle" class="p-button-rounded p-button-success p-button-outlined" (click)="confirmActivate(employee)" pTooltip="Ativar Colaborador" tooltipPosition="top"></button>
+            <button *ngIf="employee.isActive" pButton type="button" icon="pi pi-times-circle" class="p-button-rounded p-button-danger p-button-outlined" (click)="confirmInactivate(employee)" pTooltip="Inativar Colaborador" tooltipPosition="top"></button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+          <tr>
+              <td colspan="5" class="p-4 text-center text-slate-500 dark:text-slate-400">Nenhum colaborador encontrado.</td>
+          </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  
+  <p-dialog header="Novo Colaborador" [(visible)]="displayCreateDialog" [modal]="true" [style]="{width: '50vw', minWidth: '450px'}" [draggable]="false" [resizable]="false">
+    <form [formGroup]="createEmployeeForm" (ngSubmit)="createEmployee()" class="space-y-6 p-fluid w-full" >
+      <div>
+        <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nome Completo</label>
+        <input id="name" type="text" pInputText formControlName="name" class="w-full" 
+               [ngClass]="{'ng-invalid ng-dirty': createEmployeeForm.get('name')?.invalid && createEmployeeForm.get('name')?.touched}"/>
+        <small *ngIf="createEmployeeForm.get('name')?.invalid && createEmployeeForm.get('name')?.touched" class="p-error block mt-1">Nome é obrigatório.</small>
+      </div>
+      <div>
+        <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
+        <input id="email" type="email" pInputText formControlName="email" class="w-full"
+               [ngClass]="{'ng-invalid ng-dirty': createEmployeeForm.get('email')?.invalid && createEmployeeForm.get('email')?.touched}"/>
+        <small *ngIf="createEmployeeForm.get('email')?.errors?.['required'] && createEmployeeForm.get('email')?.touched" class="p-error block mt-1">Email é obrigatório.</small>
+        <small *ngIf="createEmployeeForm.get('email')?.errors?.['email'] && createEmployeeForm.get('email')?.touched" class="p-error block mt-1">Formato de email inválido.</small>
+      </div>
+      <div>
+        <label for="rbxUsername" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Usuário RBX</label>
+        <input id="rbxUsername" type="text" pInputText formControlName="rbxUsername" class="w-full" />
+        <small class="block mt-1">Usuário RBX não é obrigatório para criar um novo colaborador, porém é indicado criar preenchido.</small>
+      </div>
+      <div class="w-full"> <label for="role" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Papel</label>
+        <p-select 
+            appendTo="body"
+            id="role"
+            [options]="employeeRoleOptions.slice(1)"  
+            formControlName="role" 
+            optionLabel="label" 
+            optionValue="value"
+            placeholder="Selecione um Papel"
+            [style]="{'width': '100%'}" panelStyleClass="min-w-full" [ngClass]="{'ng-invalid ng-dirty': createEmployeeForm.get('role')?.invalid && createEmployeeForm.get('role')?.touched}">
+        </p-select>
+        <small *ngIf="createEmployeeForm.get('role')?.invalid && createEmployeeForm.get('role')?.touched" class="p-error block mt-1">Papel é obrigatório.</small>
+    </div>
+  
+      <div class="flex justify-end space-x-3 pt-4">
+        <button pButton type="button" label="Cancelar" (click)="displayCreateDialog=false" class="p-button-text"></button>
+        <button pButton type="submit" label="Salvar" icon="pi pi-check" [loading]="isSubmitting" [disabled]="createEmployeeForm.invalid || isSubmitting"></button>
+      </div>
+    </form>
+  </p-dialog>
+
+  <p-dialog header="Atualizar Colaborador" [(visible)]="displayUpdateDialog" [modal]="true" [style]="{width: '50vw', minWidth: '450px'}" [draggable]="false" [resizable]="false" (onHide)="updateEmployeeForm.reset()">
+    <form [formGroup]="updateEmployeeForm" (ngSubmit)="updateEmployee()" class="space-y-6 p-fluid w-full">
+      <div>
+        <label for="update-name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nome Completo</label>
+        <input id="update-name" type="text" pInputText formControlName="name" class="w-full"
+               [ngClass]="{'ng-invalid ng-dirty': updateEmployeeForm.get('name')?.invalid && updateEmployeeForm.get('name')?.touched}"/>
+        <small *ngIf="updateEmployeeForm.get('name')?.invalid && updateEmployeeForm.get('name')?.touched" class="p-error block mt-1">Nome é obrigatório.</small>
+      </div>
+      <div>
+        <label for="update-email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
+        <input id="update-email" type="email" pInputText formControlName="email" class="w-full"
+               [ngClass]="{'ng-invalid ng-dirty': updateEmployeeForm.get('email')?.invalid && updateEmployeeForm.get('email')?.touched}"/>
+        <small *ngIf="updateEmployeeForm.get('email')?.errors?.['required'] && updateEmployeeForm.get('email')?.touched" class="p-error block mt-1">Email é obrigatório.</small>
+        <small *ngIf="updateEmployeeForm.get('email')?.errors?.['email'] && updateEmployeeForm.get('email')?.touched" class="p-error block mt-1">Formato de email inválido.</small>
+      </div>
+      <div>
+        <label for="update-rbxUsername" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Usuário RBX</label>
+        <input id="update-rbxUsername" type="text" pInputText formControlName="rbxUsername" class="w-full" />
+        </div>
+      <div class="w-full">
+        <label for="update-role" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Papel</label>
+        <p-select
+            appendTo="body"
+            id="update-role"
+            [options]="employeeRoleOptions.slice(1)" 
+            formControlName="role"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Selecione um Papel"
+            [style]="{'width': '100%'}" panelStyleClass="min-w-full"
+            [ngClass]="{'ng-invalid ng-dirty': updateEmployeeForm.get('role')?.invalid && updateEmployeeForm.get('role')?.touched}">
+        </p-select>
+        <small *ngIf="updateEmployeeForm.get('role')?.invalid && updateEmployeeForm.get('role')?.touched" class="p-error block mt-1">Papel é obrigatório.</small>
+      </div>
+  
+      <div class="flex justify-end space-x-3 pt-4">
+        <button pButton type="button" label="Cancelar" (click)="displayUpdateDialog=false" class="p-button-text"></button>
+        <button pButton type="submit" label="Salvar Alterações" icon="pi pi-check" [loading]="isUpdating" [disabled]="updateEmployeeForm.invalid || isUpdating"></button>
+      </div>
+    </form>
+  </p-dialog>

@@ -1,0 +1,28 @@
+<div class="bg-white dark:bg-slate-800 p-4 sm:p-5 shadow-lg rounded-xl border border-slate-200 dark:border-slate-700 h-full flex flex-col">
+    <h3 *ngIf="title && !isLoading" class="text-md font-semibold text-slate-700 dark:text-slate-200 mb-3 truncate">
+      {{ title }}
+    </h3>
+  
+    <div *ngIf="isLoading" class="flex-grow flex items-center justify-center animate-pulse">
+      <div class="w-full rounded-md bg-slate-200 dark:bg-slate-700" [style.height]="height">
+        </div>
+    </div>
+  
+    <div *ngIf="!isLoading && chartData" class="flex-grow relative" [style.height]="height">
+      <p-chart 
+        [type]="chartType" 
+        [data]="chartData" 
+        [options]="effectiveChartOptions"
+        width="100%"
+        [height]="height"
+        [id]="'chart-' + chartKey"> 
+      </p-chart>
+    </div>
+  
+    <div *ngIf="!isLoading && !chartData" 
+         class="flex-grow flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 text-center" 
+         [style.height]="height">
+      <i class="pi pi-chart-bar text-4xl mb-2 opacity-50"></i>
+      <p>Sem dados para exibir o gráfico.</p>
+    </div>
+  </div>

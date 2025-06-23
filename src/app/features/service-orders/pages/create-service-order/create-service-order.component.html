@@ -1,0 +1,534 @@
+<div class="bg-white dark:bg-slate-900 min-h-full">
+  <p-toast></p-toast>
+  <p-panel
+    header="Nova Ordem de Serviço"
+    styleClass="shadow-lg rounded-lg dark:border dark:border-slate-700"
+  >
+    <form [formGroup]="createOsForm" (ngSubmit)="onSubmit()" class="p-fluid">
+      <div class="mb-4">
+        <h3
+          class="text-lg font-medium text-sky-700 dark:text-sky-400 mb-4 border-b border-sky-300 dark:border-sky-700 pb-2"
+        >
+          Informações do Contrato e Cliente
+        </h3>
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2"
+        >
+          <div>
+            <label
+              for="cs-contractNumber"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+              >Nº Contrato <span class="text-red-500 dark:text-red-400">*</span></label
+            >
+            <input
+              inputId="cs-contractNumber"
+              pInputText
+              type="text"
+              formControlName="contractNumber"
+              pKeyFilter="int"
+              maxlength="6"
+              styleClass="w-full"
+              (blur)="getContractDetails()"
+              [ngClass]="{'p-invalid': createOsForm.get('contractNumber')?.invalid && createOsForm.get('contractNumber')?.touched}"
+            />
+            <div class="h-5 mt-1">
+              <small
+                  *ngIf="createOsForm.get('contractNumber')?.invalid && createOsForm.get('contractNumber')?.touched"
+                  class="p-error block mt-1 text-xs">
+                  <span *ngIf="createOsForm.get('contractNumber')?.errors?.['required']">Nº Contrato é obrigatório.</span>
+                  <span *ngIf="createOsForm.get('contractNumber')?.errors?.['pattern']">Apenas números são permitidos.</span>
+              </small>
+            </div>
+          </div>
+
+          <div>
+            <label
+              for="cs-identificationNumber"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+              >Nº Atendimento (ou ID Externo)</label
+            >
+            <p-inputNumber
+              inputId="cs-identificationNumber"
+              formControlName="identificationNumber"
+              mode="decimal"
+              [useGrouping]="false"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+            ></p-inputNumber>
+             <div  class="h-5 mt-1">
+               <small
+                  *ngIf="createOsForm.get('identificationNumber')?.invalid && createOsForm.get('identificationNumber')?.touched"
+                  class="p-error block mt-1 text-xs">
+                  <span *ngIf="createOsForm.get('identificationNumber')?.errors?.['pattern']">Apenas números são permitidos.</span>
+                </small>
+             </div>
+          </div>
+
+          <div class="sm:col-span-2 lg:col-span-1">
+            <label
+              for="cs-clientName"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+              >Cliente
+              <span class="text-red-500 dark:text-red-400">*</span></label
+            >
+            <input
+              readonly
+              id="cs-clientName"
+              type="text"
+              pInputText
+              formControlName="clientName"
+              class="w-full"
+              [ngClass]="{
+                'p-invalid':
+                  createOsForm.get('clientName')?.invalid &&
+                  createOsForm.get('clientName')?.touched
+              }"
+              placeholder="Nome completo do cliente"
+            />
+            <div class="h-5 mt-1">
+              <small
+                *ngIf="
+                  createOsForm.get('clientName')?.invalid &&
+                  createOsForm.get('clientName')?.touched
+                "
+                class="p-error block mt-1 text-xs"
+                >Nome do cliente é obrigatório.
+              </small>
+            </div>
+          </div>
+
+          <div>
+            <label
+              for="cs-phone1"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+              >Tel. Principal
+              <span class="text-red-500 dark:text-red-400">*</span></label
+            >
+            <p-inputMask
+            readonly
+            inputId="cs-phone1"
+            formControlName="phone1"
+            mask="(99) 99999-9999"
+            placeholder="(XX) XXXXX-XXXX"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [unmask]="true"
+            [autoClear]="false"
+            [ngClass]="{'p-invalid': createOsForm.get('phone1')?.invalid && createOsForm.get('phone1')?.touched}">
+            </p-inputMask>
+            <div class="h-5 mt-1">
+              <small
+                *ngIf="
+                  createOsForm.get('phone1')?.invalid &&
+                  createOsForm.get('phone1')?.touched
+                "
+                class="p-error block mt-1 text-xs"
+                >Telefone principal é obrigatório.</small
+              >
+            </div>
+          </div>
+
+          <div>
+            <label
+              for="cs-phone2"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+              >Tel. Secundário</label
+            >
+            <p-inputMask
+            inputId="cs-phone2"
+            formControlName="phone2"
+            mask="(99) 99999-9999"
+            placeholder="(XX) XXXXX-XXXX"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [unmask]="true"
+            [autoClear]="false"
+            [ngClass]="{'p-invalid': createOsForm.get('phone2')?.invalid && createOsForm.get('phone2')?.touched}">
+            </p-inputMask>
+          </div>
+
+          <div>
+            <label
+              for="cs-clientType"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+              >Tipo de Cliente
+              <span class="text-red-500 dark:text-red-400">*</span></label
+            >
+            <p-select
+              inputId="cs-clientType"
+              [options]="clientTypeOptions"
+              formControlName="clientType"
+              placeholder="Selecione"
+              optionLabel="label"
+              optionValue="value"
+              styleClass="w-full"
+              [ngClass]="{
+                'ng-dirty': createOsForm.get('clientType')?.touched,
+                'ng-invalid':
+                  createOsForm.get('clientType')?.invalid &&
+                  createOsForm.get('clientType')?.touched
+              }"
+            />
+            <div class="h-5 mt-1">
+              <small
+                *ngIf="
+                  createOsForm.get('clientType')?.invalid &&
+                  createOsForm.get('clientType')?.touched
+                "
+                class="p-error block mt-1 text-xs"
+                >Tipo de cliente é obrigatório.</small
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h3
+          class="text-lg font-medium text-sky-700 dark:text-sky-400 mb-4 border-b border-sky-300 dark:border-sky-700 pb-2"
+        >
+          Localização
+        </h3>
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2"
+        >
+          <div>
+            <label
+              for="cs-city"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+              >Cidade
+              <span class="text-red-500 dark:text-red-400">*</span></label
+            >
+            <input
+              readonly
+              inputId="cs-city"
+              formControlName="city"
+              placeholder="Cidade"
+              pInputText
+              [ngClass]="{
+                'ng-dirty': createOsForm.get('city')?.touched,
+                'ng-invalid':
+                  createOsForm.get('city')?.invalid &&
+                  createOsForm.get('city')?.touched
+              }"
+            />
+            <div class="h-5 mt-1">
+              <small
+                *ngIf="
+                  createOsForm.get('city')?.invalid &&
+                  createOsForm.get('city')?.touched
+                "
+                class="p-error block mt-1 text-xs"
+                >Cidade é obrigatória.</small
+              >
+            </div>
+          </div>
+
+          <div>
+            <label
+              for="cs-district"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+              >Bairro
+              <span class="text-red-500 dark:text-red-400">*</span></label
+            >
+            <input
+              readonly
+              id="cs-district"
+              type="text"
+              pInputText
+              formControlName="district"
+              class="w-full"
+              [ngClass]="{
+                'p-invalid':
+                  createOsForm.get('district')?.invalid &&
+                  createOsForm.get('district')?.touched
+              }"
+              placeholder="Nome do bairro"
+            />
+            <div class="h-5 mt-1">
+              <small
+                *ngIf="
+                  createOsForm.get('district')?.invalid &&
+                  createOsForm.get('district')?.touched
+                "
+                class="p-error block mt-1 text-xs "
+                >Bairro é obrigatório.</small
+              >
+            </div>
+          </div>
+
+          <div class="sm:col-span-2 lg:col-span-3">
+            <label
+              for="cs-address"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+              >Endereço Completo
+              <span class="text-red-500 dark:text-red-400">*</span></label
+            >
+            <input
+              readonly
+              id="cs-address"
+              type="text"
+              pInputText
+              formControlName="address"
+              class="w-full"
+              [ngClass]="{
+                'p-invalid':
+                  createOsForm.get('address')?.invalid &&
+                  createOsForm.get('address')?.touched
+              }"
+              placeholder="Rua, Número, Complemento"
+            />
+            <div class="h-5 mt-1">
+              <small
+                *ngIf="
+                  createOsForm.get('address')?.invalid &&
+                  createOsForm.get('address')?.touched
+                "
+                class="p-error block mt-1 text-xs"
+                >Endereço é obrigatório.</small
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h3
+          class="text-lg font-medium text-sky-700 dark:text-sky-400 mb-4 border-b border-sky-300 dark:border-sky-700 pb-2"
+        >
+          Detalhes da Ordem de Serviço
+        </h3>
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2"
+        >
+          <div>
+            <label
+              for="cs-serviceOrderType"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+              >Tipo de OS
+              <span class="text-red-500 dark:text-red-400">*</span></label
+            >
+            <p-select
+              inputId="cs-serviceOrderType"
+              [options]="typeOfOsOptions"
+              formControlName="serviceOrderType"
+              placeholder="Selecione"
+              optionLabel="label"
+              optionValue="value"
+              styleClass="w-full"
+              [ngClass]="{
+                'ng-dirty': createOsForm.get('serviceOrderType')?.touched,
+                'ng-invalid':
+                  createOsForm.get('serviceOrderType')?.invalid &&
+                  createOsForm.get('serviceOrderType')?.touched
+              }"
+            ></p-select>
+            <div class="h-5 mt-1">
+              <small
+                *ngIf="
+                  createOsForm.get('serviceOrderType')?.invalid &&
+                  createOsForm.get('serviceOrderType')?.touched
+                "
+                class="p-error block mt-1 text-xs"
+                >Tipo de OS é obrigatório.</small
+              >
+            </div>
+          </div>
+
+          <div>
+            <label
+              for="cs-commandArea"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+              >Área de Comando
+              <span class="text-red-500 dark:text-red-400">*</span></label
+            >
+            <p-select
+              inputId="cs-commandArea"
+              [options]="commandAreaOptions"
+              formControlName="commandArea"
+              placeholder="Selecione"
+              optionLabel="label"
+              optionValue="value"
+              styleClass="w-full"
+              [ngClass]="{
+                'ng-dirty': createOsForm.get('commandArea')?.touched,
+                'ng-invalid':
+                  createOsForm.get('commandArea')?.invalid &&
+                  createOsForm.get('commandArea')?.touched
+              }"
+            ></p-select>
+            <div class="h-5 mt-1">
+              <small
+                *ngIf="
+                  createOsForm.get('commandArea')?.invalid &&
+                  createOsForm.get('commandArea')?.touched
+                "
+                class="p-error block mt-1 text-xs"
+                >Área de comando é obrigatória.</small
+              >
+            </div>
+          </div>
+
+          <div>
+            <label
+              for="cs-technology"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+              >Tecnologia <span class="text-red-500 dark:text-red-400">*</span></label
+            >
+            <p-select
+              inputId="cs-technology"
+              [options]="technologyOptions"
+              formControlName="technology"
+              placeholder="Selecione"
+              optionLabel="label"
+              optionValue="value"
+              styleClass="w-full"
+              [ngClass]="{
+                'ng-dirty': createOsForm.get('technology')?.touched,
+                'ng-invalid':
+                  createOsForm.get('technology')?.invalid &&
+                  createOsForm.get('technology')?.touched
+              }"
+            ></p-select>
+             <div class="h-5 mt-1">
+               <small
+                *ngIf="
+                  createOsForm.get('technology')?.invalid &&
+                  createOsForm.get('technology')?.touched
+                "
+                class="p-error block mt-1 text-xs"
+                >Tecnologia é obrigatória.</small>
+             </div>
+          </div>
+
+          <div>
+            <label
+              for="cs-scheduleDate"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+              >Data Agendamento <span class="text-red-500 dark:text-red-400">*</span></label
+            >
+            <p-select
+              inputId="cs-scheduleDate"
+              formControlName="scheduleDate"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+              [options]="scheduleDateOptions"
+              placeholder="dd/mm/aaaa"
+              [ngClass]="{
+                'ng-dirty': createOsForm.get('scheduleDate')?.touched,
+                'ng-invalid':
+                  createOsForm.get('scheduleDate')?.invalid &&
+                  createOsForm.get('scheduleDate')?.touched
+              }"
+            />
+            <div class="h-5 mt-1">
+              <small
+                *ngIf="
+                  createOsForm.get('scheduleDate')?.invalid &&
+                  createOsForm.get('scheduleDate')?.touched
+                "
+                class="p-error block mt-1 text-xs"
+                >Data de agendamento é obrigatória.
+              </small>
+            </div>
+          </div>
+
+          <div>
+            <label
+              for="cs-period"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+              >Período <span class="text-red-500 dark:text-red-400">*</span></label
+            >
+            <p-select
+              inputId="cs-period"
+              [options]="periodOptions" 
+              formControlName="period"
+              placeholder="Selecione"
+              optionLabel="label"
+              optionValue="value"
+              styleClass="w-full"
+              [ngClass]="{
+                'ng-dirty': createOsForm.get('period')?.touched,
+                'ng-invalid':
+                  createOsForm.get('period')?.invalid &&
+                  createOsForm.get('period')?.touched
+              }"
+            ></p-select>
+            <div class="h-5 mt-1">
+              <small
+                *ngIf="
+                  createOsForm.get('period')?.invalid &&
+                  createOsForm.get('period')?.touched
+                "
+                class="p-error block mt-1 text-xs"
+                >Período é obrigatório.
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="col-span-full flex flex-wrap justify-end items-center gap-3 mt-2 pt-6 border-t border-slate-200 dark:border-slate-700"
+      >
+        <button
+          pButton
+          type="button"
+          label="Ofertas Disponíveis"
+          icon="pi pi-list"
+          severity="warn"
+          (click)="displayOffersModal = true"
+        ></button>
+        <button
+          pButton
+          type="button"
+          label="Solicitar Oferta de OS"
+          icon="pi pi-calendar-plus"
+          severity="info"
+          (click)="showCreateOfferDialog()"
+        ></button>
+        <button
+          pButton
+          type="submit"
+          label="Salvar Ordem de Serviço"
+          icon="pi pi-check"
+          [loading]="isSubmitting"
+          [disabled]="createOsForm.invalid || isSubmitting"
+        ></button>
+        
+      </div>
+    </form>
+  </p-panel>
+</div>
+
+<p-dialog
+  header="Solicitar Nova Oferta de OS"
+  [(visible)]="displayCreateOfferModal"
+  [modal]="true"
+  [style]="{width: '60vw', minWidth: '500px'}"
+  (onHide)="displayCreateOfferModal = false"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <ng-template pTemplate="content">
+    <app-create-request-offer
+      *ngIf="displayCreateOfferModal" (offerCreated)="onOfferCreated($event)"
+      (creationCancelled)="onOfferCreationCancelled()"
+      [showCancelButton]="true"> </app-create-request-offer>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Ofertas Disponíveis"
+  [(visible)]="displayOffersModal"
+  [modal]="true"
+  [style]="{width: '60vw', minWidth: '500px'}"
+  (onHide)="displayOffersModal = false"
+  [draggable]="false"
+  [resizable]="false"
+  dismissableMask="true"
+>
+  <ng-template #content>
+    <app-show-offers-list />
+  </ng-template>
+</p-dialog>

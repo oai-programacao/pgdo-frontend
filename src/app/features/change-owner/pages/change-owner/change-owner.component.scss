@@ -1,0 +1,42 @@
+.container-grid {
+  display: flex;
+  justify-content: space-between; 
+  align-items: flex-start; 
+  gap: 1rem; 
+  padding: 3rem;
+}
+
+  .btn_{
+    gap: 0.7rem;
+    justify-content: flex-start;
+    align-items: center;
+    display: flex;
+  }
+  .column {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .button-group {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .content-box-wrapper {
+    display: flex;
+    gap: 1rem; 
+    justify-content: space-between;
+    align-items: flex-start; 
+  }
+  
+  .content-box {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    border: 3px solid #ccc;
+    border-radius: 1rem;
+    padding: 1rem;
+  }
+  
+  

@@ -1,0 +1,176 @@
+<div class="p-4 md:p-6">
+    <p-toast></p-toast>
+    <p-panel header="Consultar ONTs por Slot na OLT" styleClass="shadow-md rounded-lg dark:border dark:border-slate-700">
+      <form [formGroup]="queryForm" (ngSubmit)="onSubmit()" class="p-fluid">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-5 mb-6">
+        <div>
+          <label for="olt-slot-olt" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+            OLT <span class="text-red-500">*</span>
+          </label>
+          <p-dropdown
+            inputId="olt-slot-olt"
+            [options]="oltOptions"
+            formControlName="olt"
+            placeholder="Selecione a OLT"
+            optionLabel="label"
+            optionValue="value"
+            styleClass="w-full"
+            [ngClass]="{'ng-invalid ng-dirty': queryForm.get('olt')?.invalid && queryForm.get('olt')?.touched}"
+          ></p-dropdown>
+          <div class="h-5 mt-1.5">
+            <small *ngIf="queryForm.get('olt')?.invalid && queryForm.get('olt')?.touched" class="p-error block text-xs">
+              OLT é obrigatória.
+            </small>
+          </div>
+        </div>
+
+        <div>
+          <label for="olt-slot-slot" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+            Slot <span class="text-red-500">*</span>
+          </label>
+          <input
+            id="olt-slot-slot"
+            type="text"
+            pInputText
+            formControlName="slot"
+            class="w-full"
+            placeholder="Ex: 1 (somente o slot)"
+            [ngClass]="{'p-invalid': queryForm.get('slot')?.invalid && queryForm.get('slot')?.touched}"
+          />
+          <div class="h-5 mt-1.5">
+            <small *ngIf="queryForm.get('slot')?.errors?.['required'] && queryForm.get('slot')?.touched" class="p-error block text-xs">
+              Slot é obrigatório.
+            </small>
+            <small *ngIf="queryForm.get('slot')?.errors?.['pattern'] && queryForm.get('slot')?.touched" class="p-error block text-xs">
+              Formato inválido (ex: 0, 0/1/0).
+            </small>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1.5 invisible">Ação</label>
+
+          <button
+            pButton
+            type="submit"
+            label="Consultar Slot"
+            icon="pi pi-search"
+            [loading]="isLoading"
+            [disabled]="queryForm.invalid || isLoading"
+          ></button>
+
+          <div class="h-5 mt-1.5"></div>
+        </div>
+      </div>
+      </form>
+  
+      <div *ngIf="isLoading" class="flex justify-center items-center my-8">
+        <p-progressSpinner styleClass="w-12 h-12" strokeWidth="6" animationDuration=".8s"></p-progressSpinner>
+      </div>
+  
+      <ng-container *ngIf="(results$ | async) as slotPortResults; else noQueryOrError">
+        <div *ngIf="!isLoading && slotPortResults.length > 0">
+          <div *ngFor="let portInfo of slotPortResults; let i = index; trackByPort" class="mb-6">
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center 
+                        p-3 mb-0 bg-slate-100 dark:bg-slate-700 
+                        rounded-t-lg shadow border border-slate-300 dark:border-slate-600">
+              <div class="text-xl font-semibold text-sky-600 dark:text-sky-400">
+                Porta: {{ portInfo.port }}
+              </div>
+              <div class="flex flex-col items-start sm:items-end sm:flex-row sm:space-x-4 mt-2 sm:mt-0 text-sm">
+                <span class="text-slate-700 dark:text-slate-200">
+                  Total ONTs: <strong class="text-slate-900 dark:text-white">{{ portInfo.total }}</strong>
+                </span>
+                <span class="text-slate-700 dark:text-slate-200">
+                  Online: <strong class="text-green-600 dark:text-green-400">{{ portInfo.online }}</strong>
+                  <span *ngIf="portInfo.total > 0" class="text-xs text-slate-500 dark:text-slate-400">
+                    ({{ (portInfo.online / portInfo.total) * 100 | number:'1.0-0' }}%)
+                  </span>
+                </span>
+              </div>
+            </div>
+            
+            <p-panel [toggleable]="true" 
+                     [collapsed]="true" 
+                     styleClass="shadow-md rounded-b-lg border-x border-b border-slate-300 dark:border-slate-600 !border-t-0"> 
+                     <ng-template pTemplate="header">
+                <span class="font-medium text-slate-700 dark:text-slate-200">ONTs na Porta</span>
+              </ng-template>
+              
+              <div *ngIf="portInfo.onus && portInfo.onus.length > 0; else noOntsInPort" 
+                   class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-1">
+                <div *ngFor="let ont of portInfo.onus; trackBy: trackByOnt" 
+                     (click)="showOntDetails(ont)" 
+                     class="cursor-pointer transform hover:scale-105 transition-transform duration-200">
+                  <p-card styleClass="h-full border shadow-md hover:shadow-lg dark:bg-slate-700/50 dark:border dark:border-slate-600">
+                    <ng-template pTemplate="title">
+                      <div class="text-base truncate" [pTooltip]="'ID: ' + ont.ontId" tooltipPosition="top">{{ ont.ontId }}</div>
+                    </ng-template>
+                    <ng-template pTemplate="subtitle">
+                      <div class="text-xs text-slate-500 dark:text-slate-400 truncate" [pTooltip]="'SN: ' + ont.sn" tooltipPosition="top">SN: {{ ont.sn }}</div>
+                    </ng-template>
+                    
+                    <div class="text-sm mb-2">
+                      <span class="font-medium">Modelo:</span> {{ ont.type || 'N/A' }}
+                    </div>
+                    <div class="flex justify-between items-center">
+                      <span class="text-sm font-medium">Status:</span>
+                      <p-tag [value]="ont.runState | titlecase" [severity]="getOntStatusSeverity(ont.runState)"></p-tag>
+                    </div>
+                     <p *ngIf="ont.rxTx" class="text-xs text-slate-500 dark:text-slate-400 mt-2 truncate" [pTooltip]="ont.rxTx" tooltipPosition="top">
+                      {{ ont.rxTx }}
+                    </p>
+                  </p-card>
+                </div>
+              </div>
+              <ng-template #noOntsInPort>
+                <div class="text-center text-slate-500 dark:text-slate-400 p-3">
+                  Nenhuma ONT encontrada nesta porta.
+                </div>
+              </ng-template>
+            </p-panel>
+          </div>
+        </div>
+      </ng-container>
+  
+      <ng-template #noQueryOrError>
+        <div *ngIf="!isLoading && hasSearched && !((results$ | async)?.length)" 
+             class="mt-6 text-center text-slate-500 dark:text-slate-400 p-4 border dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800">
+          Nenhum resultado para os critérios informados.
+        </div>
+        <div *ngIf="!isLoading && !hasSearched" class="mt-6 text-center text-slate-500 dark:text-slate-400 p-4">
+          Preencha os filtros e clique em "Consultar Slot".
+        </div>
+      </ng-template>
+    </p-panel>
+  
+    <p-dialog header="Detalhes da ONT: {{ selectedOntDetail?.ontId }}" 
+              [(visible)]="displayOntDetailModal" 
+              [modal]="true" 
+              [style]="{width: '90vw', maxWidth: '650px'}" 
+              [draggable]="false" 
+              [resizable]="false"
+              (onHide)="selectedOntDetail = undefined"
+              styleClass="dark:bg-slate-800 dark:text-slate-100">
+      <ng-container *ngIf="selectedOntDetail">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm p-2 dark:text-slate-200">
+          <div><strong>Serial Number:</strong><br>{{ selectedOntDetail.sn }}</div>
+          <div><strong>Status:</strong><br>
+            <p-tag [value]="selectedOntDetail.runState | titlecase" 
+                   [severity]="getOntStatusSeverity(selectedOntDetail.runState)"></p-tag>
+          </div>
+          <div><strong>Modelo:</strong><br>{{ selectedOntDetail.type || 'N/A' }}</div>
+          <div><strong>Distância:</strong><br>{{ selectedOntDetail.distance || 'N/A' }}</div>
+          <div class="sm:col-span-2"><strong>Sinal RX/TX:</strong><br>{{ selectedOntDetail.rxTx || 'N/A' }}</div>
+          <div class="sm:col-span-2"><strong>Última Subida (UpTime):</strong><br>{{ selectedOntDetail.lastUpTime }}</div>
+          <div class="sm:col-span-2"><strong>Última Queda (DownTime):</strong><br>{{ selectedOntDetail.lastDownTime }}</div>
+          <div class="sm:col-span-2"><strong>Causa da Última Queda:</strong><br>{{ selectedOntDetail.lastDownCause || 'N/A' }}</div>
+          <div class="sm:col-span-2">
+            <strong>Descrição:</strong><br>
+            <pre class="whitespace-pre-wrap font-sans bg-slate-100 dark:bg-slate-700 p-2 rounded max-h-32 overflow-y-auto">{{ selectedOntDetail.description || 'N/A' }}</pre>
+          </div>
+        </div>
+      </ng-container>
+    </p-dialog>
+  </div>

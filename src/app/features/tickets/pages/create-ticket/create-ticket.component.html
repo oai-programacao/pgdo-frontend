@@ -1,0 +1,69 @@
+<div class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
+  <p-toast></p-toast>
+
+  <p-panel header="Abrir Novo Chamado de Suporte" styleClass="dark:border dark:border-slate-700">
+    
+    <form [formGroup]="createTicketForm" class="p-fluid space-y-8" (ngSubmit)="onSubmit()">
+
+      <div>
+        <label for="ticket-topic" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+          Tópico Principal <span class="text-red-500 dark:text-red-400">*</span>
+        </label>
+        <p-select
+            inputId="ticket-topic"
+            placeholder="Selecione o motivo do seu contato..."
+            optionLabel="label"
+            optionValue="value"
+            styleClass="w-full md:w-1/2 lg:w-1/3"
+            appendTo="body"
+            [options]="topicOptions" formControlName="topic"
+            [ngClass]="{'p-invalid': createTicketForm.get('topic')?.invalid && createTicketForm.get('topic')?.touched}"> 
+            <ng-template let-option #item>
+                <div 
+                class="flex items-center w-full" 
+                pTooltip="{{option.tooltip}}" 
+                tooltipPosition="right">
+                    <span class="w-full">{{ option.label }}</span>
+                </div>
+            </ng-template>
+
+            <ng-template let-selectedOption pTemplate="selectedItem">
+                <div class="flex items-center" *ngIf="selectedOption">
+                    <span>{{ selectedOption.label }}</span>
+                </div>
+            </ng-template>
+        </p-select>
+        <div class="h-5 mt-1">
+            <small *ngIf="createTicketForm.get('topic')?.invalid && createTicketForm.get('topic')?.touched" class="p-error block mt-1 text-xs">
+            Tópico é obrigatório.
+            </small>
+        </div>
+        </div>
+
+      <div>
+        <label for="ticket-description" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+          Descrição Detalhada <span class="text-red-500 dark:text-red-400">*</span>
+        </label>
+        <textarea 
+          id="ticket-description"
+          pTextarea 
+          [rows]="6" 
+          formControlName="description"
+          class="w-full"
+          placeholder="Descreva seu problema ou dúvida com o máximo de detalhes possível..."
+          [ngClass]="{'p-invalid': createTicketForm.get('description')?.invalid && createTicketForm.get('description')?.touched}">
+        </textarea>
+        <div class="h-5 mt-1">
+            <small *ngIf="createTicketForm.get('description')?.invalid && createTicketForm.get('description')?.touched" class="p-error block mt-1 text-xs">
+              A descrição é obrigatória.
+            </small>
+        </div>
+        </div>
+
+      <div class="flex justify-end items-center gap-3 mt-4 pt-6 border-t border-slate-200 dark:border-slate-700">
+        <button pButton type="submit" label="Criar Chamado" icon="pi pi-check" class="p-button-success"></button>
+      </div>
+
+    </form>
+  </p-panel>
+</div>

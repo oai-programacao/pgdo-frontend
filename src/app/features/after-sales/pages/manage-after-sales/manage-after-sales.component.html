@@ -1,0 +1,127 @@
+<div class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
+  <p-toast></p-toast>
+  
+  <p-toolbar styleClass="mb-6 rounded-lg bg-slate-50 dark:bg-slate-800 border dark:border-slate-700">
+    <ng-template pTemplate="left">
+      <h1 class="text-2xl font-semibold text-slate-800 dark:text-slate-100 my-auto">
+        Gerenciamento de Pós-Venda
+      </h1>
+    </ng-template>
+    </p-toolbar>
+
+  <p-fieldset legend="Filtros" [toggleable]="true" [collapsed]="true" styleClass="mb-6 filter-fieldset">
+    <form [formGroup]="filterForm" class="p-fluid grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5 pt-4">
+      <div>
+        <label for="filter-status" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Status</label>
+        <p-select inputId="filter-status" [options]="statusOptions" formControlName="status" placeholder="Todos" appendTo="body" styleClass="w-full" [showClear]="true"></p-select>
+      </div>
+      <div class="md:col-span-3 flex justify-end">
+        <button pButton type="button" label="Limpar Filtros" icon="pi pi-filter-slash" class="p-button-outlined p-button-secondary" (click)="clearFilters()"></button>
+      </div>
+    </form>
+  </p-fieldset>
+
+  <p-table [value]="afterSales" [loading]="isLoading" #dt styleClass="p-datatable-striped p-datatable-gridlines text-sm"
+      [paginator]="true" [rows]="rows" [totalRecords]="totalRecords" (onPage)="loadAfterSales($event)" [lazy]="true"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" [rowsPerPageOptions]="[10, 20, 50]">
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="">Cliente</th>
+        <th class="text-center">Tentativas</th>
+        <th>Telefone 1</th>
+        <th>Telefone 2</th>
+        <th class="">Última Tentativa</th>
+        <th class="text-center w-[15%]">Status</th>
+        <th class="text-center w-[15%]">Ações</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-afterSale>
+      <tr>
+        <td>
+          <div class="font-medium text-slate-800 dark:text-slate-100">{{ afterSale.sale.clientName }}</div>
+          <div class="text-xs text-slate-500">Contrato: {{ afterSale.sale.contractNumber }}</div>
+        </td>
+        <td class="text-center">{{ afterSale.attempts }}</td>
+        <td>{{ afterSale.sale.phone1 || '-' }}</td>
+        <td>{{ afterSale.sale.phone2 || '-' }}</td>
+        <td>
+          <div *ngIf="afterSale.lastAttemptAt">
+            {{ afterSale.lastAttemptAt | date:'dd/MM/yyyy HH:mm' }}
+            <div class="text-xs text-slate-500">por {{ afterSale.lastAttemptBy || '-' }}</div>
+          </div>
+          <span *ngIf="!afterSale.lastAttemptAt" class="text-slate-400">Nenhuma</span>
+        </td>
+        <td class="text-center">
+          <p-tag [value]="getStatusLabel(afterSale.status)" [severity]="getStatusSeverity(afterSale.status)"></p-tag>
+        </td>
+        <td class="text-center space-x-2">
+          <button pButton type="button" icon="pi pi-phone" class="p-button-rounded p-button-success p-button-outlined" 
+                  pTooltip="Registrar Tentativa de Contato" [disabled]="afterSale.attempts >= 3" (click)="openContactAttemptDialog(afterSale)"></button>
+          <button pButton type="button" icon="pi pi-eye" class="p-button-rounded p-button-info p-button-outlined" 
+                  pTooltip="Ver Detalhes e Histórico" (click)="openDetailsDialog(afterSale)"></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr><td colspan="5" class="text-center p-6">Nenhum registro de pós-venda encontrado.</td></tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog header="Registrar Tentativa de Contato" [(visible)]="displayAttemptDialog" [modal]="true" 
+          [style]="{width: '40vw', minWidth: '450px'}" [draggable]="false" (onHide)="selectedAfterSale = null">
+  <form *ngIf="selectedAfterSale" [formGroup]="attemptForm" (ngSubmit)="submitContactAttempt()" class="p-fluid space-y-5 pt-4">
+    <div class="text-sm p-3 bg-slate-100 dark:bg-slate-700 rounded-md">
+      Registrando para: <strong>{{ selectedAfterSale.sale.clientName }}</strong> (Contrato #{{ selectedAfterSale.sale.contractNumber }})
+    </div>
+    <div>
+      <label for="outcome" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Resultado do Contato <span class="text-red-500">*</span></label>
+      <p-select inputId="outcome" [options]="outcomeOptions" formControlName="outcome" placeholder="Selecione um resultado" appendTo="body"></p-select>
+    </div>
+    <div>
+      <label for="notes" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Observações <span class="text-red-500">*</span></label>
+      <textarea id="notes" pTextarea [rows]="4" formControlName="notes" placeholder="Descreva o que aconteceu no contato..." fluid></textarea>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-3">
+      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="displayAttemptDialog=false"></button>
+      <button pButton type="submit" label="Salvar Tentativa" icon="pi pi-check" 
+              [loading]="isSubmittingAttempt" [disabled]="attemptForm.invalid || isSubmittingAttempt" 
+              (click)="submitContactAttempt()"></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<p-dialog header="Detalhes do Pós-Venda" [(visible)]="displayDetailsDialog" [modal]="true" 
+          [style]="{width: '60vw', minWidth: '500px'}" [draggable]="false" (onHide)="selectedAfterSale = null">
+  <div *ngIf="selectedAfterSale" class="p-2 space-y-6">
+    <p-fieldset legend="Dados da Venda Associada" [toggleable]="true">
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div><strong>Cliente:</strong> {{ selectedAfterSale.sale.clientName }}</div>
+        <div><strong>Contrato:</strong> {{ selectedAfterSale.sale.contractNumber }}</div>
+        <div><strong>Vendedor:</strong> {{ selectedAfterSale.sale.seller.name }}</div>
+        <div><strong>Data da Venda:</strong> {{ selectedAfterSale.sale.saleDate }}</div>
+      </div>
+    </p-fieldset>
+    <p-fieldset legend="Histórico de Contatos" [toggleable]="true">
+      <p-timeline [value]="selectedAfterSale.contactAttempts" align="alternate" styleClass="p-timeline-basic">
+        <ng-template pTemplate="marker" let-event>
+            <span class="custom-marker shadow-2">
+                <i [class]="'pi pi-phone'"></i>
+            </span>
+        </ng-template>
+        <ng-template pTemplate="content" let-attempt>
+            <small class="p-text-secondary">{{ attempt.attemptedAt | date:'dd/MM/yyyy HH:mm' }} - por {{ attempt.attemptedBy?.name }}</small>
+            <p class="mt-2">{{ attempt.notes }}</p>
+            <p-tag [value]="getContactAttemptOutcomeLabel(attempt.outcome)" [severity]="getStatusSeverity(attempt.outcome)" class="mt-2"></p-tag> </ng-template>
+      </p-timeline>
+      <div *ngIf="!selectedAfterSale.contactAttempts || selectedAfterSale.contactAttempts.length === 0" class="text-center text-slate-500 p-4">
+        Nenhuma tentativa de contato registrada.
+      </div>
+    </p-fieldset>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton type="button" label="Fechar" icon="pi pi-times" class="p-button-text" (click)="displayDetailsDialog=false"></button>
+  </ng-template>
+</p-dialog>

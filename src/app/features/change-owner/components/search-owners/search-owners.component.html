@@ -1,0 +1,103 @@
+<p-toast />
+
+<form [formGroup]="formDataClients" class="mx-auto max-w-2xl rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+  <div class="space-y-6">
+    <fieldset>
+      <legend class="mb-4 text-lg font-semibold text-gray-800 dark:text-gray-200">
+        Titular Antigo
+      </legend>
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div class="flex flex-col gap-2">
+          <label for="formerHolderCode" class="font-medium text-gray-700 dark:text-gray-300">
+            Código Antigo Titular
+          </label>
+          <p-inputNumber
+            inputId="formerHolderCode"
+            formControlName="formerHolderCode"
+            [useGrouping]="false"
+            maxlength="6"
+            styleClass="w-full"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label for="formerHolderContract" class="font-medium text-gray-700 dark:text-gray-300">
+            Contrato Antigo Titular
+          </label>
+          <p-inputNumber
+            inputId="formerHolderContract"
+            formControlName="formerHolderContract"
+            [useGrouping]="false"
+            maxlength="6"
+            styleClass="w-full"
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <p-divider styleClass="my-2" />
+
+    <fieldset>
+      <legend class="mb-4 text-lg font-semibold text-gray-800 dark:text-gray-200">
+        Novo Titular
+      </legend>
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div class="flex flex-col gap-2">
+          <label for="currentHolderCode" class="font-medium text-gray-700 dark:text-gray-300">
+            Código Novo Titular
+          </label>
+          <p-inputNumber
+            inputId="currentHolderCode"
+            formControlName="currentHolderCode"
+            [useGrouping]="false"
+            maxlength="6"
+            styleClass="w-full"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label for="currentHolderContract" class="font-medium text-gray-700 dark:text-gray-300">
+            Contrato Novo Titular
+          </label>
+          <p-inputNumber
+            inputId="currentHolderContract"
+            formControlName="currentHolderContract"
+            [useGrouping]="false"
+            maxlength="6"
+            styleClass="w-full"
+          />
+        </div>
+      </div>
+    </fieldset>
+
+    <p-divider styleClass="my-2" />
+
+    <div class="grid grid-cols-1 items-end gap-6 md:grid-cols-2">
+      <div class="flex flex-col gap-2">
+        <label for="icondisplay" class="font-medium text-gray-700 dark:text-gray-300">
+          Data da Mudança
+        </label>
+        <p-datepicker
+          formControlName="date"
+          [iconDisplay]="'input'"
+          [showIcon]="true"
+          inputId="icondisplay"
+          dateFormat="dd/mm/yy"
+          [disabledDays]="[0]"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </div>
+
+      <div class="flex h-full items-end">
+        <p-button
+          [disabled]="!this.formDataClients.valid"
+          label="Buscar"
+          severity="success"
+          (onClick)="getClientsData()"
+          styleClass="w-full md:w-auto"
+        />
+      </div>
+    </div>
+  </div>
+</form>

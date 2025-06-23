@@ -1,0 +1,147 @@
+<div class="custom-margin-horizontal custom-margin-vertical custom-flex custom-flex-column">
+  <div class="custom-margin-vertical">
+    <div class="custom-flex custom-justify-center">
+      <span class="custom-font-semibold">
+        CLÁUSULA PRIMEIRA – DA SOLICITAÇÃO DE ALTERAÇÃO DE TITULARIDADE
+      </span>
+    </div>
+    <div class="custom-margin-vertical">
+      <div class="custom-flex custom-gap custom-margin-vertical">
+        <span class="custom-font-bold">1.1</span>
+        <span>
+          Pelo presente documento, o <b>TITULAR NOVO</b> formaliza estar de
+          acordo com a solicitação de <b>ALTERAÇÃO DE TITULARIDADE</b>,
+          realizada pelo <b>TITULAR ANTIGO</b>, conforme descrito nos itens
+          abaixo do presente documento
+        </span>
+      </div>
+      <div class="custom-flex custom-gap">
+        <span class="custom-font-bold">1.2</span>
+
+        <span>
+          Os termos e condições do
+          <b>CONTRATO DE PRESTAÇÃO DE SERVIÇOS DE TELECOMUNICAÇÕES</b> a ser
+          aplicado está registrado junto ao
+          <b>Cartório de Registro de Títulos e Documentos</b> do Município de
+          <b>Assis</b>, Estado de <b>São Paulo</b>, e disponível no endereço
+          virtual eletrônico: <b>https://oai.com.br/</b>.
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="custom-margin-vertical">
+    <div class="custom-flex custom-justify-center">
+      <span class="custom-font-semibold">
+        CLÁUSULA SEGUNDA – DA ALTERAÇÃO DE TITULARIDADE
+      </span>
+    </div>
+
+    <div class="custom-margin-vertical">
+      <div class="custom-flex custom-gap custom-margin-vertical">
+        <span>
+          O
+          <b>TITULAR, {{ newClient?.Nome }}, {{ newClient?.CNPJ_CNPF | cpfCnpj }}</b>,
+          solicitou a alteração de titularidade do contrato assinado através
+          do Termo de Adesão <b>{{ newClient?.Codigo }}</b>, assinado em
+          <b>{{ signedDate | date: 'dd/MM/yyyy' }}</b>.
+        </span>
+      </div>
+    </div>
+    <div class="custom-margin-vertical">
+      <div class="custom-flex custom-gap custom-margin-bottom">
+        <span class="custom-font-bold ">2.1</span>
+        <span>
+          A alteração de titularidade será finalizada e devidamente consentida
+          pelo <b>TITULAR ANTIGO</b> em termo a parte de
+          <b>{{ newClientContract }}</b
+          >.
+        </span>
+      </div>
+      <div class="custom-flex custom-gap custom-margin-bottom">
+        <span class="custom-font-bold ">2.2</span>
+        <span>
+          O <b>TITULAR NOVO</b> se declara ciente de todas as obrigações
+          aceitas, comprometendo-se a cumprir integralmente os termos e
+          condições do
+          <b>CONTRATO DE PRESTAÇÃO DE SERVIÇOS DE TELECOMUNICAÇÕES</b> que está
+          registrado junto ao
+          <b>Cartório de Registro de Títulos e Documento</b> do Município de
+          <b>Assis</b>, Estado de <b>São Paulo</b>, e disponível no endereço
+          virtual eletrônico: <b>https://oai.com.br/</b>.
+        </span>
+      </div>
+      <div class="custom-flex custom-gap">
+        <span class="custom-font-bold custom-gap">2.3</span>
+        <span>
+          O <b>TITULAR NOVO</b> declara ter recebido neste ato cópia do
+          <b> TERMO DE ADESÃO</b> originalmente assinado pelo
+          <b> TITULAR ANTIGO</b>, ciente de todas as condições.
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="custom-margin-bottom">
+    <div class="custom-flex custom-justify-center">
+      <span class="custom-font-semibold">
+        CLÁUSULA TERCEIRA – DAS CONDIÇÕES GERAIS
+      </span>
+    </div>
+    <div class="custom-margin-vertical">
+      <div class="custom-flex custom-gap custom-margin-bottom">
+        <span class="custom-font-bold">3.1</span>
+
+        <span>
+          O <b>TITULAR NOVO</b> declara, para todos os fins de direito que o
+          presente <b>TERMO DE ALTERAÇÃO DE TITULARIDADE</b>, é a expressão de
+          sua vontade, em face do reconhecimento da legitimidade da presente
+          contratação.
+        </span>
+      </div>
+      <div class="custom-flex custom-gap custom-margin-bottom">
+        <span class="custom-font-bold">3.2</span>
+        <span>
+          A partir da assinatura do presente documento, fica a parte obrigada ao
+          fiel cumprimento das cláusulas aqui contidas, enquanto estiver vigente
+          o <b>Contrato de Prestação de Serviços de Telecomunicações</b> e caso
+          haja acessório, o <b>Contrato de Comodato de Equipamentos</b>.
+        </span>
+      </div>
+      <div class="custom-flex custom-gap">
+        <span class="custom-font-bold custom-gap">3.3</span>
+
+        <span>
+          Fica ratificada a cláusula do instrumento citado da Cláusula 1.2 e de
+          seu respectivo <b>TERMO DE ADESÃO</b>.
+        </span>
+      </div>
+    </div>
+  </div>
+  <div style="margin-bottom: 1rem;">
+    <div class="custom-flex custom-margin-bottom">
+      <span>
+        E, por estar de acordo, o <b>TITULAR NOVO </b> adere ao presente
+        documento assinando, declarando ainda, não estar assinando e/ou
+        aceitando o presente sob premente coação, estado de necessidade ou outra
+        forma de vício de consentimento, tendo conhecimento de todo direito e
+        obrigação que assume nesta data.
+      </span>
+    </div>
+  </div>
+  <p-divider />
+  <div class="custom-flex custom-flex-column">
+    <div>
+      <span>ASSINATURA:</span>
+      <div class="custom-margin-vertical custom-border-bottom"></div>
+    </div>
+    <div class="custom-margin-vertical">
+      <span>
+        NOVO TITULAR: <b>{{ newClient?.Nome }}</b>
+      </span>
+    </div>
+    <div class="custom-margin-vertical">
+      <span>
+        CPF/CNPJ: <b>{{ newClient?.CNPJ_CNPF | cpfCnpj }}</b>
+      </span>
+    </div>
+  </div>
+</div>

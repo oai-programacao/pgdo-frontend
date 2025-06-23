@@ -1,0 +1,67 @@
+<div class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
+  <p-toast></p-toast>
+  
+  <p-toolbar styleClass="mb-6 rounded-lg bg-slate-50 dark:bg-slate-800 border dark:border-slate-700">
+    <ng-template pTemplate="left">
+      <h1 class="text-2xl font-semibold text-slate-800 dark:text-slate-100 my-auto">
+        Consulta de Endereços Cabeados
+      </h1>
+    </ng-template>
+  </p-toolbar>
+
+  <p-fieldset legend="Filtros" [toggleable]="true" [collapsed]="false" styleClass="mb-6 filter-fieldset">
+    <form [formGroup]="filterForm" class="p-fluid">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5 pt-4">
+        <div class="w-full">
+          <label for="clientName" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Nome do Cliente</label>
+          <p-iconfield>
+                <p-inputicon styleClass="pi pi-search" />
+                <input id="clientName" type="text" pInputText formControlName="clientName" placeholder="Busque por nome" class="w-full"/>
+          </p-iconfield>
+        </div>
+        <div class="w-full">
+          <label for="address" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Endereço</label>
+           <p-iconfield>
+            <p-inputicon styleClass="pi pi-map-marker"></p-inputicon>
+            <input id="address" type="text" pInputText formControlName="address" placeholder="Busque por endereço" class="w-full"/>
+           </p-iconfield>
+        </div>
+        <div class="w-full">
+            <label for="cities" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Cidades</label>
+            <p-multiSelect inputId="cities" [options]="cityOptions" formControlName="cities" 
+                placeholder="Todas" display="chip" appendTo="body" styleClass="w-full">
+            </p-multiSelect>
+        </div>
+      </div>
+      <div class="flex justify-end mt-5 pt-4 border-t border-slate-200 dark:border-slate-700">
+        <button pButton type="button" label="Limpar Filtros" icon="pi pi-filter-slash" class="p-button-outlined p-button-secondary" (click)="clearFilters()"></button>
+      </div>
+    </form>
+  </p-fieldset>
+
+  <p-table #dt [value]="addresses" [loading]="isLoading" styleClass="p-datatable-striped p-datatable-gridlines text-sm"
+      [paginator]="true" [rows]="rows" [totalRecords]="totalRecords" (onPage)="loadAddresses($event)" [lazy]="true"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} endereços" [rowsPerPageOptions]="[10, 20, 50]">
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="w-1/5">Cliente</th>
+        <th class="w-1/5">Cidade</th>
+        <th class="w-1/5">Bairro</th>
+        <th class="w-1/5">Rua / Logradouro</th>
+        <th class="w-1/5">Complemento</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-addr>
+      <tr>
+        <td class="font-medium truncate max-w-xs" [pTooltip]="addr.clientName">{{ addr.clientName }}</td>
+        <td><p-tag [value]="getCityLabel(addr.city)"></p-tag></td>
+        <td>{{ addr.district }}</td>
+        <td class="truncate max-w-xs" [pTooltip]="addr.street">{{ addr.street }}</td>
+        <td class="truncate max-w-xs" [pTooltip]="addr.complement">{{ addr.complement }}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr><td colspan="5" class="text-center p-6">Nenhum endereço encontrado para os filtros aplicados.</td></tr>
+    </ng-template>
+  </p-table>
+</div>

@@ -1,0 +1,75 @@
+<div>
+    <h2 class="text-xl font-semibold mb-4 text-slate-700 dark:text-slate-200">Painel do Administrador</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+      <app-card-widget 
+      title="Instalações Executadas"  
+      [value]="widgetDataMap.get(WIDGET_KEYS.INSTALLATIONS)?.actualMonthValue ?? '...'"
+      icon="pi pi-cog" 
+      variant="success" 
+      icon="pi pi-users" 
+      [trend]="getTrendForWidget(WIDGET_KEYS.INSTALLATIONS)"
+      variant="primary" 
+      footerText="Mês atual vs Mês anterior" 
+      />
+
+      <app-card-widget 
+      title="Mudanças de Endereço" 
+      [value]="widgetDataMap.get(WIDGET_KEYS.CHANGE_OF_ADDRESS)?.actualMonthValue ?? '...'" 
+      icon="pi pi-map-marker"
+      variant="info" 
+      footerText="Mês atual vs Mês anterior"
+      [trend]="getTrendForWidget(WIDGET_KEYS.CHANGE_OF_ADDRESS)"
+      />
+    
+      <app-card-widget 
+        title="Visitas Técnicas" 
+        [value]="widgetDataMap.get(WIDGET_KEYS.TECHNICAL_VISIT)?.actualMonthValue ?? '...'" 
+        icon="pi pi-eye" 
+        variant="primary" 
+        footerText="Mês atual vs Mês anterior"
+        [trend]="getTrendForWidget(WIDGET_KEYS.TECHNICAL_VISIT)"
+      />
+      
+      <app-card-widget title="Cancelamentos" [value]="50" icon="pi pi-chart-line" variant="danger" footerText="Esse mês até o dia atual" />
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-6">
+        <app-content-panel title="OS previstas para hoje" icon="pi pi-info-circle">
+            <p>Este é um painel de conteúdo dinâmico. Você pode colocar qualquer coisa aqui dentro.</p>
+          </app-content-panel>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 mt-4">
+
+        <app-dashboard-chart
+          title="Contagem de OS por Técnico"
+          chartType="bar"
+          [chartData]="technicianOsData"
+          [chartOptions]="technicianOsOptions"
+          height="350px"
+          [isLoading]="isLoadingTechnicianData">
+        </app-dashboard-chart>
+      
+        <app-dashboard-chart
+          title="Acessos por Dispositivo"
+          chartType="doughnut"
+          [chartData]="acessosDispositivoData"
+          [chartOptions]="opcoesGraficoRosca"
+          height="350px"
+          [showGrid]=false
+          [isLoading]="loadingAcessos"
+          />
+      
+        <app-dashboard-chart
+          title="Progressão de Receita (Últimos 6 meses)"
+          chartType="line"
+          [chartData]="receitaData"
+          [chartOptions]="opcoesGraficoLinha"
+          height="280px"
+          class="md:col-span-2 xl:col-span-2"> 
+        </app-dashboard-chart>
+      
+      </div>
+
+</div>

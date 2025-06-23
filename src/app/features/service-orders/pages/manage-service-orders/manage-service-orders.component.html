@@ -1,0 +1,185 @@
+<!-- <div class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+
+    <p-toolbar styleClass="mb-6 rounded-lg bg-slate-50 dark:bg-slate-800 border dark:border-slate-700">
+        <ng-template pTemplate="left">
+            <h1 class="text-2xl font-semibold text-slate-800 dark:text-slate-100 my-auto">Acompanhamento de OS</h1>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <div class="flex items-center gap-2">
+                <button pButton type="button" label="OS Vencidas" class="p-button-warning"  pTooltip="Filtrar por OS com agendamento vencido"></button>
+                <button pButton type="button" label="Contagem Geral" icon="pi pi-chart-bar" class="p-button-secondary"></button>
+            </div>
+        </ng-template>
+    </p-toolbar>
+
+    <p-fieldset legend="Filtros" [toggleable]="true" [collapsed]="true" styleClass="mb-6 filter-fieldset">
+    </p-fieldset>
+
+    <p-table #dt 
+        [value]="serviceOrders" 
+        [loading]="isLoading" 
+        dataKey="id" 
+        editMode="row"
+        styleClass="p-datatable-striped p-datatable-gridlines text-sm"
+        [paginator]="true" 
+        [rows]="rows" 
+        [totalRecords]="totalRecords" 
+        (onPage)="loadServiceOrders($event)" 
+        [lazy]="true"
+        [rowsPerPageOptions]="[10, 20, 50]">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Contrato</th>
+                <th>Cliente / Endereço</th>
+                <th>Tipo OS</th>
+                <th class="w-40">Data Agend.</th>
+                <th class="w-40">Período</th>
+                <th class="w-48">Técnico</th>
+                <th class="w-32">Início</th>
+                <th class="w-32">Fim</th>
+                <th class="w-24">Duração</th>
+                <th class="w-48">Status</th>
+                <th style="width:12rem" class="text-center">Ações</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-os let-editing="editing" let-ri="rowIndex">
+            <tr [pEditableRow]="os">
+                <td>{{ os.contractNumber }}</td>
+                <td>
+                    <div class="font-medium truncate w-fit" [pTooltip]="os.clientName">{{ os.clientName }}</div>
+                    <div class="text-xs text-slate-500 truncate w-fit" [pTooltip]="os.address">{{ os.address }}</div>
+                </td>
+                <td>{{ getTypeOfOsLabel(os.typeOfOs) }}</td>
+
+                <td>
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <p-datepicker [(ngModel)]="os.scheduleDate" dateFormat="dd/mm/yy" dataType="string" appendTo="body" styleClass="w-full"></p-datepicker>
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{ os.scheduleDate }}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td>
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <p-select [options]="periodOptions" [(ngModel)]="os.period" appendTo="body" styleClass="w-full"></p-select>
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{ getPeriodLabel(os.period) }}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td>
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <p-select [options]="technicians" optionLabel="name" optionValue="id" [(ngModel)]="os.technician" appendTo="body" styleClass="w-full" />
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{ os.technician }}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td>
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <p-datepicker [(ngModel)]="os.startOfOs" [timeOnly]="true" dataType="string" dateFormat="HH:mm" hourFormat="24" appendTo="body" />
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{ os.startOfOs }}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td>
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <p-datepicker [(ngModel)]="os.endOfOs" [timeOnly]="true" dataType="string" dateFormat="HH:mm" hourFormat="24" appendTo="body" />
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{ os.endOfOs }}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+
+                <td>{{ os.durationOfOs | formatDuration }}</td>
+                <td>
+                    <p-cellEditor>
+                         <ng-template pTemplate="input">
+                            <p-select [options]="statusOptions" [(ngModel)]="os.status" appendTo="body" styleClass="w-full" />
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            <p-tag [value]="getStatusLabel(os.status)" [severity]="getStatusSeverity(os.status)"></p-tag>
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                
+                <td class="text-center">
+                    <div *ngIf="!editing" class="flex justify-center gap-1">
+                        <button pButton pInitEditableRow type="button" icon="pi pi-pencil" class="p-button-rounded p-button-warning p-button-text" pTooltip="Editar Linha"></button>
+                        <button pButton type="button" icon="pi pi-eye" class="p-button-rounded p-button-info p-button-text" pTooltip="Ver Detalhes" (click)="openDetailsDialog(os)"></button>
+                    </div>
+                    <div *ngIf="editing" class="flex justify-center gap-1">
+                        <button pButton pSaveEditableRow type="button" icon="pi pi-check" class="p-button-rounded p-button-success p-button-text" (click)="onRowEditSave(os)"></button>
+                        <button pButton pCancelEditableRow type="button" icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" (click)="onRowEditCancel(os, ri)"></button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+        </p-table>
+
+    </div>
+
+    <p-dialog
+        [(visible)]="displayDetailsDialog"
+        [modal]="true"
+        [draggable]="false"
+        [resizable]="false"
+        [style]="{ width: '50vw' }"
+        [header]="'Detalhes da Ordem de Serviço'"
+    >
+        <div>
+            <p>Detalhes da Ordem de Serviço:</p>
+            <ul>
+                <li>ID: {{ selectedServiceOrder?.id }}</li>
+                <li>Técnico: {{ selectedServiceOrder?.technician }}</li>
+                <li>Data Agendada: {{ selectedServiceOrder?.scheduleDate }}</li>
+            </ul>
+        </div>
+    </p-dialog> -->
+
+    <div *ngIf="!isLoading">
+  <form [formGroup]="osGroup">
+    <p-table
+      [value]="os"
+      [lazy]="true"
+      (onPage)="loadServiceOrders($event)"
+      [paginator]="true"
+      [rows]="rows"
+      [totalRecords]="totalRecords"
+      [first]="first"
+      formArrayName="orders"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>ID</th>
+          <th>Contrato (FormControl)</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-i="rowIndex">
+        <tr [formGroupName]="i">
+          <td>{{ rowData.id }}</td>
+          <td>
+            <input type="text" pInputText formControlName="contractNumber" />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </form>
+</div>
+
+<div *ngIf="isLoading">
+  Carregando...
+</div>
