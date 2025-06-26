@@ -7,11 +7,16 @@ import { StepperModule } from "primeng/stepper";
 import { ButtonModule } from "primeng/button";
 import { IftaLabelModule } from "primeng/iftalabel";
 import { SelectModule } from 'primeng/select';
-import {  FormsModule} from "@angular/forms";
+import {  FormGroup, FormsModule} from "@angular/forms";
 import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
 import { FloatLabel } from 'primeng/floatlabel';
 import { SignaturePadComponent } from "../../shared/components/signature-pad/signature-pad.component";
+import { CpfCnpjPipe } from "../../shared/pipes/cpf-cnpj.pipe";
+import { RgPipe } from "../../shared/pipes/rg.pipe";
+import { PhonesPipe } from "../../shared/pipes/phones.pipe";
+import { InputNumberModule } from 'primeng/inputnumber';
+
 @Component({
   selector: "app-register-new-client",
   imports: [
@@ -25,7 +30,11 @@ import { SignaturePadComponent } from "../../shared/components/signature-pad/sig
     DatePickerModule,
     TextareaModule,
     FloatLabel,
-    SignaturePadComponent
+    SignaturePadComponent,
+    CpfCnpjPipe,
+    RgPipe,
+    PhonesPipe,
+    InputNumberModule
 ],
   templateUrl: "./register-new-client.component.html",
   styleUrl: "./register-new-client.component.scss",
@@ -39,6 +48,15 @@ export class RegisterNewClientComponent implements OnInit {
       {name: "Pessoa Jurídica", value: "PJ"}
     
     ]
+
+    form = {
+      cpf: '',
+      rg: '',
+      cnpj: '',
+      telefoneComercial: '',
+      telefoneFixo: '',
+      telefoneCelular: ''
+    };
   ngOnInit(){
    
   }

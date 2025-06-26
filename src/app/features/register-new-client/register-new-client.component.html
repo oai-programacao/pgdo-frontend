@@ -1,7 +1,7 @@
 <div
   class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md"
 >
-  <h1>Cadastrar Novo Cliente</h1>
+  <h1 class="text-3xl font-semibold mb-8">Cadastrar Novo Cliente</h1>
   <div>
     <p-stepper [value]="1">
       <p-step-item [value]="1">
@@ -9,7 +9,6 @@
         <p-step-panel>
           <ng-template #content let-activateCallback="activateCallback">
             <div class="flex justify-between items-center flex-wrap gap-4">
-              
               <!-- Tipo de pessoa (PF ou PJ) -->
               <!-- ✅ Ok! Placeholder claro e o uso do optionLabel está correto -->
               <div class="flex flex-col gap-2 w-full">
@@ -26,36 +25,56 @@
               <!-- Campos para Pessoa Física -->
               <!-- ✅ Claro e objetivo. Pode futuramente ter máscara para CPF/RG -->
               @if(selectedTypePerson === 'PF'){
-                <input pInputText placeholder="Digite o CPF" fluid />
-                <input pInputText placeholder="Digite o RG" fluid />
+              <input
+                pInputText
+                type="text"
+                placeholder="Digite o CPF"
+                [(ngModel)]="form.cpf"
+                [value]="form.cpf | cpfCnpj"
+                maxlength="11"
+                fluid
+              />
+
+              <input
+                pInputText
+                type="text"
+                placeholder="Digite o RG"
+                [(ngModel)]="form.rg"
+                [value]="form.rg | rg"
+                fluid
+                maxlength="11"
+              />
               }
 
               <!-- Campos para Pessoa Jurídica -->
               <!-- ⚠️ Sugestão: trocar "Nome Fantasioso" por "Nome Fantasia" -->
               @if(selectedTypePerson === 'PJ'){
-                <div class="w-full flex justify-between gap-5">
-                  <input
-                    class="w-1/3"
-                    type="text"
-                    pInputText
-                    placeholder="CNPJ"
-                    fluid
-                  />
-                  <input
-                    class="w-1/3"
-                    type="text"
-                    pInputText
-                    placeholder="Nome da companhia"
-                    fluid
-                  />
-                  <input
-                    class="w-1/3"
-                    type="text"
-                    pInputText
-                    placeholder="Nome Fantasia"
-                    fluid
-                  />
-                </div>
+              <div class="w-full flex justify-between gap-5">
+                <input
+                  pInputText
+                  type="text"
+                  class="w-1/3"
+                  placeholder="CNPJ"
+                  [(ngModel)]="form.cnpj"
+                  [value]="form.cnpj | cpfCnpj"
+                  maxlength="14"
+                  fluid
+                />
+                <input
+                  class="w-1/3"
+                  type="text"
+                  pInputText
+                  placeholder="Nome da companhia"
+                  fluid
+                />
+                <input
+                  class="w-1/3"
+                  type="text"
+                  pInputText
+                  placeholder="Nome Fantasia"
+                  fluid
+                />
+              </div>
               }
 
               <!-- E-mail -->
@@ -87,7 +106,13 @@
               <!-- CEP e Endereço -->
               <!-- ✅ Intuitivo e direto. Pode implementar auto-preenchimento futuramente -->
               <div class="flex justify-center gap-5 w-full">
-                <input class="w-1/2" type="text" pInputText placeholder="CEP" />
+                <input
+                  class="w-1/2"
+                  type="text"
+                  pInputText
+                  placeholder="CEP"
+                  maxlength="8"
+                />
                 <input
                   class="w-1/2"
                   type="text"
@@ -117,21 +142,30 @@
               <!-- ✅ Ótima separação entre os tipos de telefone. Pode usar máscara futuramente -->
               <div class="flex justify-between w-full gap-2">
                 <input
-                  type="text"
                   pInputText
+                  type="text"
                   placeholder="Telefone Comercial"
+                  [(ngModel)]="form.telefoneComercial"
+                  [value]="form.telefoneComercial | phones"
                   fluid
+                  maxlength="8"
                 />
                 <input
                   type="text"
                   pInputText
                   placeholder="Telefone fixo"
+                  [(ngModel)]="form.telefoneFixo"
+                  [value]="form.telefoneFixo | phones"
+                  maxlength="8"
                   fluid
                 />
                 <input
                   type="text"
                   pInputText
                   placeholder="Telefone celular"
+                  maxlength="9"
+                  [(ngModel)]="form.telefoneCelular"
+                  [value]="form.telefoneCelular | phones"
                   fluid
                 />
               </div>
@@ -151,24 +185,27 @@
         <p-step-panel>
           <ng-template #content let-activateCallback="activateCallback">
             <div class="flex flex-col gap-7">
-
               <!-- Código do plano e valor de adesão -->
               <!-- ⚠️ Pode-se considerar usar type="number" para facilitar digitação -->
               <div class="w-full flex justify-between gap-5">
                 <input
-                  type="text"
+                  type="number"
                   class="w-1/2"
                   placeholder="Código do plano"
                   pInputText
                   fluid
                 />
-                <input
-                  type="text"
-                  class="w-1/2"
-                  placeholder="Valor de adesão"
-                  pInputText
-                  fluid
-                />
+                <div class="relative w-1/2">
+                  
+                  <p-inputnumber
+                    inputId="locale-br"
+                    mode="decimal"
+                    locale="pt-BR"
+                    [minFractionDigits]="2"
+                    placeholder="Valor de adesão"
+                    fluid
+                  />
+                </div>
               </div>
 
               <!-- Data de vencimento -->
@@ -185,14 +222,19 @@
               <!-- ✅ Muito bem estruturado com floatlabel -->
               <div>
                 <p-floatlabel>
-                  <textarea pTextarea fluid></textarea>
+                  <textarea
+                    pTextarea
+                    fluid
+                    rows="5"
+                    style="min-height: 120px"
+                  ></textarea>
                   <label for="observation">Observação</label>
                 </p-floatlabel>
               </div>
             </div>
 
             <!-- Navegação entre etapas -->
-            <div class="flex py-6 gap-2">
+            <div class="flex py-6 gap-2 justify-between">
               <p-button
                 label="Voltar"
                 severity="secondary"
@@ -212,7 +254,7 @@
             <div class="flex flex-col w-full">
               <!-- Local para exibir ou capturar a assinatura do cliente -->
               <div class="w-full">
-                  <app-signature-pad/>
+                <app-signature-pad />
               </div>
             </div>
 
@@ -236,7 +278,6 @@
           </ng-template>
         </p-step-panel>
       </p-step-item>
-
     </p-stepper>
   </div>
 </div>
