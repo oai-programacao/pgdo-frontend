@@ -16,9 +16,28 @@ export class SignaturePadComponent {
   @ViewChild('canvas') canvasEl!: ElementRef;
   signatureImg!: string;
 
+
   ngAfterViewInit() {
-  this.signaturePad = new SignaturePad(this.canvasEl.nativeElement);
-  }
+  const canvas = this.canvasEl.nativeElement as HTMLCanvasElement;
+
+  // 👉 Garante que o canvas desenhe corretamente com dimensões visuais
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+
+  this.signaturePad = new SignaturePad(canvas, {
+    penColor: 'black',
+    backgroundColor: 'white'
+  });
+}
+clearPad() {
+  this.signaturePad.clear();
+}
+
+savePad() {
+  const base64Data = this.signaturePad.toDataURL();
+  console.log('Assinatura base64:', base64Data);
+  this.signatureImg = base64Data;
+}
 
   startDrawing(event: Event) {
     // works in device not in browser
@@ -26,11 +45,21 @@ export class SignaturePadComponent {
   moved(event: Event) {
     // works in device not in browser
   }
-  savePad() {
-    const base64Data = this.signaturePad.toDataURL();
- }
 
-  clearPad() {
-    this.signaturePad.clear();
-  }
+
+
 }
+
+
+
+
+//   ngAfterViewInit() {
+//   this.signaturePad = new SignaturePad(this.canvasEl.nativeElement);
+//   }
+//   savePad() {
+//     const base64Data = this.signaturePad.toDataURL();
+//  }
+
+//   clearPad() {
+//     this.signaturePad.clear();
+//   }
