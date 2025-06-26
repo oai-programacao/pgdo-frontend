@@ -1,12 +1,11 @@
 <div>
     <canvas
-      class="block mb-4 border-2 border-gray-300 rounded-lg"
+      class="block mb-4 border-2 border-gray-300 rounded-lg w-full max-h-[200px]"
       #canvas
       (touchstart)="startDrawing($event)"
       (touchmove)="moved($event)"
-      width="700"
-      height="200"
+     
     ></canvas>
     <button pButton label="Limpar" rounded severity="danger" (click)="clearPad()"></button>
-    <button pButton label="Salvar" rounded  (click)="savePad()"></button>
+    <!-- <button pButton label="Salvar" rounded  (click)="savePad()"></button> -->
 </div>
