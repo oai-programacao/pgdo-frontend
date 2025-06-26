@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import SignaturePad from 'signature_pad';
 
@@ -10,56 +10,63 @@ import SignaturePad from 'signature_pad';
   templateUrl: './signature-pad.component.html',
   styleUrl: './signature-pad.component.scss'
 })
-export class SignaturePadComponent {
-  signatureNeeded!: boolean;
+export class SignaturePadComponent implements AfterViewInit, OnDestroy {
+  @ViewChild('canvas') canvasEl!: ElementRef<HTMLCanvasElement>;
   signaturePad!: SignaturePad;
-  @ViewChild('canvas') canvasEl!: ElementRef;
   signatureImg!: string;
-
+  private resizeObserver!: ResizeObserver;
 
   ngAfterViewInit() {
-  const canvas = this.canvasEl.nativeElement as HTMLCanvasElement;
+    const canvas = this.canvasEl.nativeElement;
 
-  // 👉 Garante que o canvas desenhe corretamente com dimensões visuais
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
+    this.signaturePad = new SignaturePad(canvas, {
+      backgroundColor: 'white',
+      minWidth: 0.5,
+      maxWidth: 2,
+      penColor: 'black',
+    });
 
-  this.signaturePad = new SignaturePad(canvas, {
-    penColor: 'black',
-    backgroundColor: 'white'
-  });
-}
-clearPad() {
-  this.signaturePad.clear();
-}
+    this.resizeCanvas(); // inicial
 
-savePad() {
-  const base64Data = this.signaturePad.toDataURL();
-  console.log('Assinatura base64:', base64Data);
-  this.signatureImg = base64Data;
-}
-
-  startDrawing(event: Event) {
-    // works in device not in browser
-  }
-  moved(event: Event) {
-    // works in device not in browser
+    // Responsivo: atualiza o canvas quando o elemento for redimensionado
+    this.resizeObserver = new ResizeObserver(() => this.resizeCanvas());
+    this.resizeObserver.observe(canvas);
   }
 
+  ngOnDestroy(): void {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+  }
 
+  private resizeCanvas() {
+    const canvas = this.canvasEl.nativeElement;
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
 
+    // Salva a assinatura temporariamente antes de redimensionar
+    const data = this.signaturePad.toData();
+
+    // Ajusta o tamanho físico
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+
+    // Ajusta o tamanho visual
+    canvas.getContext('2d')?.scale(ratio, ratio);
+
+    this.signaturePad.clear(); // limpa primeiro
+    this.signaturePad.fromData(data); // restaura a assinatura existente
+  }
+
+  clearPad() {
+    this.signaturePad.clear();
+  }
+
+  savePad() {
+    if (this.signaturePad.isEmpty()) {
+      console.warn('Assinatura está vazia');
+      return;
+    }
+    this.signatureImg = this.signaturePad.toDataURL();
+    console.log('Assinatura base64:', this.signatureImg);
+  }
 }
-
-
-
-
-//   ngAfterViewInit() {
-//   this.signaturePad = new SignaturePad(this.canvasEl.nativeElement);
-//   }
-//   savePad() {
-//     const base64Data = this.signaturePad.toDataURL();
-//  }
-
-//   clearPad() {
-//     this.signaturePad.clear();
-//   }
