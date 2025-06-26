@@ -11,62 +11,62 @@ import SignaturePad from 'signature_pad';
   styleUrl: './signature-pad.component.scss'
 })
 export class SignaturePadComponent implements AfterViewInit, OnDestroy {
-  @ViewChild('canvas') canvasEl!: ElementRef<HTMLCanvasElement>;
   signaturePad!: SignaturePad;
   signatureImg!: string;
+
+  @ViewChild('canvas') canvasEl!: ElementRef<HTMLCanvasElement>;
+
   private resizeObserver!: ResizeObserver;
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     const canvas = this.canvasEl.nativeElement;
 
     this.signaturePad = new SignaturePad(canvas, {
       backgroundColor: 'white',
+      penColor: 'black',
       minWidth: 0.5,
       maxWidth: 2,
-      penColor: 'black',
     });
 
-    this.resizeCanvas(); // inicial
+    // Resize handler
+    this.resizeCanvas();
 
-    // Responsivo: atualiza o canvas quando o elemento for redimensionado
-    this.resizeObserver = new ResizeObserver(() => this.resizeCanvas());
+    // Observa mudanças na tela para redimensionar automaticamente
+    this.resizeObserver = new ResizeObserver(() => {
+      this.resizeCanvas();
+    });
     this.resizeObserver.observe(canvas);
   }
 
   ngOnDestroy(): void {
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-    }
+    this.resizeObserver?.disconnect();
   }
 
-  private resizeCanvas() {
-    const canvas = this.canvasEl.nativeElement;
-    const ratio = Math.max(window.devicePixelRatio || 1, 1);
-
-    // Salva a assinatura temporariamente antes de redimensionar
-    const data = this.signaturePad.toData();
-
-    // Ajusta o tamanho físico
-    canvas.width = canvas.offsetWidth * ratio;
-    canvas.height = canvas.offsetHeight * ratio;
-
-    // Ajusta o tamanho visual
-    canvas.getContext('2d')?.scale(ratio, ratio);
-
-    this.signaturePad.clear(); // limpa primeiro
-    this.signaturePad.fromData(data); // restaura a assinatura existente
-  }
-
-  clearPad() {
+  clearPad(): void {
     this.signaturePad.clear();
   }
 
-  savePad() {
-    if (this.signaturePad.isEmpty()) {
-      console.warn('Assinatura está vazia');
-      return;
-    }
-    this.signatureImg = this.signaturePad.toDataURL();
-    console.log('Assinatura base64:', this.signatureImg);
+  savePad(): void {
+    const base64Data = this.signaturePad.toDataURL();
+    console.log('Assinatura base64:', base64Data);
+    this.signatureImg = base64Data;
+  }
+
+  private resizeCanvas(): void {
+    const canvas = this.canvasEl.nativeElement;
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+
+    // Salva a assinatura antes do resize (opcional)
+    const data = this.signaturePad.toData();
+
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+
+    const ctx = canvas.getContext('2d');
+    if (ctx) ctx.scale(ratio, ratio);
+
+    // Restaura a assinatura após o resize
+    this.signaturePad.clear();
+    this.signaturePad.fromData(data);
   }
 }
