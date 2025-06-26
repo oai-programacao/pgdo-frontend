@@ -148,6 +148,12 @@ export const routes: Routes = [
           import('./features/system-warnings/pages/system-warning-list/system-warning-list.component').then((m) => m.SystemWarningListComponent),
         title: 'Avisos do Sistema',
       },
+      {
+        path: 'cliente-cadastrar',
+        loadComponent: () => 
+          import('./features/register-new-client/register-new-client.component').then((m) => m.RegisterNewClientComponent),
+        title: 'Cadastrar Novo Cliente'
+      },
       { path: '', redirectTo: 'home', pathMatch: 'full' } // Rota padrão dentro de /app
     ]
   },
