@@ -23,27 +23,29 @@ import { TooltipModule } from 'primeng/tooltip';
 import { EmployeeService } from '../../../employees/services/employee.service';
 import { EmployeeRole, ViewEmployeeDto } from '../../../../interfaces/employee.model';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { SignaturePadComponent } from "../../../../shared/components/signature-pad/signature-pad.component";
 
 @Component({
   selector: 'app-admin-manage-sales',
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    TableModule, 
-    ButtonModule, 
+    CommonModule,
+    ReactiveFormsModule,
+    TableModule,
+    ButtonModule,
     InputTextModule,
-    SelectModule, 
-    DatePickerModule, 
-    InputNumberModule, 
-    DialogModule, 
+    SelectModule,
+    DatePickerModule,
+    InputNumberModule,
+    DialogModule,
     ToastModule,
-    ToolbarModule, 
-    TagModule, 
-    TooltipModule, 
+    ToolbarModule,
+    TagModule,
+    TooltipModule,
     TextareaModule,
     FieldsetModule,
-    ConfirmDialogModule
-  ],
+    ConfirmDialogModule,
+    SignaturePadComponent
+],
   templateUrl: './admin-manage-sales.component.html',
   styleUrl: './admin-manage-sales.component.scss',
   providers: [MessageService, DatePipe, ConfirmationService]

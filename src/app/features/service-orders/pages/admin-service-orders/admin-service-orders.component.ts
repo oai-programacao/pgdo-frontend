@@ -11,9 +11,9 @@ import { ToastModule } from 'primeng/toast';
 import { ServiceOrderService } from '../../services/service-order.service';
 import { TechnicianService } from '../../../technicians/services/technician.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { ViewTechnicianDto } from '../../../../interfaces/technician.model';
-import { ViewServiceOrderDto } from '../../../../interfaces/service-order.model';
+import { UpdateServiceOrderDto, ViewServiceOrderDto } from '../../../../interfaces/service-order.model';
 import { CitiesLabels, CommandArea, Period, PeriodLabels, ServiceOrderStatus, ServiceOrderStatusLabels, TypeOfOs, TypeOfOsLabels } from '../../../../interfaces/enums.model';
 import { PhonesPipe } from '../../../../shared/pipes/phones.pipe';
 import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pipe';
@@ -21,6 +21,7 @@ import { ButtonModule } from 'primeng/button';
 import { FieldsetModule } from 'primeng/fieldset';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { SignaturePadComponent } from "../../../../shared/components/signature-pad/signature-pad.component";
 
 @Component({
   selector: 'app-admin-service-orders',
@@ -39,8 +40,8 @@ import { MultiSelectModule } from 'primeng/multiselect';
     ButtonModule,
     FieldsetModule,
     InputNumberModule,
-    MultiSelectModule
-  ],
+    MultiSelectModule,
+],
   templateUrl: './admin-service-orders.component.html',
   styleUrl: './admin-service-orders.component.scss',
   providers: [MessageService]
@@ -74,8 +75,14 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   selectedServiceOrder: ViewServiceOrderDto | null = null;
 
   //Opções de filtro
-  statusOptions: any[];
-  serviceOrderTypeOptions: any[];
+  statusOptions: any[] = [
+    { label: 'Em Branco', value: null},
+    ...Object.entries(ServiceOrderStatusLabels).map(([key, value]) => ({
+      label: value,
+      value: ServiceOrderStatus[key as keyof typeof ServiceOrderStatus]
+    }))
+  ]
+  serviceOrderTypeOptions: any[]
   cityOptions: any[];
   periodOptions: any[];
 
@@ -86,7 +93,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   isSubmittingSubForm = false; // Flag de loading para os sub-formulários
 
   constructor() {
-      this.statusOptions = this.mapLabelsToOptions(ServiceOrderStatusLabels);
+      // this.statusOptions = this.mapLabelsToOptions(ServiceOrderStatusLabels);
       this.serviceOrderTypeOptions = this.mapLabelsToOptions(TypeOfOsLabels);
       this.cityOptions = this.mapLabelsToOptions(CitiesLabels);
       this.periodOptions = this.mapLabelsToOptions(PeriodLabels);
@@ -102,7 +109,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initForms();
-     this.initializeStateFromUrl(); // 2. Lemos a URL e populamos o formulário/paginação
+    this.initializeStateFromUrl(); // 2. Lemos a URL e populamos o formulário/paginação
     this.initTechnicians();
     this.loadServiceOrders();
   }
@@ -163,11 +170,82 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     });
   }
 
+  updateServiceOrder(index: number): void {
+    const formGroup = this.orders.at(index) as FormGroup;
+    const id = formGroup.get('id')?.value;
+
+    if (!id) return;
+
+    const technician = formGroup.get('technician')?.value;
+    const startOfOs = formGroup.get('startOfOs')?.value;
+    const endOfOs = formGroup.get('endOfOs')?.value;
+
+    // Validações com base nas regras de negócio
+    if (!technician && (startOfOs || endOfOs)) {
+      this.messageService.add({ severity: 'warn', summary: 'Validação', detail: 'Para informar horário de início ou fim, é necessário definir um técnico.' });
+      formGroup.get('startOfOs')?.setValue(null, { emitEvent: false });
+      formGroup.get('endOfOs')?.setValue(null, { emitEvent: false });
+      return;
+    }
+
+    if (technician && !startOfOs && endOfOs) {
+      this.messageService.add({ severity: 'warn', summary: 'Validação', detail: 'Para informar o horário de fim, o horário de início deve estar preenchido.' });
+      formGroup.get('endOfOs')?.setValue(null, { emitEvent: false });
+      return;
+    }
+
+    const dto: UpdateServiceOrderDto = {
+      scheduleDate: formGroup.get('scheduleDate')?.value || null,
+      period: formGroup.get('period')?.value || null,
+      technology: formGroup.get('technology')?.value || null,
+      technicianId: technician || null,
+      status: formGroup.get('status')?.value || null,
+      cabling: formGroup.get('cabling')?.value ?? null,
+      isActiveToReport: undefined,
+      startOfOs: startOfOs || null,
+      endOfOs: endOfOs || null,
+      observation: formGroup.get('observation')?.value || null,
+    };
+
+    this.serviceOrderService.update(id, dto).subscribe({
+      next: () => {
+       this.loadServiceOrders(); // Recarrega as ordens de serviço após a atualização
+      },
+      error: (err) => {
+        console.error('Erro ao atualizar Ordem de Serviço:', err);
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao atualizar Ordem de Serviço.' });
+      }
+    });
+  }
+
+
   clearFilters(): void { 
     this.filterForm.reset(); 
     this.first = 0; // Reseta a paginação para a primeira página
     this.loadServiceOrders(); // Recarrega as ordens de serviço sem filtros
   }
+
+  // Adicione este método auxiliar no componente
+  private setupFormListeners(): void {
+    this.orders.controls.forEach((group, index) => {
+      const controlsToWatch = ['scheduleDate', 'period', 'technician', 'startOfOs', 'endOfOs', 'status'];
+
+      controlsToWatch.forEach(controlName => {
+        const control = group.get(controlName);
+        if (!control) return;
+
+        control.valueChanges
+          .pipe(
+            debounceTime(2000),
+            takeUntil(this.destroy$)
+          )
+          .subscribe(currentValue => {
+            this.updateServiceOrder(index);
+          });
+      });
+    });
+  }
+
 
   private updateUrlQueryParams(): void {
     const page = Math.floor(this.first / this.rows);
@@ -236,17 +314,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     });
   }
 
-  // private populateOrdersArray() {
-  //   const ordersArray = this.orders;
-  //   ordersArray.clear(); // Limpa o FormArray para evitar duplicação
-
-  //   this.os.forEach((order) => {
-  //     console.log('Populating order:', order);
-  //     ordersArray.push(this.createServiceOrderGroup(order));
-  //   });
-  //   this.isLoading = false;
-  // }
-
   private populateOrdersArray() {
     // 2. Usamos o setTimeout para desacoplar a atualização do formulário
     // do ciclo de detecção de mudanças do evento (onPage).
@@ -261,6 +328,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       
       // 4. Avisa o Angular para garantir a atualização da view.
       this.cdr.markForCheck();
+      this.setupFormListeners();
     }, 0);
   }
 
