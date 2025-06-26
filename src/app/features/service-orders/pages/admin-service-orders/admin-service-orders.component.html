@@ -1,4 +1,4 @@
-<div class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
+<div class="md:p-4 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
 
     <p-fieldset [toggleable]="true" [collapsed]="true" styleClass="mb-6 filter-fieldset">
     <ng-template pTemplate="header">
@@ -26,11 +26,11 @@
     
         <div>
           <label for="startDate" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Agendado De</label>
-          <p-datepicker inputId="startDate" formControlName="startDate" dateFormat="dd/mm/yy" [showIcon]="true" placeholder="dd/mm/aaaa" showClear appendTo="body"/>
+          <p-datepicker inputId="startDate" formControlName="startDate" dateFormat="dd/mm/yy" dataType="string" [showIcon]="true" placeholder="dd/mm/aaaa" showClear appendTo="body"/>
         </div>
         <div>
           <label for="endDate" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Agendado Até</label>
-          <p-datepicker inputId="endDate" formControlName="endDate" dateFormat="dd/mm/yy" [showIcon]="true" placeholder="dd/mm/aaaa" showClear appendTo="body" />
+          <p-datepicker inputId="endDate" formControlName="endDate" dateFormat="dd/mm/yy" dataType="string" [showIcon]="true" placeholder="dd/mm/aaaa" showClear appendTo="body" />
         </div>
         <div>
           <label for="periods" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Períodos</label>
@@ -85,9 +85,9 @@
                         <th class="w-38">Data Agend.</th>
                         <th class="w-24">Período</th>
                         <th class="w-48">Técnico</th>
-                        <th class="w-26">Início</th>
-                        <th class="w-26">Fim</th>
-                        <th class="w-24">Duração</th>
+                        <th class="w-32">Início</th>
+                        <th class="w-32">Fim</th>
+                        <th class="w-20">Duração</th>
                         <th class="w-50">Status</th>
                         <th style="width:12rem" class="text-center">Ações</th>
                     </tr>
@@ -130,13 +130,14 @@
                                 appendTo="body"
                                 styleClass="min-w-[150px] max-w-[150px]"
                                 id="technician"
+                                showClear
                             />
                         </td>
                         <td>
-                            <p-datepicker formControlName="startOfOs" styleClass="min-w-full" [timeOnly]="true" dataType="string" dateFormat="HH:mm" hourFormat="24" appendTo="body" />
+                            <p-datepicker formControlName="startOfOs" styleClass="min-w-full" [timeOnly]="true" dataType="string" dateFormat="HH:mm" hourFormat="24" appendTo="body" showClear/>
                         </td>
                         <td>
-                            <p-datepicker formControlName="endOfOs" styleClass="min-w-full" [timeOnly]="true" dataType="string" dateFormat="HH:mm" hourFormat="24" appendTo="body" />
+                            <p-datepicker formControlName="endOfOs" styleClass="min-w-full" [timeOnly]="true" dataType="string" dateFormat="HH:mm" hourFormat="24" appendTo="body" showClear/>
                         </td>
                         <td>
                             {{ os.durationOfOs | formatDuration }}
@@ -173,6 +174,8 @@
         </form>
     </div>
 </div>
+
+<p-toast />
 
 <ng-template #loadingTemplate>
     <div class="flex justify-center items-center p-8">

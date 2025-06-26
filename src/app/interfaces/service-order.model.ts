@@ -46,6 +46,7 @@ export interface ViewServiceOrderDto {
   createdAt: string;
   updatedAt?: string;
   updatedBy?: string;
+  isActiveToReport?: boolean; // Se a OS está ativa para relatório
 }
 
 // DTO para criar a Ordem de Serviço
@@ -69,9 +70,9 @@ export interface CreateServiceOrderDto {
 
 export interface UpdateServiceOrderDto {
   period?: Period;
-  scheduleDate: string; // DD/MM/YYYY
+  scheduleDate?: string | undefined;
   technology?: Technology;
-  technicianId: string; // ID do técnico
+  technicianId?: string; // ID do técnico
   status?: ServiceOrderStatus; // Status da OS
   cabling?: boolean; // Se é cabeamento ou não
   isActiveToReport?: boolean; // Se a OS está ativa para relatório

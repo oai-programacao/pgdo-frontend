@@ -128,6 +128,7 @@ export enum ServiceOrderStatus {
   RESCHEDULED_PENDING = 'RESCHEDULED_PENDING',
   TECHNICAL_INFEASIBILITY = 'TECHNICAL_INFEASIBILITY',
   NORMALIZED = 'NORMALIZED',
+
 }
 
 export const ServiceOrderStatusLabels: Record<ServiceOrderStatus, string> = {

@@ -86,7 +86,7 @@ export class ServiceOrderService {
     return this.http.get<ViewServiceOrderDto>(`${this.apiUrl}/${id}`);
   }
 
-  update(id: string, dto: Partial<UpdateServiceOrderDto>): Observable<ViewServiceOrderDto> {
+  update(id: string, dto: UpdateServiceOrderDto): Observable<ViewServiceOrderDto> {
     return this.http.patch<ViewServiceOrderDto>(`${this.apiUrl}/${id}`, dto);
   }
 
