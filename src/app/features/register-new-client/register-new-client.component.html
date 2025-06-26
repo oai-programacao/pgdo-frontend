@@ -209,9 +209,9 @@
         <p-step>Assinatura do Cliente</p-step>
         <p-step-panel>
           <ng-template #content let-activateCallback="activateCallback">
-            <div class="flex flex-col h-48">
+            <div class="flex flex-col">
               <!-- Local para exibir ou capturar a assinatura do cliente -->
-              Assinatura aqui
+              <app-signature-pad />
             </div>
 
             <!-- Botões de navegação final -->

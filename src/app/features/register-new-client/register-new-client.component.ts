@@ -11,6 +11,7 @@ import {  FormsModule} from "@angular/forms";
 import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
 import { FloatLabel } from 'primeng/floatlabel';
+import { SignaturePadComponent } from "../../shared/components/signature-pad/signature-pad.component";
 @Component({
   selector: "app-register-new-client",
   imports: [
@@ -23,8 +24,9 @@ import { FloatLabel } from 'primeng/floatlabel';
     SelectModule,
     DatePickerModule,
     TextareaModule,
-    FloatLabel
-  ],
+    FloatLabel,
+    SignaturePadComponent
+],
   templateUrl: "./register-new-client.component.html",
   styleUrl: "./register-new-client.component.scss",
   providers: [
