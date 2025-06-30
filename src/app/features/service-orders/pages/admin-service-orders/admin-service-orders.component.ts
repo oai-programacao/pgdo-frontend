@@ -21,7 +21,7 @@ import { ButtonModule } from 'primeng/button';
 import { FieldsetModule } from 'primeng/fieldset';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { SignaturePadComponent } from "../../../../shared/components/signature-pad/signature-pad.component";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-admin-service-orders',
@@ -41,6 +41,7 @@ import { SignaturePadComponent } from "../../../../shared/components/signature-p
     FieldsetModule,
     InputNumberModule,
     MultiSelectModule,
+    TooltipModule
 ],
   templateUrl: './admin-service-orders.component.html',
   styleUrl: './admin-service-orders.component.scss',
