@@ -13,7 +13,7 @@ export const routes: Routes = [
   },{
     path: 'app', // Um prefixo para todas as rotas autenticadas
     component: MainLayoutComponent, // O MainLayoutComponent é carregado aqui
-    // canActivate: [authGuard],       // Protege todo o layout e seus filhos
+    canActivate: [authGuard],       // Protege todo o layout e seus filhos
     children: [ // Rotas filhas que serão renderizadas DENTRO do router-outlet do MainLayoutComponent
       {
         path: 'home', // A URL final será /app/home
@@ -151,7 +151,7 @@ export const routes: Routes = [
       {
         path: 'cliente-cadastrar',
         loadComponent: () => 
-          import('./features/register-new-client/register-new-client.component').then((m) => m.RegisterNewClientComponent),
+          import('./features/register-new-client/pages/register-new-client.component').then((m) => m.RegisterNewClientComponent),
         title: 'Cadastrar Novo Cliente'
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' } // Rota padrão dentro de /app
