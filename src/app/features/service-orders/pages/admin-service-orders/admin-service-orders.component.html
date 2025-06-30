@@ -82,7 +82,7 @@
                         <th>Contrato</th>
                         <th>Cliente / Endereço</th>
                         <th>Tipo OS</th>
-                        <th class="w-38">Data Agend.</th>
+                        <th class="w-46">Data Agend.</th>
                         <th class="w-24">Período</th>
                         <th class="w-48">Técnico</th>
                         <th class="w-32">Início</th>
@@ -97,8 +97,10 @@
                         <td>{{os.contractNumber}}</td>
                         <td>
                             <div class="font-medium truncate w-fit">{{ os.clientName }}</div>
-                            <div class="text-xs text-slate-500 truncate w-fit">{{ os.address }}</div>
-                            <div class="text-xs text-slate-500 truncate w-fit">Telefone - {{ os.phone1 | phones}}</div>
+                            <div class="text-s text-slate-500 truncate w-fit">{{ os.address }}</div>
+                            <div class="text-s text-slate-500 truncate w-fit">Cidade - {{ getCitiesLabel(os.city) }}</div>
+                            <div class="text-s text-slate-500 truncate w-fit">Telefone - {{ os.phone1 | phones}}</div>
+                            
                         </td>
                         <td>{{ getTypeOfOsLabel(os.typeOfOs) }}</td>
                         <td>
@@ -162,6 +164,7 @@
                                         icon="pi pi-flag"
                                         text
                                         pTooltip="Visita Improdutiva"
+                                        tooltipPosition="left"
                                     ></button>
                                     <button
                                         type="button"
@@ -170,6 +173,7 @@
                                         rounded
                                         text
                                         pTooltip="Ajuda Técnica"
+                                        tooltipPosition="left"
                                     ></button>
                                 </div>
 
@@ -179,6 +183,8 @@
                                         pButton
                                         icon="pi pi-pencil"
                                         class="p-button-rounded p-button-text p-button-warning"
+                                        pTooltip="Editar OS"
+                                        tooltipPosition="left"
                                     ></button>
                                     <button
                                         type="button"
