@@ -25,7 +25,7 @@ export class SignaturePadComponent implements AfterViewInit, OnDestroy {
     this.signaturePad = new SignaturePad(canvas, {
       backgroundColor: 'white',
       penColor: 'black',
-      minWidth: 1.2,
+      minWidth: 1.8,
       maxWidth: 3,
     });
 
