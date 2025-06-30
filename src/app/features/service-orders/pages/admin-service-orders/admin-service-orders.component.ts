@@ -14,7 +14,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { ViewTechnicianDto } from '../../../../interfaces/technician.model';
 import { UpdateServiceOrderDto, ViewServiceOrderDto } from '../../../../interfaces/service-order.model';
-import { CitiesLabels, CommandArea, Period, PeriodLabels, ServiceOrderStatus, ServiceOrderStatusLabels, TypeOfOs, TypeOfOsLabels } from '../../../../interfaces/enums.model';
+import { CitiesLabels, City, CommandArea, Period, PeriodLabels, ServiceOrderStatus, ServiceOrderStatusLabels, TypeOfOs, TypeOfOsLabels } from '../../../../interfaces/enums.model';
 import { PhonesPipe } from '../../../../shared/pipes/phones.pipe';
 import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pipe';
 import { ButtonModule } from 'primeng/button';
@@ -386,6 +386,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
 
   private mapLabelsToOptions = (labels: Record<string, string>): any[] => Object.entries(labels).map(([value, label]) => ({ label, value }));
   getStatusLabel = (status: ServiceOrderStatus) => ServiceOrderStatusLabels[status] || status;
+  getCitiesLabel = (city: City) => CitiesLabels[city] || city;
   getTypeOfOsLabel = (type: TypeOfOs) => TypeOfOsLabels[type] || type;
   getPeriodLabel = (period: Period) => PeriodLabels[period] || period;
 
