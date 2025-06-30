@@ -14,7 +14,7 @@ export class RegisterClientService {
 
   
   registerClient(data: CreateRegisterClientDto): Observable<ViewRegisterClientResponseDto> {
-    const url = `${this.apiUrl}/clientContract`;
+    const url = `${this.apiUrl}/clientRegister`;
     return this.http.post<ViewRegisterClientResponseDto>(url, data);
   }
 }

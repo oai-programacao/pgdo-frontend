@@ -223,6 +223,7 @@
                 optionLabel="name"
                 optionValue="value"
                 placeholder="Plano" 
+                appendTo="body"
                 styleClass="w-[40%]"
                 />
                 <p-inputnumber
@@ -240,6 +241,7 @@
                   [options]="dueDateOptions"
                   formControlName="dueDay"
                   placeholder="Dia de vencimento"
+                  appendTo="body"
                   fluid
                   styleClass="w-[20%]"
                 />
@@ -363,7 +365,7 @@
 
             <div class="flex py-6 gap-2 justify-between">
               <p-button label="Voltar" icon="pi pi-arrow-left" severity="secondary" (onClick)="activateCallback(1)" />
-              <p-button label="Próximo" [disabled]="contracts.length === 0" (onClick)="activateCallback(3); submitRegistration()" />
+              <p-button label="Próximo" [disabled]="contracts.length === 0" (onClick)="activateCallback(3); " />
             </div>
           </ng-template>
         </p-step-panel>
@@ -375,7 +377,7 @@
           <ng-template #content let-activateCallback="activateCallback">
             <div class="flex flex-col w-full">
               <div class="w-full">
-                <app-signature-pad />
+                <app-signature-pad (signatureData)="onSignatureDataReceived($event)" />
               </div>
             </div>
 
@@ -391,6 +393,8 @@
                 <p-button
                   label="Concluir"
                   severity="success"
+                  (onClick)="submitRegistration()"
+                  [disabled]="form.invalid" 
                 />
               </div>
             </div>
@@ -401,3 +405,6 @@
   </div>
 </form>
 </div>
+
+
+<p-toast />

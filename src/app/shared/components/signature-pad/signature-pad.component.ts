@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import SignaturePad from 'signature_pad';
 
@@ -13,6 +13,7 @@ import SignaturePad from 'signature_pad';
 export class SignaturePadComponent implements AfterViewInit, OnDestroy {
   signaturePad!: SignaturePad;
   signatureImg!: string;
+  @Output() signatureData: EventEmitter<string> = new EventEmitter<string>();
 
   @ViewChild('canvas') canvasEl!: ElementRef<HTMLCanvasElement>;
 
@@ -48,8 +49,9 @@ export class SignaturePadComponent implements AfterViewInit, OnDestroy {
 
   savePad(): void {
     const base64Data = this.signaturePad.toDataURL();
-    console.log('Assinatura base64:', base64Data);
     this.signatureImg = base64Data;
+    this.signatureData.emit(base64Data);
+    
   }
 
   private resizeCanvas(): void {
