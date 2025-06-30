@@ -1,5 +1,6 @@
+import { MessageService } from 'primeng/api';
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, OnInit, ViewChild } from "@angular/core";
 
 // PRIME
 import { InputTextModule } from "primeng/inputtext";
@@ -19,6 +20,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ViaCepService } from "../../../service/viacep.service";
 import { RegisterClientService } from "../services/register-client.service";
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: "app-register-new-client",
@@ -37,19 +39,24 @@ import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
     FloatLabel,
     SignaturePadComponent,
     InputNumberModule,
-    NgxMaskDirective
+    NgxMaskDirective,
+    ToastModule
 ],
   templateUrl: "./register-new-client.component.html",
   styleUrl: "./register-new-client.component.scss",
-  providers: [provideNgxMask()]
+  providers: [provideNgxMask(), MessageService]
 })
 export class RegisterNewClientComponent {
   private readonly viacepService = inject(ViaCepService);
   private readonly registerClientService = inject(RegisterClientService);
+  private readonly messageService = inject(MessageService);
   fb!: FormBuilder;
   form!: FormGroup;
   contractForm!: FormGroup;
   planCodes: [] = [];
+
+  signaturePadData: string = '';
+  
 
   constructor() {
     this.fb = inject(FormBuilder);
@@ -81,7 +88,9 @@ export class RegisterNewClientComponent {
       residentialPhone: ['', Validators.required],
       mobilePhone: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
+      signaturePad: [null, Validators.required],
     });
+    
 
     // Form usado apenas para adicionar contratos
     this.contractForm = this.createContract();
@@ -124,7 +133,7 @@ export class RegisterNewClientComponent {
         next: (response) => {
           if (response) {
             const endereco = {
-              zipCode: response.cep.replace(/\D/g, ''), // Remove traços, espaços, etc.
+              zipCode: response.cep, // Remove traços, espaços, etc.
               state: response.uf,
               city: response.localidade,
               street: response.logradouro,
@@ -259,5 +268,15 @@ export class RegisterNewClientComponent {
   getPlanName(planCode: number): string {
     const plan = [...this.pfPlans, ...this.pjPlans].find(p => p.value === planCode);
     return plan ? plan.name : 'Plano Desconhecido';
+  }
+
+  onSignatureDataReceived(signatureData: string): void {
+    this.signaturePadData = signatureData
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Assinatura Capturada',
+      detail: 'A assinatura foi capturada com sucesso.',
+    })
+    this.form.get('signaturePad')?.setValue(signatureData);
   }
  }
