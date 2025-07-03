@@ -46,7 +46,7 @@ import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
   styleUrl: "./register-new-client.component.scss",
   providers: [provideNgxMask(), MessageService]
 })
-export class RegisterNewClientComponent implements OnInit, OnDestroy {
+export class RegisterNewClientComponent {
   private readonly viacepService = inject(ViaCepService);
   private readonly registerClientService = inject(RegisterClientService);
   private readonly messageService = inject(MessageService);
@@ -56,13 +56,8 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
   contractForm!: FormGroup;
   planCodes: [] = [];
   stepIndex = 1;
-
   signaturePadData: string = '';
-   // 1. CRIE UMA NOVA PROPRIEDADE PARA ARMAZENAR O ENDEREÇO "ATRASADO"
-  public debouncedAddressForMap: any = null;
-
-  // 2. CRIE UM "SUBJECT" PARA GERENCIAR O UNSUBSCRIBE (BOA PRÁTICA)
-  private destroy$ = new Subject<void>();
+  public addressForMapSearch: any = null;
 
   constructor() {
     this.fb = inject(FormBuilder);
@@ -103,10 +98,6 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
     this.contractForm = this.createContract();
   }
 
-  ngOnInit(): void {
-    this.setupAddressDebounce();
-  }
-
   dueDateOptions: any = [
     1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
   ]
@@ -132,42 +123,35 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
     {name: "Pessoa Jurídica", value: "PJ"}
   ];
 
-   private setupAddressDebounce(): void {
-    this.contractForm.get('address')?.valueChanges.pipe(
-      // Atraso de 500ms (meio segundo)
-      debounceTime(500),
+  public searchAddressOnMap(): void {
+    // Primeiro, marcamos os campos do endereço como "tocados" para mostrar erros de validação
+    this.contractForm.get('address')?.markAllAsTouched();
 
-      // Só continua se o valor do endereço realmente mudou
-      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
-      
-      // Gerencia o ciclo de vida para evitar memory leaks
-      takeUntil(this.destroy$)
+    // Pegamos a referência para o form group do endereço
+    const addressForm = this.contractForm.get('address');
 
-    ).subscribe(addressValue => {
-      // Esta parte do código só vai rodar 500ms depois que o usuário PARAR de digitar
+    // Verificamos se os campos necessários (rua, numero, cidade) são válidos
+    if (!addressForm || !addressForm.get('street')?.value || !addressForm.get('number')?.value || !addressForm.get('city')?.value) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Dados Incompletos',
+        detail: 'Por favor, preencha pelo menos a rua, número e cidade para pesquisar no mapa.',
+      });
+      this.addressForMapSearch = null; // Garante que o mapa não apareça
+      return;
+    }
 
-      // Verifica se temos um endereço válido para buscar
-      if (addressValue && addressValue.number && addressValue.street) {
-        
-        // Mapeia para o formato que o componente do mapa espera
-        this.debouncedAddressForMap = {
-          logradouro: addressValue.street,
-          numero: addressValue.number,
-          bairro: addressValue.neighborhood,
-          localidade: addressValue.city
-        };
+    // Se os dados são válidos, pegamos os valores
+    const addressValue = addressForm.value;
 
-      } else {
-        // Se o endereço não for mais válido (ex: apagou o número),
-        // limpamos a variável para o mapa desaparecer.
-        this.debouncedAddressForMap = null;
-      }
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    // Populamos nossa variável de controle com o objeto mapeado
+    // que o componente do mapa espera.
+    this.addressForMapSearch = {
+      logradouro: addressValue.street,
+      numero: addressValue.number,
+      bairro: addressValue.neighborhood,
+      localidade: addressValue.city
+    };
   }
 
   getCep(isContract: boolean): void {

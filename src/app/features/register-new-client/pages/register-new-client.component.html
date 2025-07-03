@@ -328,9 +328,18 @@
                   </div>
                 </div>
 
-              <div *ngIf="debouncedAddressForMap" class="w-full mt-5">
-                  <app-google-maps [address]="debouncedAddressForMap"/>
-              </div>
+             <div class="flex justify-end my-4">
+                <p-button 
+                    label="Procurar endereço no Mapa" 
+                    icon="pi pi-map-marker"
+                    styleClass="p-button-outlined"
+                    (click)="searchAddressOnMap()">
+                </p-button>
+            </div>
+
+            <div *ngIf="addressForMapSearch" class="w-full mt-2">
+                <app-google-maps [address]="addressForMapSearch"/>
+            </div>
 
                 <p-floatlabel>
                   <textarea
