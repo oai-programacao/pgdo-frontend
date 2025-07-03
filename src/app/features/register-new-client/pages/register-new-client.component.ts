@@ -243,8 +243,9 @@ export class RegisterNewClientComponent {
             neighborhood: response.bairro,
             complement: response.complemento,
           };
-          
+        
           formGroup.get(addressPath)?.patchValue(endereco);
+          this.form.get('ibge')?.setValue(response.ibge);
           
           // Foca no campo "número" para o usuário continuar o preenchimento
           // (Esta é uma melhoria de UX opcional)
