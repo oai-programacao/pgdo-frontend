@@ -11,3 +11,21 @@
 nav {
   scrollbar-gutter: stable;
 }
+
+/* Define a trilha (o fundo onde a barra se move) */
+::-webkit-scrollbar-track {
+  background: transparent; /* Deixa o fundo da trilha transparente */
+}
+
+/* Define o "polegar" (a parte móvel da barra de rolagem) */
+::-webkit-scrollbar-thumb {
+  background-color: #4a5568; /* Cor cinza-ardósia, combinando com seu tema */
+  border-radius: 20px; /* Bordas arredondadas */
+  /* Cria um pequeno espaçamento em volta da barra para um visual mais limpo */
+  border: 2px solid #1e293b; /* Use a cor de fundo exata do seu menu (slate-800) */
+}
+
+/* Efeito ao passar o mouse sobre a barra */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #718096;
+}

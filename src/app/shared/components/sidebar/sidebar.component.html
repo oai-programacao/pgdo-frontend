@@ -136,7 +136,7 @@
     </button>
   </div>
 
-    <nav class="flex-grow mt-2 space-y-1 px-2 overflow-y-none min-h-0" [ngClass]="{'overflow-y-auto': !isCollapsed}">
+    <nav class="flex-grow mt-2 space-y-1 px-2 overflow-y-none min-h-0 scroll-fade" [ngClass]="{'overflow-y-auto': !isCollapsed}">
       <ng-container *ngFor="let item of visibleMenuItems$ | async; trackBy: trackById">
         <div>
           <a 
