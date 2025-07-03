@@ -304,6 +304,10 @@
                 </div>
               </div>
 
+              <div *ngIf="debouncedAddressForMap" class="w-full mt-5">
+                  <app-google-maps [address]="debouncedAddressForMap"/>
+              </div>
+
               <p-floatlabel>
                 <textarea pTextarea formControlName="observation" rows="3" fluid></textarea>
                 <label>Observação</label>

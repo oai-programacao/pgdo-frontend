@@ -1,6 +1,6 @@
 import { MessageService } from 'primeng/api';
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit, ViewChild } from "@angular/core";
+import { Component, inject, OnDestroy, OnInit, ViewChild } from "@angular/core";
 
 // PRIME
 import { InputTextModule } from "primeng/inputtext";
@@ -13,14 +13,13 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
 import { FloatLabel } from 'primeng/floatlabel';
 import { SignaturePadComponent } from "../../../shared/components/signature-pad/signature-pad.component";
-import { CpfCnpjPipe } from "../../../shared/pipes/cpf-cnpj.pipe";
-import { RgPipe } from "../../../shared/pipes/rg.pipe";
-import { PhonesPipe } from "../../../shared/pipes/phones.pipe";
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ViaCepService } from "../../../service/viacep.service";
 import { RegisterClientService } from "../services/register-client.service";
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { ToastModule } from 'primeng/toast';
+import { GoogleMapsComponent } from "../../../shared/components/google-maps/google-maps.component";
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: "app-register-new-client",
@@ -40,13 +39,14 @@ import { ToastModule } from 'primeng/toast';
     SignaturePadComponent,
     InputNumberModule,
     NgxMaskDirective,
-    ToastModule
+    ToastModule,
+    GoogleMapsComponent
 ],
   templateUrl: "./register-new-client.component.html",
   styleUrl: "./register-new-client.component.scss",
   providers: [provideNgxMask(), MessageService]
 })
-export class RegisterNewClientComponent {
+export class RegisterNewClientComponent implements OnInit, OnDestroy {
   private readonly viacepService = inject(ViaCepService);
   private readonly registerClientService = inject(RegisterClientService);
   private readonly messageService = inject(MessageService);
@@ -56,7 +56,11 @@ export class RegisterNewClientComponent {
   planCodes: [] = [];
 
   signaturePadData: string = '';
-  
+   // 1. CRIE UMA NOVA PROPRIEDADE PARA ARMAZENAR O ENDEREÇO "ATRASADO"
+  public debouncedAddressForMap: any = null;
+
+  // 2. CRIE UM "SUBJECT" PARA GERENCIAR O UNSUBSCRIBE (BOA PRÁTICA)
+  private destroy$ = new Subject<void>();
 
   constructor() {
     this.fb = inject(FormBuilder);
@@ -96,6 +100,10 @@ export class RegisterNewClientComponent {
     this.contractForm = this.createContract();
   }
 
+  ngOnInit(): void {
+    this.setupAddressDebounce();
+  }
+
   dueDateOptions: any = [
     1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
   ]
@@ -120,6 +128,44 @@ export class RegisterNewClientComponent {
     {name: "Pessoa Física", value: "PF"},
     {name: "Pessoa Jurídica", value: "PJ"}
   ];
+
+   private setupAddressDebounce(): void {
+    this.contractForm.get('address')?.valueChanges.pipe(
+      // Atraso de 500ms (meio segundo)
+      debounceTime(500),
+
+      // Só continua se o valor do endereço realmente mudou
+      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
+      
+      // Gerencia o ciclo de vida para evitar memory leaks
+      takeUntil(this.destroy$)
+
+    ).subscribe(addressValue => {
+      // Esta parte do código só vai rodar 500ms depois que o usuário PARAR de digitar
+
+      // Verifica se temos um endereço válido para buscar
+      if (addressValue && addressValue.number && addressValue.street) {
+        
+        // Mapeia para o formato que o componente do mapa espera
+        this.debouncedAddressForMap = {
+          logradouro: addressValue.street,
+          numero: addressValue.number,
+          bairro: addressValue.neighborhood,
+          localidade: addressValue.city
+        };
+
+      } else {
+        // Se o endereço não for mais válido (ex: apagou o número),
+        // limpamos a variável para o mapa desaparecer.
+        this.debouncedAddressForMap = null;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   getCep(isContract: boolean): void {
     const cepRaw = isContract

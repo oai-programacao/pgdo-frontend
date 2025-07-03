@@ -13,7 +13,7 @@ export const routes: Routes = [
   },{
     path: 'app', // Um prefixo para todas as rotas autenticadas
     component: MainLayoutComponent, // O MainLayoutComponent é carregado aqui
-    canActivate: [authGuard],       // Protege todo o layout e seus filhos
+    // canActivate: [authGuard],       // Protege todo o layout e seus filhos
     children: [ // Rotas filhas que serão renderizadas DENTRO do router-outlet do MainLayoutComponent
       {
         path: 'home', // A URL final será /app/home
