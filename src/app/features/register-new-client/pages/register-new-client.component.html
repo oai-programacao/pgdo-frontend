@@ -480,8 +480,8 @@
                   ></p-fileUpload>
                 </div>
 
-                <div *ngIf="form.get('photoRg')?.value" class="mt-2 flex flex-column align-items-center gap-3">
-                  <img [src]="form.get('photoRg')?.value" alt="Preview do Documento" class="w-full md:w-6 border-round" />
+                <div *ngIf="form.get('photoRg')?.value" class="mt-2 flex align-items-center gap-3">
+                  <img [src]="form.get('photoRg')?.value" alt="Preview do Documento" class="w-[50%] border-round" />
                   <p-button
                     label="Remover Imagem"
                     icon="pi pi-trash"
