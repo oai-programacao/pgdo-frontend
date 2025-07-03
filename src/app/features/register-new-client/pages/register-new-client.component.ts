@@ -8,7 +8,7 @@ import { StepperModule } from "primeng/stepper";
 import { ButtonModule } from "primeng/button";
 import { IftaLabelModule } from "primeng/iftalabel";
 import { SelectModule } from 'primeng/select';
-import {  FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
+import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
 import { FloatLabel } from 'primeng/floatlabel';
@@ -21,6 +21,8 @@ import { ToastModule } from 'primeng/toast';
 import { GoogleMapsComponent } from "../../../shared/components/google-maps/google-maps.component";
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { FileUpload } from 'primeng/fileupload'; // Importe o FileUpload
+import { FileUploadModule } from 'primeng/fileupload';
 
 @Component({
   selector: "app-register-new-client",
@@ -43,7 +45,8 @@ import { InputIconModule } from 'primeng/inputicon';
     ToastModule,
     GoogleMapsComponent,
     IconFieldModule,
-    InputIconModule
+    InputIconModule,
+    FileUploadModule
 ],
   templateUrl: "./register-new-client.component.html",
   styleUrl: "./register-new-client.component.scss",
@@ -54,6 +57,7 @@ export class RegisterNewClientComponent {
   private readonly registerClientService = inject(RegisterClientService);
   private readonly messageService = inject(MessageService);
   @ViewChild(SignaturePadComponent) signaturePadComponent!: SignaturePadComponent;
+  @ViewChild('fileUpload') fileUpload!: FileUpload;
   fb!: FormBuilder;
   form!: FormGroup;
   contractForm!: FormGroup;
@@ -67,6 +71,7 @@ export class RegisterNewClientComponent {
     this.fb = inject(FormBuilder);
     this.form = this.fb.group({
       clientType: [null, Validators.required],
+      photoRg: [null],
       cpf: [null],
       rg: [null],
       cnpj: [null],
@@ -156,6 +161,33 @@ export class RegisterNewClientComponent {
       bairro: addressValue.neighborhood,
       localidade: addressValue.city
     };
+  }
+
+   /**
+   * Converte o arquivo selecionado para BASE64 e o atribui ao form control 'photoRg'.
+   * @param event O evento emitido pelo p-FileUpload.
+   */
+  onUpload(event: any) {
+    const file = event.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (e: any) => {
+      // O resultado é a string em BASE64
+      const base64 = e.target.result;
+      this.form.patchValue({ photoRg: base64 });
+      this.form.get('photoRg')?.markAsDirty();
+    };
+
+    // Inicia a leitura do arquivo, que ao ser concluída, acionará o 'onload'
+    reader.readAsDataURL(file);
+  }
+
+  /**
+   * Limpa o valor do campo de imagem e reseta o componente de upload.
+   */
+  clearImage() {
+    this.form.get('photoRg')?.setValue(null);
+    this.fileUpload.clear(); // Limpa os arquivos do componente p-FileUpload
   }
 
   getCep(isContract: boolean): void {
