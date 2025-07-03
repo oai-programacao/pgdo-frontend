@@ -1,36 +1,57 @@
 <div
   class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md"
 >
-<form [formGroup]="form">
-  <h1 class="text-3xl font-semibold mb-4">Cadastrar Novo Cliente</h1>
-  <div>
-    <p-stepper [value]="1">
-      <p-step-item [value]="1">
-        <p-step>Dados do Cliente</p-step>
-        <p-step-panel>
-          <ng-template #content let-activateCallback="activateCallback">
-            <div class="flex justify-between items-center flex-wrap gap-4">
-              <div class="flex gap-2 w-full">
-                <p-select
-                  [options]="typePerson"
-                  optionLabel="name"
-                  optionValue="value"
-                  formControlName="clientType"
-                  placeholder="Tipo de Pessoa*"
-                  fluid
-                  styleClass="min-w-[200px] max-w-[200px]"
-                />
-                <div class="w-1/3">
-                  <p-datepicker
-                    appendTo="body"
-                    placeholder="Data de Nascimento ou abertura do CNPJ*"
-                    formControlName="birthDate"
+  <form [formGroup]="form">
+    <h1 class="text-3xl font-semibold mb-4">Cadastrar Novo Cliente</h1>
+    <div>
+      <p-stepper [(value)]="stepIndex" [linear]="true">
+        <p-step-item [value]="1">
+          <p-step>Dados do Cliente</p-step>
+          <p-step-panel>
+            <ng-template #content let-activateCallback="activateCallback">
+              <div class="flex justify-between items-center flex-wrap gap-4">
+                <div class="flex gap-2 w-full">
+                  <p-select
+                    [options]="typePerson"
+                    optionLabel="name"
+                    optionValue="value"
+                    formControlName="clientType"
+                    placeholder="Tipo de Pessoa*"
                     fluid
+                    styleClass="min-w-[200px] max-w-[200px]"
                   />
+                  <div
+                    class="flex flex-row gap-2 w-full md:w-full lg:w-2/5"
+                  >
+                    @if (isPJ) {
+                    <p-datepicker
+                      appendTo="body"
+                      placeholder="Data de abertura do CNPJ*"
+                      formControlName="birthDate"
+                      class="w-full md:w-[50%] lg:w-[45%]"
+                      fluid
+                    />
+                    <input
+                      pInputText
+                      placeholder="Inscrição Estadual"
+                      fluid
+                      formControlName="stateRegistration"
+                      class="w-full md:w-[50%] lg:w-[45%]"
+                    />
+                    } @else {
+                    <p-datepicker
+                      appendTo="body"
+                      class="w-full md:w-[48%] lg:w-[45%]"
+                      placeholder="Data de Nascimento*"
+                      formControlName="birthDate"
+                      fluid
+                    />
+                    }
+                  </div>
                 </div>
-              </div>
 
-              @if(isPF){
+                @if(isPF){
+
                 <input
                   type="text"
                   pInputText
@@ -58,357 +79,405 @@
                   mask="00.000.000-0"
                   unmask="true"
                 />
-              }
+                } @if(isPJ){
 
-              @if(isPJ){
-              <div class="w-full flex justify-between gap-5">
-                <input
-                  class="w-1/3"
-                  type="text"
-                  pInputText
-                  placeholder="Razão Social*"
-                  formControlName="name"
-                  fluid
-                />
-                <input
-                  pInputText
-                  type="tel"
-                  class="w-1/3"
-                  placeholder="CNPJ*"
-                  formControlName="cnpj"
-                  mask="00.000.000/0000-00"
-                  unmask="true"
-                  maxlength="18"
-                  fluid
-                />
-                
-                <input
-                  class="w-1/3"
-                  type="text"
-                  pInputText
-                  placeholder="Nome Fantasia"
-                  formControlName="fantasyName"
-                  fluid
-                />
-              </div>
-              }
-
-              <div formGroupName="addresses" class="w-full flex flex-col gap-5">
-                <h3 class="text-xl font-semibold border-b">Endereço Principal de Cadastro</h3>
-
-                <div class="flex justify-center gap-5 w-full">
+                <div class="w-full flex justify-between gap-5">
                   <input
-                    class="w-[20%]"
-                    type="tel"
-                    pInputText
-                    placeholder="CEP*"
-                    mask="00000-000"
-                    unmask="true"
-                    maxlength="10"
-                    formControlName="zipCode"
-                    (blur)="getCep(false)"
-                    fluid
-                  />
-                  <input
-                    class="w-[60%]"
+                    class="w-1/3"
                     type="text"
                     pInputText
-                    placeholder="Endereço"
-                    formControlName="street"
+                    placeholder="Razão Social*"
+                    formControlName="name"
                     fluid
                   />
                   <input
-                    type="tel"
-                    class="w-[20%]"
                     pInputText
-                    placeholder="Número*"
-                    formControlName="number"
+                    type="tel"
+                    class="w-1/3"
+                    placeholder="CNPJ*"
+                    formControlName="cnpj"
+                    mask="00.000.000/0000-00"
+                    unmask="true"
+                    maxlength="18"
+                    fluid
+                  />
+
+                  <input
+                    class="w-1/3"
+                    type="text"
+                    pInputText
+                    placeholder="Nome Fantasia"
+                    formControlName="fantasyName"
                     fluid
                   />
                 </div>
+                }
 
-                <div class="flex justify-center gap-5 w-full">
-                  <input
-                    class="w-1/2"
-                    type="text"
-                    pInputText
-                    placeholder="Cidade*"
-                    formControlName="city"
-                    fluid
-                  />
-                  <input
-                    class="w-1/2"
-                    type="text"
-                    pInputText
-                    placeholder="Bairro*"
-                    formControlName="neighborhood"
-                    fluid
-                  />
-                  <input
-                    class="w-1/2"
-                    type="text"
-                    pInputText
-                    placeholder="Complemento"
-                    formControlName="complement"
-                    fluid
-                  />
-                </div>
-              </div>
+                <div
+                  formGroupName="addresses"
+                  class="w-full flex flex-col gap-5"
+                >
+                  <h3 class="text-xl font-semibold border-b">
+                    Endereço Principal de Cadastro
+                  </h3>
 
-              <div class="flex flex-col justify-between w-full gap-5">
-                <h3 class="text-xl font-semibold border-b">Contatos</h3>
-                <div class="flex justify-between gap-3 w-full">
-                 
-                  <input
-                    type="email"
-                    pInputText
-                    placeholder="E-mail*"
-                    fluid
-                    formControlName="email"
-                  />
-                  <input
-                    type="tel"
-                    pInputText
-                    placeholder="Telefone Fixo*"
-                    formControlName="residentialPhone"
-                    mask="(00)0000-0000"
-                    unmask="true"
-                    maxlength="14"
-                    fluid
-                  />
-                  <input
-                    type="tel"
-                    pInputText
-                    placeholder="Celular*"
-                    maxlength="14"
-                    mask="(00)00000-0000"
-                    unmask="true"
-                    formControlName="mobilePhone"
-                    fluid
-                  />
-                  <input
-                    type="tel"
-                    pInputText
-                    placeholder="Telefone Comercial"
-                    formControlName="commercialPhone"
-                    maxlength="14"
-                    mask="(00)00000-0000"
-                    unmask="true"
-                    fluid
-                  />
-                </div>
-              </div>
-            </div>
-
-            
-            <div class="py-6">
-              <p-button label="Próximo" (onClick)="activateCallback(2)" />
-            </div>
-          </ng-template>
-        </p-step-panel>
-      </p-step-item>
-
-      
-      <p-step-item [value]="2">
-        <p-step>Cadastrar Contratos</p-step>
-        <p-step-panel>
-          <ng-template #content let-activateCallback="activateCallback">
-            <small>É necessário adicionar pelo menos um contrato.*</small>
-            
-            <div [formGroup]="contractForm" class="flex flex-col gap-5 mb-6">
-              <div class="flex flex-wrap gap-4 w-full">
-                <p-select 
-                [options]="isPJ ? pjPlans : pfPlans"
-                formControlName="planCode" 
-                optionLabel="name"
-                optionValue="value"
-                placeholder="Plano" 
-                appendTo="body"
-                styleClass="w-[40%]"
-                />
-                <p-inputnumber
-                  inputId="accessionValue"
-                  formControlName="accessionValue"
-                  mode="currency"
-                  locale="pt-BR"
-                  [minFractionDigits]="2"
-                  placeholder="Valor de adesão"
-                  styleClass="w-[20%]"
-                  currency="BRL"
-                  currencyDisplay="symbol"
-                />
-                <p-select
-                  [options]="dueDateOptions"
-                  formControlName="dueDay"
-                  placeholder="Dia de vencimento"
-                  appendTo="body"
-                  fluid
-                  styleClass="w-[20%]"
-                />
-              </div>
-
-              <div>
-                <h3 class="text-xl font-semibold border-b mb-5">Endereço de Instalação</h3>
-                <div formGroupName="address" class="flex flex-col gap-5">
                   <div class="flex justify-center gap-5 w-full">
                     <input
+                      class="w-[20%]"
                       type="tel"
                       pInputText
-                      placeholder="CEP"
-                      formControlName="zipCode"
-                      (blur)="getCep(true)"
+                      placeholder="CEP*"
                       mask="00000-000"
                       unmask="true"
                       maxlength="10"
-                      class="w-[20%] md:w-[15%] lg:w-[15%]"
+                      formControlName="zipCode"
+                      (blur)="getCep(false)"
+                      fluid
                     />
                     <input
+                      class="w-[60%]"
                       type="text"
                       pInputText
                       placeholder="Endereço"
                       formControlName="street"
-                      class="w-[60%] md:w-[70%] lg:w-[70%]"
+                      fluid
                     />
                     <input
                       type="tel"
+                      class="w-[20%]"
                       pInputText
                       placeholder="Número*"
                       formControlName="number"
-                      class="w-[20%] md:w-[15%] lg:w-[15%]"
+                      fluid
                     />
                   </div>
-                  <div class="flex justify-center gap-5">
+
+                  <div class="flex justify-center gap-5 w-full">
                     <input
+                      class="w-1/2"
                       type="text"
                       pInputText
-                      placeholder="Bairro"
-                      formControlName="neighborhood"
-                      class="w-1/3 md:w-1/2 lg:w-2/5"
-                    />
-                    <input
-                      type="text"
-                      pInputText
-                      placeholder="Cidade"
+                      placeholder="Cidade*"
                       formControlName="city"
-                      class="w-1/3 md:w-1/2 lg:w-2/5"
+                      fluid
                     />
-                    
                     <input
+                      class="w-1/2"
+                      type="text"
+                      pInputText
+                      placeholder="Bairro*"
+                      formControlName="neighborhood"
+                      fluid
+                    />
+                    <input
+                      class="w-1/2"
                       type="text"
                       pInputText
                       placeholder="Complemento"
                       formControlName="complement"
-                      class="w-1/3 md:w-1/2 lg:w-2/5"
+                      fluid
+                    />
+                  </div>
+                </div>
+
+                <div class="flex flex-col justify-between w-full gap-5">
+                  <h3 class="text-xl font-semibold border-b">Contatos</h3>
+                  <div class="flex justify-between gap-3 w-full">
+                    <input
+                      type="email"
+                      pInputText
+                      placeholder="E-mail*"
+                      fluid
+                      formControlName="email"
+                    />
+                    <input
+                      type="tel"
+                      pInputText
+                      placeholder="Telefone Fixo*"
+                      formControlName="residentialPhone"
+                      mask="(00)0000-0000"
+                      unmask="true"
+                      maxlength="14"
+                      fluid
+                    />
+                    <input
+                      type="tel"
+                      pInputText
+                      placeholder="Celular*"
+                      maxlength="14"
+                      mask="(00)00000-0000"
+                      unmask="true"
+                      formControlName="mobilePhone"
+                      fluid
+                    />
+                    <input
+                      type="tel"
+                      pInputText
+                      placeholder="Telefone Comercial"
+                      formControlName="commercialPhone"
+                      maxlength="14"
+                      mask="(00)00000-0000"
+                      unmask="true"
+                      fluid
                     />
                   </div>
                 </div>
               </div>
+
+              <div class="py-6">
+                <p-button label="Próximo" (onClick)="activateCallback(2)" />
+              </div>
+            </ng-template>
+          </p-step-panel>
+        </p-step-item>
+
+        <p-step-item [value]="2">
+          <p-step>Cadastrar Contratos</p-step>
+          <p-step-panel>
+            <ng-template #content let-activateCallback="activateCallback">
+              <small>É necessário adicionar pelo menos um contrato.*</small>
+
+              <div [formGroup]="contractForm" class="flex flex-col gap-5 mb-6">
+                <div class="flex flex-wrap gap-4 w-full">
+                  <p-select
+                    [options]="isPJ ? pjPlans : pfPlans"
+                    formControlName="planCode"
+                    optionLabel="name"
+                    optionValue="value"
+                    placeholder="Plano"
+                    appendTo="body"
+                    styleClass="w-[40%]"
+                  />
+                  <p-inputnumber
+                    inputId="accessionValue"
+                    formControlName="accessionValue"
+                    mode="currency"
+                    locale="pt-BR"
+                    [minFractionDigits]="2"
+                    placeholder="Valor de adesão"
+                    styleClass="w-[20%]"
+                    currency="BRL"
+                    currencyDisplay="symbol"
+                  />
+                  <p-select
+                    [options]="dueDateOptions"
+                    formControlName="dueDay"
+                    placeholder="Dia de vencimento"
+                    appendTo="body"
+                    fluid
+                    styleClass="w-[20%]"
+                  />
+                </div>
+
+                <div>
+                  <h3 class="text-xl font-semibold border-b mb-5">
+                    Endereço de Instalação
+                  </h3>
+                  <div formGroupName="address" class="flex flex-col gap-5">
+                    <div class="flex justify-center gap-5 w-full">
+                      <input
+                        type="tel"
+                        pInputText
+                        placeholder="CEP"
+                        formControlName="zipCode"
+                        (blur)="getCep(true)"
+                        mask="00000-000"
+                        unmask="true"
+                        maxlength="10"
+                        class="w-[20%] md:w-[15%] lg:w-[15%]"
+                      />
+                      <input
+                        type="text"
+                        pInputText
+                        placeholder="Endereço"
+                        formControlName="street"
+                        class="w-[60%] md:w-[70%] lg:w-[70%]"
+                      />
+                      <input
+                        type="tel"
+                        pInputText
+                        placeholder="Número*"
+                        formControlName="number"
+                        class="w-[20%] md:w-[15%] lg:w-[15%]"
+                      />
+                    </div>
+                    <div class="flex justify-center gap-5">
+                      <input
+                        type="text"
+                        pInputText
+                        placeholder="Bairro"
+                        formControlName="neighborhood"
+                        class="w-1/3 md:w-1/2 lg:w-2/5"
+                      />
+                      <input
+                        type="text"
+                        pInputText
+                        placeholder="Cidade"
+                        formControlName="city"
+                        class="w-1/3 md:w-1/2 lg:w-2/5"
+                      />
+
+                      <input
+                        type="text"
+                        pInputText
+                        placeholder="Complemento"
+                        formControlName="complement"
+                        class="w-1/3 md:w-1/2 lg:w-2/5"
+                      />
+                    </div>
+                  </div>
+                </div>
 
               <div *ngIf="debouncedAddressForMap" class="w-full mt-5">
                   <app-google-maps [address]="debouncedAddressForMap"/>
               </div>
 
-              <p-floatlabel>
-                <textarea pTextarea formControlName="observation" rows="3" fluid></textarea>
-                <label>Observação</label>
-              </p-floatlabel>
+                <p-floatlabel>
+                  <textarea
+                    pTextarea
+                    formControlName="observation"
+                    rows="3"
+                    fluid
+                  ></textarea>
+                  <label>Observação</label>
+                </p-floatlabel>
 
-              <div class="flex justify-end">
-                <p-button label="Adicionar Contrato" [disabled]="contractForm.invalid" (onClick)="addContract()" />
+                <div class="flex justify-end">
+                  <p-button
+                    label="Adicionar Contrato"
+                    [disabled]="contractForm.invalid"
+                    (onClick)="addContract()"
+                  />
+                </div>
               </div>
-            </div>
 
-            <div formArrayName="contract" class="space-y-4">
-              <div
-                *ngFor="let contract of contracts.controls; let i = index"
-                [formGroupName]="i"
-                class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-md p-5 flex flex-col gap-3"
-              >
-                <div class="flex justify-between items-start">
-                  <div>
-                    <p class="text-lg font-semibold text-slate-800 dark:text-white">
-                      {{ getPlanName(contract.value.planCode) }}
+              <div formArrayName="contract" class="space-y-4">
+                <div
+                  *ngFor="let contract of contracts.controls; let i = index"
+                  [formGroupName]="i"
+                  class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-md p-5 flex flex-col gap-3"
+                >
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <p
+                        class="text-lg font-semibold text-slate-800 dark:text-white"
+                      >
+                        {{ getPlanName(contract.value.planCode) }}
+                      </p>
+                    </div>
+                    <p-button
+                      icon="pi pi-trash"
+                      severity="danger"
+                      styleClass="p-button-sm"
+                      (onClick)="removeContract(i)"
+                      label="Remover"
+                    ></p-button>
+                  </div>
+
+                  <div
+                    class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-slate-700 dark:text-slate-200"
+                  >
+                    <div>
+                      <span
+                        class="block text-xs font-medium text-slate-400 mb-1"
+                        >Valor de Adesão</span
+                      >
+                      <span class="font-semibold">{{
+                        contract.value.accessionValue | currency : "BRL"
+                      }}</span>
+                    </div>
+
+                    <div>
+                      <span
+                        class="block text-xs font-medium text-slate-400 mb-1"
+                        >Dia de Vencimento</span
+                      >
+                      <span class="font-semibold"
+                        >Dia {{ contract.value.dueDay }}</span
+                      >
+                    </div>
+
+                    <div *ngIf="contract.value.observation">
+                      <span
+                        class="block text-xs font-medium text-slate-400 mb-1"
+                        >Observações</span
+                      >
+                      <span class="italic text-sm">{{
+                        contract.value.observation
+                      }}</span>
+                    </div>
+                  </div>
+
+                  <div *ngIf="contract.value.address?.zipCode" class="mt-2">
+                    <span class="block text-xs font-medium text-slate-400 mb-1"
+                      >Endereço</span
+                    >
+                    <p
+                      class="text-sm leading-snug text-slate-600 dark:text-slate-300"
+                    >
+                      {{ contract.value.address.street }},
+                      {{ contract.value.address.number }}<br />
+                      {{ contract.value.address.neighborhood }} -
+                      {{ contract.value.address.city }} /
+                      {{ contract.value.address.state }}<br />
+                      CEP: {{ contract.value.address.zipCode }}
                     </p>
                   </div>
-                  <p-button
-                    icon="pi pi-trash"
-                    severity="danger"
-                    styleClass="p-button-sm"
-                    (onClick)="removeContract(i)"
-                    label="Remover"
-                  ></p-button>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-slate-700 dark:text-slate-200">
-                  <div>
-                    <span class="block text-xs font-medium text-slate-400 mb-1">Valor de Adesão</span>
-                    <span class="font-semibold">{{ contract.value.accessionValue | currency:'BRL' }}</span>
-                  </div>
-
-                  <div>
-                    <span class="block text-xs font-medium text-slate-400 mb-1">Dia de Vencimento</span>
-                    <span class="font-semibold">Dia {{ contract.value.dueDay }}</span>
-                  </div>
-
-                  <div *ngIf="contract.value.observation">
-                    <span class="block text-xs font-medium text-slate-400 mb-1">Observações</span>
-                    <span class="italic text-sm">{{ contract.value.observation }}</span>
-                  </div>
-                </div>
-
-                <div *ngIf="contract.value.address?.zipCode" class="mt-2">
-                  <span class="block text-xs font-medium text-slate-400 mb-1">Endereço</span>
-                  <p class="text-sm leading-snug text-slate-600 dark:text-slate-300">
-                    {{ contract.value.address.street }}, {{ contract.value.address.number }}<br />
-                    {{ contract.value.address.neighborhood }} - {{ contract.value.address.city }} / {{ contract.value.address.state }}<br />
-                    CEP: {{ contract.value.address.zipCode }}
-                  </p>
                 </div>
               </div>
-            </div>
 
-            <div class="flex py-6 gap-2 justify-between">
-              <p-button label="Voltar" icon="pi pi-arrow-left" severity="secondary" (onClick)="activateCallback(1)" />
-              <p-button label="Próximo" [disabled]="contracts.length === 0" (onClick)="activateCallback(3); " />
-            </div>
-          </ng-template>
-        </p-step-panel>
-      </p-step-item>
-
-      <p-step-item [value]="3">
-        <p-step>Assinatura do Cliente</p-step>
-        <p-step-panel>
-          <ng-template #content let-activateCallback="activateCallback">
-            <div class="flex flex-col w-full">
-              <div class="w-full">
-                <app-signature-pad (signatureData)="onSignatureDataReceived($event)" />
-              </div>
-            </div>
-
-            <div class="flex py-6 gap-2 justify-between">
-              <div class="py-6">
+              <div class="flex py-6 gap-2 justify-between">
                 <p-button
                   label="Voltar"
+                  icon="pi pi-arrow-left"
                   severity="secondary"
-                  (onClick)="activateCallback(2)"
+                  (onClick)="activateCallback(1)"
                 />
-              </div>
-              <div class="py-6">
                 <p-button
-                  label="Concluir"
-                  severity="success"
-                  (onClick)="submitRegistration()"
-                  [disabled]="form.invalid" 
+                  label="Próximo"
+                  [disabled]="contracts.length === 0"
+                  (onClick)="activateCallback(3)"
                 />
               </div>
-            </div>
-          </ng-template>
-        </p-step-panel>
-      </p-step-item>
-    </p-stepper>
-  </div>
-</form>
-</div>
+            </ng-template>
+          </p-step-panel>
+        </p-step-item>
 
+        <p-step-item [value]="3">
+          <p-step>Assinatura do Cliente</p-step>
+          <p-step-panel>
+            <ng-template #content let-activateCallback="activateCallback">
+              <div class="flex flex-col w-full">
+                <div class="w-full">
+                  <app-signature-pad
+                    (signatureData)="onSignatureDataReceived($event)"
+                  />
+                </div>
+              </div>
+
+              <div class="flex py-6 gap-2 justify-between">
+                <div class="py-6">
+                  <p-button
+                    label="Voltar"
+                    severity="secondary"
+                    (onClick)="activateCallback(2)"
+                  />
+                </div>
+                <div class="py-6">
+                  <p-button
+                    label="Concluir"
+                    severity="success"
+                    (onClick)="submitRegistration()"
+                    [disabled]="form.invalid"
+                  />
+                </div>
+              </div>
+            </ng-template>
+          </p-step-panel>
+        </p-step-item>
+      </p-stepper>
+    </div>
+  </form>
+</div>
 
 <p-toast />

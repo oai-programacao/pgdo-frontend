@@ -25,8 +25,8 @@ export class SignaturePadComponent implements AfterViewInit, OnDestroy {
     this.signaturePad = new SignaturePad(canvas, {
       backgroundColor: 'white',
       penColor: 'black',
-      minWidth: 0.5,
-      maxWidth: 2,
+      minWidth: 1.8,
+      maxWidth: 3,
     });
 
     // Resize handler
@@ -51,7 +51,7 @@ export class SignaturePadComponent implements AfterViewInit, OnDestroy {
     const base64Data = this.signaturePad.toDataURL();
     this.signatureImg = base64Data;
     this.signatureData.emit(base64Data);
-    
+
   }
 
   private resizeCanvas(): void {

@@ -50,10 +50,12 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
   private readonly viacepService = inject(ViaCepService);
   private readonly registerClientService = inject(RegisterClientService);
   private readonly messageService = inject(MessageService);
+  @ViewChild(SignaturePadComponent) signaturePadComponent!: SignaturePadComponent;
   fb!: FormBuilder;
   form!: FormGroup;
   contractForm!: FormGroup;
   planCodes: [] = [];
+  stepIndex = 1;
 
   signaturePadData: string = '';
    // 1. CRIE UMA NOVA PROPRIEDADE PARA ARMAZENAR O ENDEREÇO "ATRASADO"
@@ -85,6 +87,7 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
         neighborhood: [''],
         district: [''],
         referencePoint: [''],
+        addressType: ["BILLING"]
       }),
       contract: this.fb.array([]),
       ibge: [''],
@@ -179,7 +182,7 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
         next: (response) => {
           if (response) {
             const endereco = {
-              zipCode: response.cep, // Remove traços, espaços, etc.
+              zipCode: response.cep.replace(/\D/g, ''), // Remove traços, espaços, etc.
               state: response.uf,
               city: response.localidade,
               street: response.logradouro,
@@ -213,13 +216,25 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
       const test = {
         ...clientData,
         alias: clientData.name,
+        companyName: clientData.clientType === 'PJ' ? clientData.name : null,
+        fantasyName:  clientData.clientType === 'PJ' ? clientData.name : null,
         addresses: [addresses]
       }
 
       this.registerClientService.registerClient(test).subscribe({
         next: (response) => {
-          console.log("Cliente registrado com sucesso:", response);
           // Aqui você pode redirecionar ou mostrar uma mensagem de sucesso
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Cadastro realizado com sucesso',
+            detail: `Cliente ${response.name} cadastrado com sucesso!`
+          })
+          this.stepIndex = 1; // Reseta o stepper para o início
+          this.form.reset();
+          this.contracts.clear();
+          this.signaturePadData = ''; // Limpa a assinatura
+          this.form.get('signaturePad')?.setValue(null); // Limpa o campo de assinatura
+          this.signaturePadComponent.clearPad(); // Limpa o pad de assinatura
         },
         error: (error) => {
           console.error("Erro ao registrar cliente:", error);
@@ -229,6 +244,8 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
     } else {
       this.form.markAllAsTouched();
     }
+
+
   }
   
   get isPF(): boolean {
