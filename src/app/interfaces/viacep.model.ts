@@ -9,4 +9,5 @@ export interface ViaCepResponse {
     gia: string; // Código GIA (Guia de Informação e Apuração do ICMS)
     ddd: string; // Código DDD (Discagem Direta à Distância)
     siafi: string; // Código SIAFI (Sistema Integrado de Administração Financeira)
+    erro?: boolean; // Indica se houve erro na consulta
 }

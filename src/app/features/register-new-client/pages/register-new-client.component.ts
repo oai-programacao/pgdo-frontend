@@ -19,7 +19,8 @@ import { RegisterClientService } from "../services/register-client.service";
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { ToastModule } from 'primeng/toast';
 import { GoogleMapsComponent } from "../../../shared/components/google-maps/google-maps.component";
-import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 
 @Component({
   selector: "app-register-new-client",
@@ -40,7 +41,9 @@ import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
     InputNumberModule,
     NgxMaskDirective,
     ToastModule,
-    GoogleMapsComponent
+    GoogleMapsComponent,
+    IconFieldModule,
+    InputIconModule
 ],
   templateUrl: "./register-new-client.component.html",
   styleUrl: "./register-new-client.component.scss",
@@ -57,6 +60,7 @@ export class RegisterNewClientComponent {
   planCodes: [] = [];
   stepIndex = 1;
   signaturePadData: string = '';
+  isCepLoading: boolean = false;
   public addressForMapSearch: any = null;
 
   constructor() {
@@ -155,41 +159,89 @@ export class RegisterNewClientComponent {
   }
 
   getCep(isContract: boolean): void {
-    const cepRaw = isContract
-      ? this.contractForm.get('address.zipCode')?.value
-      : this.form.get('addresses.zipCode')?.value;
+  const cepControlPath = isContract 
+    ? 'address.zipCode' 
+    : 'addresses.zipCode';
+  
+  const formGroup = isContract 
+    ? this.contractForm 
+    : this.form;
 
-    const cep = cepRaw?.replace(/\D/g, ''); // Remove traços, espaços, etc.
+  const cepRaw = formGroup.get(cepControlPath)?.value;
+  const cep = cepRaw?.replace(/\D/g, '');
 
-    if (cep && cep.length === 8) {
-      this.viacepService.getAddress(cep).subscribe({
-        next: (response) => {
-          if (response) {
-            const endereco = {
-              zipCode: response.cep.replace(/\D/g, ''), // Remove traços, espaços, etc.
-              state: response.uf,
-              city: response.localidade,
-              street: response.logradouro,
-              neighborhood: response.bairro,
-              district: response.complemento,
-              referencePoint: ''
-            };
+  if (cep && cep.length === 8) {
+    this.isCepLoading = true;
+    
+    // Caminho do FormGroup de endereço para facilitar o acesso
+    const addressPath = isContract ? 'address' : 'addresses';
 
-            if (isContract) {
-              this.contractForm.get('address')?.patchValue(endereco);
-            } else {
-              this.form.get('addresses')?.patchValue(endereco);
-              this.form.get('ibge')?.setValue(response.ibge);
-            }
-          } else {
-            console.warn("CEP não encontrado.");
-          }
-        },
-        error: (error) => {
-          console.error("Erro ao buscar CEP:", error);
+    this.viacepService.getAddress(cep).subscribe({
+      next: (response) => {
+        // ====================================================================
+        // AQUI ESTÁ A LÓGICA DE VERIFICAÇÃO PRINCIPAL
+        // ====================================================================
+        
+        // Verificamos se a resposta tem a propriedade "erro"
+        if (response.erro) {
+          // 1. Se tiver, o CEP é inválido.
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'CEP não encontrado',
+            detail: 'O CEP digitado não retornou um endereço válido.'
+          });
+          
+          // Limpa os campos de endereço para não confundir o usuário com dados antigos,
+          // mas mantém o CEP que ele digitou.
+          formGroup.get(addressPath)?.patchValue({
+            state: '',
+            city: '',
+            street: '',
+            neighborhood: '',
+            complement: '', // Corrigido de 'district' para 'complement' se for o caso
+            referencePoint: ''
+          });
+
+        } else {
+          // 2. Se não tiver, o CEP é válido. Preenchemos o formulário.
+          const endereco = {
+            state: response.uf,
+            city: response.localidade,
+            street: response.logradouro,
+            neighborhood: response.bairro,
+            complement: response.complemento,
+          };
+          
+          formGroup.get(addressPath)?.patchValue(endereco);
+          
+          // Foca no campo "número" para o usuário continuar o preenchimento
+          // (Esta é uma melhoria de UX opcional)
+          document.querySelector<HTMLInputElement>(`[formcontrolname="number"]`)?.focus();
         }
-      });
-    }
+        
+        // Finalmente, desativa o loading
+        this.isCepLoading = false;
+      },
+      error: (error) => {
+        // Este bloco agora só será chamado para erros de rede reais (ex: sem internet)
+        this.isCepLoading = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro de Rede',
+          detail: 'Não foi possível conectar ao serviço de CEP. Verifique sua conexão.'
+        });
+        console.error("Erro de rede ao buscar CEP:", error);
+      }
+    });
+  }
+}
+
+  public clearContractAddress(): void {
+    // Limpa todos os campos dentro do form group 'address' do contractForm
+    this.contractForm.get('address')?.reset();
+    
+    // Garante que o mapa também desapareça ao limpar os campos
+    this.addressForMapSearch = null;
   }
 
   submitRegistration(): void {
@@ -249,6 +301,7 @@ export class RegisterNewClientComponent {
       const contract = this.fb.group(this.contractForm.value);
       this.contracts.push(contract);
       this.contractForm.reset(); // limpa o form
+      this.addressForMapSearch = null; // limpa o endereço do mapa
     } else {
       this.contractForm.markAllAsTouched();
     }

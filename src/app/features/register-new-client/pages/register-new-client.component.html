@@ -328,7 +328,14 @@
                   </div>
                 </div>
 
-             <div class="flex justify-end my-4">
+             <div class="flex justify-end my-4 gap-2">
+                <p-button 
+                    label="Limpar" 
+                    icon="pi pi-times"
+                    styleClass="p-button-secondary p-button-outlined"
+                    (click)="clearContractAddress()">
+                </p-button>
+
                 <p-button 
                     label="Procurar endereço no Mapa" 
                     icon="pi pi-map-marker"
