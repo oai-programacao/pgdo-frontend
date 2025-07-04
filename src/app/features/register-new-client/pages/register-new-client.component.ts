@@ -57,7 +57,8 @@ export class RegisterNewClientComponent {
   private readonly registerClientService = inject(RegisterClientService);
   private readonly messageService = inject(MessageService);
   @ViewChild(SignaturePadComponent) signaturePadComponent!: SignaturePadComponent;
-  @ViewChild('fileUpload') fileUpload!: FileUpload;
+  @ViewChild('fileUploadFront') fileUploadFront!: FileUpload;
+  @ViewChild('fileUploadVerse') fileUploadVerse!: FileUpload;
   fb!: FormBuilder;
   form!: FormGroup;
   contractForm!: FormGroup;
@@ -72,6 +73,7 @@ export class RegisterNewClientComponent {
     this.form = this.fb.group({
       clientType: [null, Validators.required],
       photoRg: [null],
+      photoRgVerse: [null],
       cpf: [null],
       rg: [null],
       cnpj: [null],
@@ -102,7 +104,6 @@ export class RegisterNewClientComponent {
       signaturePad: [null, Validators.required],
     });
     
-
     // Form usado apenas para adicionar contratos
     this.contractForm = this.createContract();
   }
@@ -163,111 +164,113 @@ export class RegisterNewClientComponent {
     };
   }
 
-   /**
-   * Converte o arquivo selecionado para BASE64 e o atribui ao form control 'photoRg'.
+    /**
+   * Converte o arquivo selecionado para BASE64 e o atribui a um form control dinâmico.
    * @param event O evento emitido pelo p-FileUpload.
+   * @param formControlName O nome do campo do formulário a ser atualizado ('photoRg' ou 'photoRgVerse').
    */
-  onUpload(event: any) {
+  onUpload(event: any, formControlName: string) {
     const file = event.files[0];
     const reader = new FileReader();
 
     reader.onload = (e: any) => {
-      // O resultado é a string em BASE64
       const base64 = e.target.result;
-      this.form.patchValue({ photoRg: base64 });
-      this.form.get('photoRg')?.markAsDirty();
+      // Atualiza o campo do formulário correto usando o nome do controle
+      this.form.get(formControlName)?.setValue(base64);
+      this.form.get(formControlName)?.markAsDirty();
     };
 
-    // Inicia a leitura do arquivo, que ao ser concluída, acionará o 'onload'
     reader.readAsDataURL(file);
   }
 
   /**
-   * Limpa o valor do campo de imagem e reseta o componente de upload.
+   * Limpa o valor do campo de imagem e reseta o componente de upload correspondente.
+   * @param formControlName O nome do campo do formulário a ser limpo.
+   * @param fileUploader A instância do componente FileUpload a ser resetada.
    */
-  clearImage() {
-    this.form.get('photoRg')?.setValue(null);
-    this.fileUpload.clear(); // Limpa os arquivos do componente p-FileUpload
+  clearImage(formControlName: string, fileUploader: FileUpload) {
+    this.form.get(formControlName)?.setValue(null);
+    fileUploader.clear(); // Limpa os arquivos do componente p-FileUpload específico
   }
 
   getCep(isContract: boolean): void {
-  const cepControlPath = isContract 
-    ? 'address.zipCode' 
-    : 'addresses.zipCode';
-  
-  const formGroup = isContract 
-    ? this.contractForm 
-    : this.form;
-
-  const cepRaw = formGroup.get(cepControlPath)?.value;
-  const cep = cepRaw?.replace(/\D/g, '');
-
-  if (cep && cep.length === 8) {
-    this.isCepLoading = true;
+    const cepControlPath = isContract 
+      ? 'address.zipCode' 
+      : 'addresses.zipCode';
     
-    // Caminho do FormGroup de endereço para facilitar o acesso
-    const addressPath = isContract ? 'address' : 'addresses';
+    const formGroup = isContract 
+      ? this.contractForm 
+      : this.form;
 
-    this.viacepService.getAddress(cep).subscribe({
-      next: (response) => {
-        // ====================================================================
-        // AQUI ESTÁ A LÓGICA DE VERIFICAÇÃO PRINCIPAL
-        // ====================================================================
-        
-        // Verificamos se a resposta tem a propriedade "erro"
-        if (response.erro) {
-          // 1. Se tiver, o CEP é inválido.
+    const cepRaw = formGroup.get(cepControlPath)?.value;
+    const cep = cepRaw?.replace(/\D/g, '');
+
+    if (cep && cep.length === 8) {
+      this.isCepLoading = true;
+      
+      // Caminho do FormGroup de endereço para facilitar o acesso
+      const addressPath = isContract ? 'address' : 'addresses';
+
+      this.viacepService.getAddress(cep).subscribe({
+        next: (response) => {
+          // ====================================================================
+          // AQUI ESTÁ A LÓGICA DE VERIFICAÇÃO PRINCIPAL
+          // ====================================================================
+          
+          // Verificamos se a resposta tem a propriedade "erro"
+          if (response.erro) {
+            // 1. Se tiver, o CEP é inválido.
+            this.messageService.add({
+              severity: 'warn',
+              summary: 'CEP não encontrado',
+              detail: 'O CEP digitado não retornou um endereço válido.'
+            });
+            
+            // Limpa os campos de endereço para não confundir o usuário com dados antigos,
+            // mas mantém o CEP que ele digitou.
+            formGroup.get(addressPath)?.patchValue({
+              state: '',
+              city: '',
+              street: '',
+              neighborhood: '',
+              complement: '', // Corrigido de 'district' para 'complement' se for o caso
+              referencePoint: ''
+            });
+
+          } else {
+            // 2. Se não tiver, o CEP é válido. Preenchemos o formulário.
+            const endereco = {
+              state: response.uf,
+              city: response.localidade,
+              street: response.logradouro,
+              neighborhood: response.bairro,
+              complement: response.complemento,
+            };
+          
+            formGroup.get(addressPath)?.patchValue(endereco);
+            this.form.get('ibge')?.setValue(response.ibge);
+            
+            // Foca no campo "número" para o usuário continuar o preenchimento
+            // (Esta é uma melhoria de UX opcional)
+            document.querySelector<HTMLInputElement>(`[formcontrolname="number"]`)?.focus();
+          }
+          
+          // Finalmente, desativa o loading
+          this.isCepLoading = false;
+        },
+        error: (error) => {
+          // Este bloco agora só será chamado para erros de rede reais (ex: sem internet)
+          this.isCepLoading = false;
           this.messageService.add({
-            severity: 'warn',
-            summary: 'CEP não encontrado',
-            detail: 'O CEP digitado não retornou um endereço válido.'
+            severity: 'error',
+            summary: 'Erro de Rede',
+            detail: 'Não foi possível conectar ao serviço de CEP. Verifique sua conexão.'
           });
-          
-          // Limpa os campos de endereço para não confundir o usuário com dados antigos,
-          // mas mantém o CEP que ele digitou.
-          formGroup.get(addressPath)?.patchValue({
-            state: '',
-            city: '',
-            street: '',
-            neighborhood: '',
-            complement: '', // Corrigido de 'district' para 'complement' se for o caso
-            referencePoint: ''
-          });
-
-        } else {
-          // 2. Se não tiver, o CEP é válido. Preenchemos o formulário.
-          const endereco = {
-            state: response.uf,
-            city: response.localidade,
-            street: response.logradouro,
-            neighborhood: response.bairro,
-            complement: response.complemento,
-          };
-        
-          formGroup.get(addressPath)?.patchValue(endereco);
-          this.form.get('ibge')?.setValue(response.ibge);
-          
-          // Foca no campo "número" para o usuário continuar o preenchimento
-          // (Esta é uma melhoria de UX opcional)
-          document.querySelector<HTMLInputElement>(`[formcontrolname="number"]`)?.focus();
+          console.error("Erro de rede ao buscar CEP:", error);
         }
-        
-        // Finalmente, desativa o loading
-        this.isCepLoading = false;
-      },
-      error: (error) => {
-        // Este bloco agora só será chamado para erros de rede reais (ex: sem internet)
-        this.isCepLoading = false;
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro de Rede',
-          detail: 'Não foi possível conectar ao serviço de CEP. Verifique sua conexão.'
-        });
-        console.error("Erro de rede ao buscar CEP:", error);
-      }
-    });
+      });
+    }
   }
-}
 
   public clearContractAddress(): void {
     // Limpa todos os campos dentro do form group 'address' do contractForm
