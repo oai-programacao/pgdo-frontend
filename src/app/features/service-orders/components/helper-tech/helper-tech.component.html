@@ -1,0 +1,54 @@
+<form
+  [formGroup]="helperForm"
+  (ngSubmit)="onSubmitHelper()"
+  class="flex flex-col gap-4 py-9 justify-center align-center"
+>
+  <div class="flex flex-col gap-2">
+    <p-select
+      id="technician"
+      [options]="technicians"
+      optionLabel="label"
+      optionValue="value"
+      formControlName="technicianId"
+      placeholder="Selecione um técnico"
+      appendTo="body"
+    ></p-select>
+  </div>
+  <div class="flex flex-row gap-4 py-5">
+    <div class="">
+      <p-datepicker
+        formControlName="start"
+        dateFormat="dd/mm/yy"
+        hourFormat="HH:mm"
+        placeholder="Data Inicial"
+        appendTo="body"
+        inputId="calendar-24h"
+        [showTime]="true"
+        [hourFormat]="'24'"
+        dataType="string"
+      ></p-datepicker>
+    </div>
+
+    <div class="">
+      <p-datepicker
+        appendTo="body"
+        formControlName="end"
+        dateFormat="dd/mm/yy"
+        hourFormat="HH:mm"
+        dataType="string"
+        placeholder="Data Final"
+        inputId="calendar-24h"
+        [showTime]="true"
+        [hourFormat]="'24'"
+      ></p-datepicker>
+    </div>
+  </div>
+
+  <p-button
+    type="submit"
+    severity="success"
+    class="flex align-center justify-center"
+  >
+    Enviar
+  </p-button>
+</form>

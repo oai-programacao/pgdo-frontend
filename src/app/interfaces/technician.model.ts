@@ -22,3 +22,5 @@ export interface ViewTechnicianDto {
     createdAt?: string;
     updatedAt?: string;
 }
+
+

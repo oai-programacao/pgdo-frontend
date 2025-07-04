@@ -1,0 +1,39 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">
+  <p-select
+    [options]="technicians"
+    optionLabel="label"
+    optionValue="value"
+    formControlName="technicianId"
+    placeholder="Selecione um técnico"
+    appendTo="body"
+  ></p-select>
+  
+
+  <textarea 
+    formControlName="observation"
+    placeholder="Observações"
+    rows="3"
+    class="p-inputtext"
+  ></textarea>
+  
+  <div *ngFor="let visit of serviceOrder.unproductiveVisits" class="visit-card">
+    <div class="flex justify-center items-center gap-2 visit-header">        
+      <div class="visit-date">
+        <i class="pi pi-calendar text-blue-500"></i>
+        <span>{{ visit.date | date : "dd/MM/yyyy" }}</span>
+      </div>
+      <div class="visit-technician">
+        <i class="pi pi-user text-green-500"></i>
+        <span>{{ visit.technician.name }}</span>
+      </div>
+      <div class="visit-observation">
+        <i class="pi pi-comment text-orange-500"></i>
+        <span>{{ visit.observation }}</span>
+      </div>
+    </div>
+  </div>
+  
+  <p-button type="submit" [disabled]="!form.valid">
+    Enviar
+  </p-button>
+</form>
