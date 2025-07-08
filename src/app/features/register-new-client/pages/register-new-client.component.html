@@ -464,9 +464,9 @@
         <p-step-panel>
           <ng-template #content let-activateCallback="activateCallback">
             
-            <div class="grid">
-              <div class="col-12 md:col-6 field">
-                <label>Foto da Frente do Documento (RG/CNH)</label>
+            <div class="flex flex-wrap gap-4">
+              <div class="flex-grow-1">
+                <label>Foto da Frente do Documento</label>
 
                 <div *ngIf="!form.get('photoRg')?.value" class="mt-2">
                   <p-fileUpload
@@ -485,7 +485,7 @@
                 <div *ngIf="form.get('photoRg')?.value" class="mt-2 flex flex-column align-items-center gap-3">
                   <img [src]="form.get('photoRg')?.value" alt="Preview Frente do Documento" class="w-full border-round" />
                   <p-button
-                    label="Remover Frente"
+                    rounded
                     icon="pi pi-trash"
                     styleClass="p-button-danger"
                     (onClick)="clearImage('photoRg', fileUploadFront)"
@@ -493,7 +493,7 @@
                 </div>
               </div>
 
-              <div class="col-12 md:col-6 field">
+              <div class="flex-grow-1">
                 <label>Foto do Verso do Documento</label>
                 
                 <div *ngIf="!form.get('photoRgVerse')?.value" class="mt-2">
@@ -513,7 +513,7 @@
                 <div *ngIf="form.get('photoRgVerse')?.value" class="mt-2 flex flex-column align-items-center gap-3">
                   <img [src]="form.get('photoRgVerse')?.value" alt="Preview Verso do Documento" class="w-full border-round" />
                   <p-button
-                    label="Remover Verso"
+                    rounded
                     icon="pi pi-trash"
                     styleClass="p-button-danger"
                     (onClick)="clearImage('photoRgVerse', fileUploadVerse)"
