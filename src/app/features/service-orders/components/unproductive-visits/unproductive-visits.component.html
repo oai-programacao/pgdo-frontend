@@ -7,33 +7,69 @@
     placeholder="Selecione um técnico"
     appendTo="body"
   ></p-select>
-  
 
-  <textarea 
+  <textarea
     formControlName="observation"
     placeholder="Observações"
     rows="3"
     class="p-inputtext"
   ></textarea>
-  
-  <div *ngFor="let visit of serviceOrder.unproductiveVisits" class="visit-card">
-    <div class="flex justify-center items-center gap-2 visit-header">        
-      <div class="visit-date">
-        <i class="pi pi-calendar text-blue-500"></i>
-        <span>{{ visit.date | date : "dd/MM/yyyy" }}</span>
+  <p-button
+    class="flex justify-center align-center"
+    type="submit"
+    [disabled]="form.invalid || isSubmitting"
+    [loading]="isSubmitting"
+  >
+    {{ isSubmitting ? "Enviando..." : "Enviar" }}
+  </p-button>
+  <div class="p-4 rounded-xl shadow-sm space-y-4">
+    
+      <div
+        *ngIf="
+          !serviceOrder.unproductiveVisits ||
+          serviceOrder.unproductiveVisits.length === 0
+        "
+      >
+        <div
+          class="text-gray-400 text-sm italic text-center py-8 flex items-center justify-center gap-2"
+        >
+          <i class="pi pi-info-circle text-lg"></i>
+          <span>Não há visitas improdutivas</span>
+        </div>
       </div>
-      <div class="visit-technician">
-        <i class="pi pi-user text-green-500"></i>
-        <span>{{ visit.technician.name }}</span>
-      </div>
-      <div class="visit-observation">
-        <i class="pi pi-comment text-orange-500"></i>
-        <span>{{ visit.observation }}</span>
+      <div
+        *ngFor="let visit of serviceOrder.unproductiveVisits"
+        class="bg-white rounded-lg shadow-sm p-5 mb-3 flex flex-col gap-3"
+      >
+        <div class="flex justify-between items-center">
+          <div class="flex justify-center gap-2 w-1/3 justify-center">
+            <i class="pi pi-calendar text-blue-600"></i>
+            <span
+              style="width: 62%"
+              class="text-sm text-gray-800 font-medium break-words truncate"
+            >
+              {{ visit.date | date : "dd/MM/yyyy" }}
+            </span>
+          </div>
+          <div class="flex justify-center gap-2 w-1/3 justify-end">
+            <i class="pi pi-user text-green-600"></i>
+            <span
+              style="width: 66%"
+              class="text-sm text-gray-800 font-medium break-words truncate"
+            >
+              {{ visit.technician.name }}
+            </span>
+          </div>
+          <div class="flex gap-2 w-1/3 justify-end">
+            <i class="pi pi-comment text-orange-600 flex"></i>
+            <span
+              style="width: 33%"
+              class="text-sm text-center text-gray-700 break-words truncate"
+            >
+              {{ visit.observation }}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  
-  <p-button type="submit" [disabled]="!form.valid">
-    Enviar
-  </p-button>
 </form>

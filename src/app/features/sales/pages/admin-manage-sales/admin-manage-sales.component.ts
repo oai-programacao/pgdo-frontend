@@ -23,7 +23,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { EmployeeService } from '../../../employees/services/employee.service';
 import { EmployeeRole, ViewEmployeeDto } from '../../../../interfaces/employee.model';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { SignaturePadComponent } from "../../../../shared/components/signature-pad/signature-pad.component";
+import { SignaturePadComponent } from '../../../../shared/components/signature-pad/signature-pad.component';
 
 @Component({
   selector: 'app-admin-manage-sales',
@@ -44,7 +44,6 @@ import { SignaturePadComponent } from "../../../../shared/components/signature-p
     TextareaModule,
     FieldsetModule,
     ConfirmDialogModule,
-    SignaturePadComponent
 ],
   templateUrl: './admin-manage-sales.component.html',
   styleUrl: './admin-manage-sales.component.scss',

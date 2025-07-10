@@ -379,7 +379,7 @@
   header="Visita Improdutiva"
   [modal]="true"
   [(visible)]="isUnproductiveVisitDialogVisible"
-  [style]="{ width: '25rem' }"
+  [style]="{ width: '35rem' }"
 >
   <ng-container *ngIf="selectedServiceOrder">
     <app-unproductive-visits
@@ -389,6 +389,16 @@
   </ng-container>
 </p-dialog>
 
-<p-dialog dismissableMask="true" draggable="false" header="Ajuda Técnica" [modal]="true" [(visible)]="isHelperTechDialogVisible" [style]="{ width: '30rem' }">
-<app-helper-tech [technicians]="technicianOptions" [serviceOrder]="selectedServiceOrder"></app-helper-tech>
+<p-dialog
+  dismissableMask="true"
+  draggable="false"
+  header="Ajuda Técnica"
+  [modal]="true"
+  [(visible)]="isHelperTechDialogVisible"
+  [style]="{ width: '30rem' }"
+>
+  <app-helper-tech
+    [technicians]="technicianOptions"
+    [serviceOrder]="selectedServiceOrder"
+  ></app-helper-tech>
 </p-dialog>

@@ -11,6 +11,7 @@ import { SelectModule } from "primeng/select";
 import { ServiceOrderService } from "../../services/service-order.service";
 import { ButtonModule } from "primeng/button";
 import { ViewServiceOrderDto } from "../../../../interfaces/service-order.model";
+import { finalize } from "rxjs";
 
 @Component({
   selector: "app-unproductive-visits",
@@ -32,48 +33,55 @@ export class UnproductiveVisitsComponent implements OnInit {
   @Input({ required: true }) serviceOrder!: ViewServiceOrderDto;
 
   form!: FormGroup;
+  isLoading = false;
+  isSubmitting = false;
+
 
   private readonly serviceOrderService = inject(ServiceOrderService);
 
-constructor() {
-  this.form = new FormGroup({
-    technicianId: new FormControl(null, Validators.required),
-    
-    observation: new FormControl("", Validators.required),
-  });
-}
+  constructor() {
+    this.form = new FormGroup({
+      technicianId: new FormControl(null, Validators.required),
+      observation: new FormControl("", Validators.required),
+    });
+  }
 
   ngOnInit() {
-      this.serviceOrderService.findById(this.serviceOrder.id).subscribe({
-        next: (response) => {
-          this.serviceOrder = response;
-        },
-        error: (e) => {
-          console.log(e);
-        }
+    this.loadServiceOrder();
+  }
+
+
+  private loadServiceOrder(){
+    this.isLoading = true;
+    this.serviceOrderService.findById(this.serviceOrder.id).pipe(finalize(() => this.isLoading = false)).subscribe({
+      next: (response) => {
+        this.serviceOrder = response;
       },
-    )
+      error: (e) => {
+        console.log(e);
+      },
+    })
   }
 
   submit() {
     if (this.form.valid) {
-    const unproductiveVisit = {
-      technicianId: this.form.value.technicianId,
-      date: new Date().toLocaleString('pt-BR').replace(',', ''), 
-      observation: this.form.value.observation,
-    };
+      const unproductiveVisit = {
+        technicianId: this.form.value.technicianId,
+        date: new Date().toLocaleString("pt-BR").replace(",", ""),
+        observation: this.form.value.observation,
+      };
 
-    this.serviceOrderService
-      .addUnproductiveVisit(this.serviceOrder.id, unproductiveVisit)
-      .subscribe({
-        next: () => {
-
-          this.form.reset()
-        },
-        error: (e) => {
-          console.log("Erro:", e);
-        },
-      });
-  }
+      this.serviceOrderService
+        .addUnproductiveVisit(this.serviceOrder.id, unproductiveVisit)
+        .subscribe({
+          next: () => {
+            this.form.reset();
+            this.loadServiceOrder();
+          },
+          error: (e) => {
+            console.log("Erro:", e);
+          },
+        });
+    }
   }
 }

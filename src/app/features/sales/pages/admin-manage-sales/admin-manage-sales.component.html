@@ -1,80 +1,200 @@
-<div class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
+<div
+  class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md"
+>
   <p-toast></p-toast>
-  
-  <p-toolbar styleClass="mb-6 rounded-lg bg-slate-50 dark:bg-slate-800 border dark:border-slate-700">
+
+  <p-toolbar
+    styleClass="mb-6 rounded-lg bg-slate-50 dark:bg-slate-800 border dark:border-slate-700"
+  >
     <ng-template pTemplate="left">
-      <h1 class="text-2xl font-semibold text-slate-800 dark:text-slate-100 my-auto">Todas as Vendas</h1>
+      <h1
+        class="text-2xl font-semibold text-slate-800 dark:text-slate-100 my-auto"
+      >
+        Todas as Vendas
+      </h1>
     </ng-template>
     <ng-template pTemplate="right">
-      <button pButton label="Nova Venda" icon="pi pi-plus" class="p-button-success" (click)="openCreateDialog()"></button>
+      <button
+        pButton
+        label="Nova Venda"
+        icon="pi pi-plus"
+        class="p-button-success"
+        (click)="openCreateDialog()"
+      ></button>
     </ng-template>
   </p-toolbar>
 
   <form [formGroup]="filterForm" class="mb-6">
-    <p-fieldset legend="Filtros de Pesquisa" [toggleable]="true" [collapsed]="true" styleClass="mb-6 filter-fieldset">   
-        <form [formGroup]="filterForm">
-            <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Utilize os filtros abaixo para refinar sua busca, todos os campos são opcionais.
-                </label>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-6 p-fluid">
-            
-            <div>
-                <label for="clientName" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Nome do Cliente
-                </label>
-                <input id="clientName" type="text" pInputText formControlName="clientName" placeholder="Busque por nome" class="w-full"/>
-            </div>
+    <p-fieldset
+      legend="Filtros de Pesquisa"
+      [toggleable]="true"
+      [collapsed]="true"
+      styleClass="mb-6 filter-fieldset"
+    >
+      <form [formGroup]="filterForm">
+        <div>
+          <label
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+          >
+            Utilize os filtros abaixo para refinar sua busca, todos os campos
+            são opcionais.
+          </label>
+        </div>
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-6 p-fluid"
+        >
+          <div>
+            <label
+              for="clientName"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >
+              Nome do Cliente
+            </label>
+            <input
+              id="clientName"
+              type="text"
+              pInputText
+              formControlName="clientName"
+              placeholder="Busque por nome"
+              class="w-full"
+            />
+          </div>
 
-            <div>
-                <label for="clientCode" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Cód. do Cliente
-                </label>
-                <p-inputNumber inputId="clientCode" formControlName="clientCode" mode="decimal" [useGrouping]="false" placeholder="Digite o código" class="w-full"></p-inputNumber>
-            </div>
+          <div>
+            <label
+              for="clientCode"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >
+              Cód. do Cliente
+            </label>
+            <p-inputNumber
+              inputId="clientCode"
+              formControlName="clientCode"
+              mode="decimal"
+              [useGrouping]="false"
+              placeholder="Digite o código"
+              class="w-full"
+            ></p-inputNumber>
+          </div>
 
-            <div>
-                <label for="status" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Status Geral
-                </label>
-                <p-select inputId="status" [options]="statusOptions" formControlName="status" placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" appendTo="body" styleClass="w-full"></p-select>
-            </div>
+          <div>
+            <label
+              for="status"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >
+              Status Geral
+            </label>
+            <p-select
+              inputId="status"
+              [options]="statusOptions"
+              formControlName="status"
+              placeholder="Todos"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              appendTo="body"
+              styleClass="w-full"
+            ></p-select>
+          </div>
 
-            <div>
-                <label for="contractStatus" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Status do Contrato
-                </label>
-                <p-select inputId="contractStatus" [options]="contractStatusOptions" formControlName="contractStatus" placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" appendTo="body" styleClass="w-full"></p-select>
-            </div>
+          <div>
+            <label
+              for="contractStatus"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >
+              Status do Contrato
+            </label>
+            <p-select
+              inputId="contractStatus"
+              [options]="contractStatusOptions"
+              formControlName="contractStatus"
+              placeholder="Todos"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              appendTo="body"
+              styleClass="w-full"
+            ></p-select>
+          </div>
 
-            <div>
-                <label for="accessionStatus" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Status da Adesão
-                </label>
-                <p-select inputId="accessionStatus" [options]="accessionStatusOptions" formControlName="accessionStatus" placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" appendTo="body" styleClass="w-full"></p-select>
-            </div>
+          <div>
+            <label
+              for="accessionStatus"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >
+              Status da Adesão
+            </label>
+            <p-select
+              inputId="accessionStatus"
+              [options]="accessionStatusOptions"
+              formControlName="accessionStatus"
+              placeholder="Todos"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              appendTo="body"
+              styleClass="w-full"
+            ></p-select>
+          </div>
 
-            <div>
-                <label for="salesperson" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Vendedor
-                </label>
-                <p-select inputId="salesperson" [options]="sellers" formControlName="sellerId" placeholder="Todos" optionLabel="name" optionValue="id" [showClear]="true" appendTo="body" styleClass="w-full"></p-select>
-            </div>
+          <div>
+            <label
+              for="salesperson"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >
+              Vendedor
+            </label>
+            <p-select
+              inputId="salesperson"
+              [options]="sellers"
+              formControlName="sellerId"
+              placeholder="Todos"
+              optionLabel="name"
+              optionValue="id"
+              [showClear]="true"
+              appendTo="body"
+              styleClass="w-full"
+            ></p-select>
+          </div>
+        </div>
 
-            </div>
-            
-            <div class="flex justify-end items-center gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
-              <button pButton type="button" label="Limpar Filtros" icon="pi pi-filter-slash" class="p-button-outlined p-button-secondary" (click)="clearFilters()"></button>
-              <button pButton type="button" label="Aplicar Filtros" icon="pi pi-search" (click)="updateUrl()"></button>
-            </div>
-        </form>
+        <div
+          class="flex justify-end items-center gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700"
+        >
+          <button
+            pButton
+            type="button"
+            label="Limpar Filtros"
+            icon="pi pi-filter-slash"
+            class="p-button-outlined p-button-secondary"
+            (click)="clearFilters()"
+          ></button>
+          <button
+            pButton
+            type="button"
+            label="Aplicar Filtros"
+            icon="pi pi-search"
+            (click)="updateUrl()"
+          ></button>
+        </div>
+      </form>
     </p-fieldset>
   </form>
 
-  <p-table #dt [value]="sales" [loading]="isLoading" styleClass="p-datatable-striped p-datatable-gridlines text-sm"
-      [paginator]="true" [rows]="rows" [totalRecords]="totalRecords" (onPage)="loadSales($event)" [lazy]="true"
-      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} vendas" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true">
+  <p-table
+    #dt
+    [value]="sales"
+    [loading]="isLoading"
+    styleClass="p-datatable-striped p-datatable-gridlines text-sm"
+    [paginator]="true"
+    [rows]="rows"
+    [totalRecords]="totalRecords"
+    (onPage)="loadSales($event)"
+    [lazy]="true"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} vendas"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    [showCurrentPageReport]="true"
+  >
     <ng-template pTemplate="header">
       <tr>
         <th>Cliente</th>
@@ -89,179 +209,363 @@
     </ng-template>
     <ng-template pTemplate="body" let-sale>
       <tr>
-        <td class="truncate max-w-xs" [pTooltip]="sale.clientName">{{ sale.clientName }}</td>
+        <td class="truncate max-w-xs" [pTooltip]="sale.clientName">
+          {{ sale.clientName }}
+        </td>
         <td>{{ sale.contractNumber }}</td>
         <td>{{ getContractStatusLabel(sale.contractStatus) }}</td>
         <td>{{ getAccessionStatusLabel(sale.accessionStatus) }}</td>
         <td>
-          <p-tag [value]="getStatusLabel(sale.saleStatus)" [severity]="getStatusSeverity(sale.saleStatus)"></p-tag>
+          <p-tag
+            [value]="getStatusLabel(sale.saleStatus)"
+            [severity]="getStatusSeverity(sale.saleStatus)"
+          ></p-tag>
         </td>
-        <td class="truncate max-w-xs" [pTooltip]="sale.salespersonName">{{ sale.seller.name || '-' }}</td>
-        <td class="truncate max-w-xs" [pTooltip]="sale.observation">{{ sale.observation || '-' }}</td>
+        <td class="truncate max-w-xs" [pTooltip]="sale.salespersonName">
+          {{ sale.seller.name || "-" }}
+        </td>
+        <td class="truncate max-w-xs" [pTooltip]="sale.observation">
+          {{ sale.observation || "-" }}
+        </td>
         <td class="flex items-center gap-2">
-            <!-- Ações de Aprovação/Rejeição (condicionais) -->
+          <!-- Ações de Aprovação/Rejeição (condicionais) -->
           <ng-container *ngIf="sale.saleStatus === 'WAITING_APPROVAL'">
-            <button pButton type="button" icon="pi pi-check" class="p-button-rounded p-button-success p-button-outlined" 
-                    pTooltip="Aprovar Venda" (click)="confirmApprove(sale)"></button>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-check"
+              class="p-button-rounded p-button-success p-button-outlined"
+              pTooltip="Aprovar Venda"
+              (click)="confirmApprove(sale)"
+            ></button>
           </ng-container>
-          <button pButton type="button" icon="pi pi-pencil" rounded pTooltip="Editar Venda" (click)="openUpdateDialog(sale)"></button>
-          <button pButton type="button" icon="pi pi-users" class="p-button-rounded p-button-info p-button-outlined" pTooltip="Transferir Venda" tooltipPosition="top"
-          (click)="openTransferDialog(sale)"></button>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-pencil"
+            rounded
+            pTooltip="Editar Venda"
+            (click)="openUpdateDialog(sale)"
+          ></button>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-users"
+            class="p-button-rounded p-button-info p-button-outlined"
+            pTooltip="Transferir Venda"
+            tooltipPosition="top"
+            (click)="openTransferDialog(sale)"
+          ></button>
         </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
-      <tr><td colspan="6" class="text-center p-6">Nenhuma venda encontrada.</td></tr>
+      <tr>
+        <td colspan="6" class="text-center p-6">Nenhuma venda encontrada.</td>
+      </tr>
     </ng-template>
   </p-table>
 </div>
 
-<p-dialog header="Registrar Nova Venda" 
-          [(visible)]="displayCreateDialog" 
-          [modal]="true" 
-          [style]="{width: '450px'}" 
-          [draggable]="false"
-          styleClass="p-fluid">
-  
-  <form [formGroup]="createForm" (ngSubmit)="submitCreateForm()" class="space-y-6 pt-4">
-
+<p-dialog
+  header="Registrar Nova Venda"
+  [(visible)]="displayCreateDialog"
+  [modal]="true"
+  [style]="{ width: '450px' }"
+  [draggable]="false"
+  styleClass="p-fluid"
+>
+  <form
+    [formGroup]="createForm"
+    (ngSubmit)="submitCreateForm()"
+    class="space-y-6 pt-4"
+  >
     <div>
-      <label for="create-contractNumber" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+      <label
+        for="create-contractNumber"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+      >
         Número do Contrato <span class="text-red-500">*</span>
       </label>
       <div class="p-inputgroup">
-        <p-inputNumber inputId="create-contractNumber" formControlName="contractNumber" mode="decimal" [useGrouping]="false" placeholder="Digite o nº do contrato"></p-inputNumber>
+        <p-inputNumber
+          inputId="create-contractNumber"
+          formControlName="contractNumber"
+          mode="decimal"
+          [useGrouping]="false"
+          placeholder="Digite o nº do contrato"
+        ></p-inputNumber>
       </div>
-       <div class="h-1 mt-1">
-           <small *ngIf="createForm.get('contractNumber')?.invalid && createForm.get('contractNumber')?.touched" class="p-error block text-xs">
-            Contrato é obrigatório.
-            </small>
-       </div>
-    </div>
-
-    <div>
-      <label for="create-saleDate" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-        Data da Venda <span class="text-red-500">*</span>
-      </label>
-      <p-datepicker inputId="create-saleDate" formControlName="saleDate" dateFormat="dd/mm/yy" dataType="string"
-                  [showIcon]="true" placeholder="dd/mm/aaaa" appendTo="body" styleClass="w-full"></p-datepicker>
       <div class="h-1 mt-1">
-          <small *ngIf="createForm.get('saleDate')?.invalid && createForm.get('saleDate')?.touched" class="p-error block text-xs">
-            Data é obrigatória.
-          </small>
-      </div>
-    </div>
-
-    <div>
-      <label for="create-contractStatus" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-        Status do Contrato <span class="text-red-500">*</span>
-      </label>
-      <p-select inputId="create-contractStatus" [options]="contractStatusOptions" formControlName="contractStatus" 
-                placeholder="Selecione um status" appendTo="body" styleClass="w-full"></p-select>
-      <div class="h-1 mt-1">
-          <small *ngIf="createForm.get('contractStatus')?.invalid && createForm.get('contractStatus')?.touched" class="p-error block text-xs">
-            Status do contrato é obrigatório.
-          </small>
-      </div>
-    </div>
-    
-    <div>
-      <label for="create-accessionStatus" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-        Status da Adesão <span class="text-red-500">*</span>
-      </label>
-      <p-select inputId="create-accessionStatus" [options]="accessionStatusOptions" formControlName="accessionStatus" 
-                placeholder="Selecione um status" appendTo="body" styleClass="w-full"></p-select>
-       <div class="h-1 mt-1">
-           <small *ngIf="createForm.get('accessionStatus')?.invalid && createForm.get('accessionStatus')?.touched" class="p-error block text-xs">
-            Status da adesão é obrigatório.
-            </small>
-       </div>
-    </div>
-  </form>
-
-  <ng-template pTemplate="footer">
-    <div class="flex justify-end gap-3">
-      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="displayCreateDialog=false"></button>
-      <button pButton type="submit" label="Salvar Venda" icon="pi pi-check" [loading]="isCreating" 
-              [disabled]="createForm.invalid || isCreating" (click)="submitCreateForm()"></button>
-    </div>
-  </ng-template>
-</p-dialog>
-
-<p-dialog 
-  header="Editar Venda (Contrato {{ selectedSale?.contractNumber }})" 
-  [(visible)]="displayUpdateDialog" 
-  [modal]="true" 
-  [style]="{width: '40vw', minWidth: '450px'}"
-  (onHide)="selectedSale = null"
-  [draggable]="false">
-  
-  <form *ngIf="selectedSale" [formGroup]="updateForm" (ngSubmit)="submitUpdateForm()" class="p-fluid space-y-6 pt-4">
-    
-    <div>
-      <label for="update-contractStatus" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-        Status do Contrato
-      </label>
-      <p-select 
-        inputId="update-contractStatus" 
-        [options]="contractStatusOptions" 
-        formControlName="contractStatus" 
-        placeholder="Selecione um status"
-        styleClass="w-1/2"
-        appendTo="body">
-      </p-select>
-    </div>
-    
-    <div>
-      <label for="update-accessionStatus" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-        Status da Adesão
-      </label>
-      <p-select 
-        inputId="update-accessionStatus" 
-        [options]="accessionStatusOptions" 
-        formControlName="accessionStatus" 
-        placeholder="Selecione um status"
-        styleClass="w-1/2"
-        appendTo="body">
-      </p-select>
-    </div>
-    
-    <div>
-      <label for="update-observation" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-        Observação
-      </label>
-      <textarea id="update-observation" pTextarea [rows]="4" formControlName="observation" 
-                placeholder="Adicione uma observação..." fluid></textarea>
-      <div class="h-5 mt-1.5">
-        <small *ngIf="updateForm.get('observation')?.invalid && updateForm.get('observation')?.touched" 
-               class="p-error block text-xs">
+        <small
+          *ngIf="
+            createForm.get('contractNumber')?.invalid &&
+            createForm.get('contractNumber')?.touched
+          "
+          class="p-error block text-xs"
+        >
+          Contrato é obrigatório.
         </small>
       </div>
     </div>
 
+    <div>
+      <label
+        for="create-saleDate"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+      >
+        Data da Venda <span class="text-red-500">*</span>
+      </label>
+      <p-datepicker
+        inputId="create-saleDate"
+        formControlName="saleDate"
+        dateFormat="dd/mm/yy"
+        dataType="string"
+        [showIcon]="true"
+        placeholder="dd/mm/aaaa"
+        appendTo="body"
+        styleClass="w-full"
+      ></p-datepicker>
+      <div class="h-1 mt-1">
+        <small
+          *ngIf="
+            createForm.get('saleDate')?.invalid &&
+            createForm.get('saleDate')?.touched
+          "
+          class="p-error block text-xs"
+        >
+          Data é obrigatória.
+        </small>
+      </div>
+    </div>
+
+    <div>
+      <label
+        for="create-contractStatus"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+      >
+        Status do Contrato <span class="text-red-500">*</span>
+      </label>
+      <p-select
+        inputId="create-contractStatus"
+        [options]="contractStatusOptions"
+        formControlName="contractStatus"
+        placeholder="Selecione um status"
+        appendTo="body"
+        styleClass="w-full"
+      ></p-select>
+      <div class="h-1 mt-1">
+        <small
+          *ngIf="
+            createForm.get('contractStatus')?.invalid &&
+            createForm.get('contractStatus')?.touched
+          "
+          class="p-error block text-xs"
+        >
+          Status do contrato é obrigatório.
+        </small>
+      </div>
+    </div>
+
+    <div>
+      <label
+        for="create-accessionStatus"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+      >
+        Status da Adesão <span class="text-red-500">*</span>
+      </label>
+      <p-select
+        inputId="create-accessionStatus"
+        [options]="accessionStatusOptions"
+        formControlName="accessionStatus"
+        placeholder="Selecione um status"
+        appendTo="body"
+        styleClass="w-full"
+      ></p-select>
+      <div class="h-1 mt-1">
+        <small
+          *ngIf="
+            createForm.get('accessionStatus')?.invalid &&
+            createForm.get('accessionStatus')?.touched
+          "
+          class="p-error block text-xs"
+        >
+          Status da adesão é obrigatório.
+        </small>
+      </div>
+    </div>
   </form>
-  
+
   <ng-template pTemplate="footer">
     <div class="flex justify-end gap-3">
-      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="displayUpdateDialog=false"></button>
-      <button pButton type="submit" label="Salvar Alterações" icon="pi pi-save" [loading]="isUpdating" [disabled]="isUpdating" (click)="submitUpdateForm()"></button>
+      <button
+        pButton
+        type="button"
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="displayCreateDialog = false"
+      ></button>
+      <button
+        pButton
+        type="submit"
+        label="Salvar Venda"
+        icon="pi pi-check"
+        [loading]="isCreating"
+        [disabled]="createForm.invalid || isCreating"
+        (click)="submitCreateForm()"
+      ></button>
     </div>
   </ng-template>
-
 </p-dialog>
 
-<p-dialog header="Transferir Venda (Contrato #{{ selectedSale?.contractNumber }})" [(visible)]="displayTransferDialog" [modal]="true" [style]="{width: '50vw', minWidth: '400px'}">
-  <form *ngIf="selectedSale" [formGroup]="transferForm" (ngSubmit)="submitTransferForm()" class="p-fluid space-y-6 pt-4">
+<p-dialog
+  header="Editar Venda (Contrato {{ selectedSale?.contractNumber }})"
+  [(visible)]="displayUpdateDialog"
+  [modal]="true"
+  [style]="{ width: '40vw', minWidth: '450px' }"
+  (onHide)="selectedSale = null"
+  [draggable]="false"
+>
+  <form
+    *ngIf="selectedSale"
+    [formGroup]="updateForm"
+    (ngSubmit)="submitUpdateForm()"
+    class="p-fluid space-y-6 pt-4"
+  >
     <div>
-      <p class="mb-2">Venda atualmente atribuída a: <strong>{{ selectedSale.seller.name }}</strong></p>
-      <label for="transfer-seller" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+      <label
+        for="update-contractStatus"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+      >
+        Status do Contrato
+      </label>
+      <p-select
+        inputId="update-contractStatus"
+        [options]="contractStatusOptions"
+        formControlName="contractStatus"
+        placeholder="Selecione um status"
+        styleClass="w-1/2"
+        appendTo="body"
+      >
+      </p-select>
+    </div>
+
+    <div>
+      <label
+        for="update-accessionStatus"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+      >
+        Status da Adesão
+      </label>
+      <p-select
+        inputId="update-accessionStatus"
+        [options]="accessionStatusOptions"
+        formControlName="accessionStatus"
+        placeholder="Selecione um status"
+        styleClass="w-1/2"
+        appendTo="body"
+      >
+      </p-select>
+    </div>
+
+    <div>
+      <label
+        for="update-observation"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+      >
+        Observação
+      </label>
+      <textarea
+        id="update-observation"
+        pTextarea
+        [rows]="4"
+        formControlName="observation"
+        placeholder="Adicione uma observação..."
+        fluid
+      ></textarea>
+      <div class="h-5 mt-1.5">
+        <small
+          *ngIf="
+            updateForm.get('observation')?.invalid &&
+            updateForm.get('observation')?.touched
+          "
+          class="p-error block text-xs"
+        >
+        </small>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-3">
+      <button
+        pButton
+        type="button"
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="displayUpdateDialog = false"
+      ></button>
+      <button
+        pButton
+        type="submit"
+        label="Salvar Alterações"
+        icon="pi pi-save"
+        [loading]="isUpdating"
+        [disabled]="isUpdating"
+        (click)="submitUpdateForm()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Transferir Venda (Contrato #{{ selectedSale?.contractNumber }})"
+  [(visible)]="displayTransferDialog"
+  [modal]="true"
+  [style]="{ width: '50vw', minWidth: '400px' }"
+>
+  <form
+    *ngIf="selectedSale"
+    [formGroup]="transferForm"
+    (ngSubmit)="submitTransferForm()"
+    class="p-fluid space-y-6 pt-4"
+  >
+    <div>
+      <p class="mb-2">
+        Venda atualmente atribuída a:
+        <strong>{{ selectedSale.seller.name }}</strong>
+      </p>
+      <label
+        for="transfer-seller"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+      >
         Transferir para <span class="text-red-500">*</span>
       </label>
-      <p-select inputId="transfer-seller" [options]="sellersOptions" formControlName="newEmployeeId" appendTo="body"
-                placeholder="Selecione o novo vendedor" optionLabel="name" optionValue="id" [ngClass]="{'p-invalid': transferForm.get('newEmployeeId')?.invalid && transferForm.get('newEmployeeId')?.touched}">
+      <p-select
+        inputId="transfer-seller"
+        [options]="sellersOptions"
+        formControlName="newEmployeeId"
+        appendTo="body"
+        placeholder="Selecione o novo vendedor"
+        optionLabel="name"
+        optionValue="id"
+        [ngClass]="{
+          'p-invalid':
+            transferForm.get('newEmployeeId')?.invalid &&
+            transferForm.get('newEmployeeId')?.touched
+        }"
+      >
       </p-select>
       <div class="h-5 mt-1.5">
-        <small *ngIf="transferForm.get('newEmployeeId')?.invalid && transferForm.get('newEmployeeId')?.touched" class="p-error block text-xs">
+        <small
+          *ngIf="
+            transferForm.get('newEmployeeId')?.invalid &&
+            transferForm.get('newEmployeeId')?.touched
+          "
+          class="p-error block text-xs"
+        >
           É necessário selecionar um novo vendedor.
         </small>
       </div>
@@ -269,12 +573,25 @@
   </form>
   <ng-template pTemplate="footer">
     <div class="flex justify-end gap-3">
-      <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="displayTransferDialog=false"></button>
-      <button pButton type="submit" label="Confirmar Transferência" icon="pi pi-check-double" [loading]="isTransferring" 
-              [disabled]="transferForm.invalid || isTransferring" (click)="submitTransferForm()"></button>
+      <button
+        pButton
+        type="button"
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="displayTransferDialog = false"
+      ></button>
+      <button
+        pButton
+        type="submit"
+        label="Confirmar Transferência"
+        icon="pi pi-check-double"
+        [loading]="isTransferring"
+        [disabled]="transferForm.invalid || isTransferring"
+        (click)="submitTransferForm()"
+      ></button>
     </div>
   </ng-template>
 </p-dialog>
 
 <p-confirmDialog />
-
