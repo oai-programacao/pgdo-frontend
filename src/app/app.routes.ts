@@ -23,11 +23,18 @@ export const routes: Routes = [
         // Não precisa de authGuard aqui de novo, pois a rota pai 'app' já está protegida
       },
       {
-        path: 'clientes/procurar',
+        path: 'clientes/cliente-cadastrados',
         loadComponent: () =>
-          import('./features/client-financial/pages/search-client-financial/search-client-financial.component').then((m) => m.SearchClientFinancialComponent),
-        title: 'Clientes',
+          import('./features/register-new-client/pages/list-client-register/list-client-register.component').then((m) => m.ListClientRegisterComponent),
+        title: 'Clientes Cadastrados',
       },
+
+      // {
+      //   path: 'clientes/procurar',
+      //   loadComponent: () =>
+      //     import('./features/client-financial/pages/search-client-financial/search-client-financial.component').then((m) => m.SearchClientFinancialComponent),
+      //   title: 'Clientes',
+      // },
       {
         path: 'colaboradores',
         loadComponent: () =>
@@ -151,7 +158,7 @@ export const routes: Routes = [
       {
         path: 'cliente-cadastrar',
         loadComponent: () => 
-          import('./features/register-new-client/pages/register-new-client.component').then((m) => m.RegisterNewClientComponent),
+          import('./features/register-new-client/pages/register-new-client/register-new-client.component').then((m) => m.RegisterNewClientComponent),
         title: 'Cadastrar Novo Cliente'
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' } // Rota padrão dentro de /app

@@ -56,7 +56,7 @@
         <td class="font-medium truncate max-w-xs" [pTooltip]="addr.clientName">{{ addr.clientName }}</td>
         <td><p-tag [value]="getCityLabel(addr.city)"></p-tag></td>
         <td>{{ addr.district }}</td>
-        <td class="truncate max-w-xs" [pTooltip]="addr.street">{{ addr.street }}</td>
+        <td class="truncate max-w-xs" [pTooltip]="addr.street">{{ addr.address }}</td>
         <td class="truncate max-w-xs" [pTooltip]="addr.complement">{{ addr.complement }}</td>
       </tr>
     </ng-template>

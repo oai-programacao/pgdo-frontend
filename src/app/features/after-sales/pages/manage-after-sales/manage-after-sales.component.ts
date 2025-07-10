@@ -40,7 +40,6 @@ import { SaleStatus } from '../../../../interfaces/sales.model';
     TooltipModule, 
     FieldsetModule,
     TimelineModule, 
-    DatePipe
   ],
   templateUrl: './manage-after-sales.component.html',
   styleUrl: './manage-after-sales.component.scss',

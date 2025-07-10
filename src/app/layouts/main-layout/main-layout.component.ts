@@ -31,18 +31,25 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       allowedRoles: ['ROLE_ADMIN', 'ROLE_STORE_MANAGER', 'ROLE_STORE_EMPLOYEE', 'ROLE_CDS'],
       expanded: false, // Estado inicial do submenu (opcional)
       children: [
-        {
-          id: "client-list",
-          label: "Buscar Faturas",
-          icon: "pi pi-receipt",
-          route: "/app/clientes/procurar",
-          exactMatch: true,
-        },
+        // {
+        //   id: "client-list",
+        //   label: "Buscar Faturas",
+        //   icon: "pi pi-receipt",
+        //   route: "/app/clientes/procurar",
+        //   exactMatch: true,
+        // },
         {
           id: 'register-client',
           label: 'Cadastrar Novo Cliente',
           icon: 'pi pi-user-plus',
           route: '/app/cliente-cadastrar',
+          exactMatch: true
+        },
+        {
+          id: 'client-list',
+          label: 'Listar Clientes',
+          icon: 'pi pi-users',
+          route: '/app/clientes/cliente-cadastrados',
           exactMatch: true
         }
       ]
@@ -241,13 +248,13 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       route: "/app/troca-titularidade",
       allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_STORE_EMPLOYEE"],
     },
-    {
-      id: "avaliations",
-      label: "Avaliações",
-      icon: "pi pi-star",
-      route: "/app/avaliacoes",
-      allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_ANALYST"],
-    },
+    // {
+    //   id: "avaliations",
+    //   label: "Avaliações",
+    //   icon: "pi pi-star",
+    //   route: "/app/avaliacoes",
+    //   allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_ANALYST"],
+    // },
     {
       id: "system-warnings",
       label: "Avisos do Sistema",

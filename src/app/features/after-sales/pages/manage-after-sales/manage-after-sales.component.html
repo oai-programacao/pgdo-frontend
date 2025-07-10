@@ -46,7 +46,7 @@
         <td>{{ afterSale.sale.phone2 || '-' }}</td>
         <td>
           <div *ngIf="afterSale.lastAttemptAt">
-            {{ afterSale.lastAttemptAt | date:'dd/MM/yyyy HH:mm' }}
+            {{ afterSale.lastAttemptAt  }}
             <div class="text-xs text-slate-500">por {{ afterSale.lastAttemptBy || '-' }}</div>
           </div>
           <span *ngIf="!afterSale.lastAttemptAt" class="text-slate-400">Nenhuma</span>
@@ -112,7 +112,7 @@
             </span>
         </ng-template>
         <ng-template pTemplate="content" let-attempt>
-            <small class="p-text-secondary">{{ attempt.attemptedAt | date:'dd/MM/yyyy HH:mm' }} - por {{ attempt.attemptedBy?.name }}</small>
+            <small class="p-text-secondary">{{ attempt.attemptedAt }} - por {{ attempt.attemptedBy?.name }}</small>
             <p class="mt-2">{{ attempt.notes }}</p>
             <p-tag [value]="getContactAttemptOutcomeLabel(attempt.outcome)" [severity]="getStatusSeverity(attempt.outcome)" class="mt-2"></p-tag> </ng-template>
       </p-timeline>
