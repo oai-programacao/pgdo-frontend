@@ -346,6 +346,7 @@
                     icon="pi pi-pencil"
                     class="p-button-rounded p-button-text p-button-warning"
                     pTooltip="Editar OS"
+                    (click)="openEditTechDialog(os)"
                     tooltipPosition="left"
                   ></button>
                   <button
@@ -401,4 +402,19 @@
     [technicians]="technicianOptions"
     [serviceOrder]="selectedServiceOrder"
   ></app-helper-tech>
+</p-dialog>
+
+<p-dialog
+  dismissableMask="true"
+  draggable="false"
+  header="Editar OS"
+  [modal]="true"
+  [(visible)]="isEditingHelperTech"
+  [style]="{ width: '50rem' }"
+>
+  @if(selectedServiceOrder){
+  <app-edit
+    [serviceOrder]="selectedServiceOrder!"
+  ></app-edit>
+  }
 </p-dialog>

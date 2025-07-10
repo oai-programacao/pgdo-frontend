@@ -5,6 +5,7 @@ import {
   inject,
   OnDestroy,
   OnInit,
+  Output,
   ViewChild,
 } from "@angular/core";
 import {
@@ -52,6 +53,7 @@ import { TooltipModule } from "primeng/tooltip";
 import { DialogModule } from "primeng/dialog";
 import { UnproductiveVisitsComponent } from "../../components/unproductive-visits/unproductive-visits.component";
 import { HelperTechComponent } from "../../components/helper-tech/helper-tech.component";
+import { EditComponent } from "../../components/edit/edit.component";
 @Component({
   selector: "app-admin-service-orders",
   imports: [
@@ -74,7 +76,8 @@ import { HelperTechComponent } from "../../components/helper-tech/helper-tech.co
     DialogModule,
     UnproductiveVisitsComponent,
     HelperTechComponent,
-  ],
+    EditComponent
+],
   templateUrl: "./admin-service-orders.component.html",
   styleUrl: "./admin-service-orders.component.scss",
   providers: [MessageService],
@@ -82,7 +85,7 @@ import { HelperTechComponent } from "../../components/helper-tech/helper-tech.co
 export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   @ViewChild("helperTech") helperTech!: HelperTechComponent;
   @ViewChild("dt") dt!: Table;
-
+  
   // Injeções de dependências
   private readonly messageService = inject(MessageService);
   private readonly serviceOrderService = inject(ServiceOrderService);
@@ -124,10 +127,12 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   helperForm!: FormGroup;
   unproductiveVisitForm!: FormGroup;
   isSubmittingSubForm = false; // Flag de loading para os sub-formulários
-
+ 
   // Dialogs
   isUnproductiveVisitDialogVisible = false;
   isHelperTechDialogVisible = false;
+  isEditingHelperTech = false;
+
 
   constructor() {
     // this.statusOptions = this.mapLabelsToOptions(ServiceOrderStatusLabels);
@@ -151,6 +156,11 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   openHelperTechDialog(selectServiceOrder: ViewServiceOrderDto | null = null) {
     this.isHelperTechDialogVisible = true;
     this.selectedServiceOrder = selectServiceOrder;
+  }
+
+  openEditTechDialog(selectedServiceOrder: ViewServiceOrderDto){
+    this.selectedServiceOrder = selectedServiceOrder;
+    this.isEditingHelperTech = true;
   }
 
   ngOnDestroy(): void {
