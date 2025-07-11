@@ -18,6 +18,7 @@ export interface CustomPageResponse<T> {
 
 // Para seu ViewServiceOrderDto (você já deve ter algo similar)
 export interface ViewServiceOrderDto {
+  helpers: never[];
   id: string; // UUID
   contractNumber?: number;
   identificationNumber?: number;

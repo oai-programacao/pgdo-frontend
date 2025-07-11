@@ -55,10 +55,17 @@ export class HelperTechComponent implements OnInit {
     end: [""],
   });
 
+  helpers!: {
+    technicianName: string;
+    start: string;
+    end: string;
+  }[];
+
   constructor() {}
 
   ngOnInit() {
     this.loadServiceOrder();
+    console.log(this.helpers)
   }
 
   private loadServiceOrder() {
@@ -67,8 +74,13 @@ export class HelperTechComponent implements OnInit {
       .findById(this.serviceOrder!.id)
       .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
-        next: (response) => {
+        next: (response: ViewServiceOrderDto) => {
           this.serviceOrder = response;
+          this.helpers = (response.technicalHelp ?? []).map(helper => ({
+            technicianName: helper.technician.name,
+            start: helper.startTime,
+            end: helper.endTime
+          }))
         },
         error: (e) => {
           console.log(e);
@@ -95,6 +107,17 @@ export class HelperTechComponent implements OnInit {
         .subscribe({
           next: () => {
             helperDto.end = endTime;
+
+            const tech = this.technicians.find(t => t.value === formValue.technicianId);
+             const technicianName = tech ? tech.label : 'Técnico';
+
+            this.helpers.push({
+              technicianName,
+              start: formValue.start,
+              end: formValue.end
+            })
+
+
             this.helperForm.reset();
             this.eventHelper.emit();
           },
@@ -104,4 +127,5 @@ export class HelperTechComponent implements OnInit {
         });
     }
   }
+
 }

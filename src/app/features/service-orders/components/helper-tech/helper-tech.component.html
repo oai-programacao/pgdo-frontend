@@ -1,3 +1,6 @@
+
+
+
 <form
   [formGroup]="helperForm"
   (ngSubmit)="onSubmitHelper()"
@@ -57,4 +60,15 @@
       class="w-full md:w-1/6"
     ></p-button>
   </div>
+<ul class="rounded-xl border border-gray-200">
+  <li *ngFor="let helper of helpers" class="p-4 flex justify-between items-center">
+    <div class="text-lg">
+      <span class="font-semibold text-slate-800">{{ helper.technicianName }}</span>
+      <div class="text-xs text-gray-500">
+        {{ helper.start }} - {{ helper.end }}
+      </div>
+    </div>
+  </li>
+  </ul>
 </form>
+
