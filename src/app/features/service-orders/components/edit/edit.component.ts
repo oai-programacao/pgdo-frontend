@@ -86,7 +86,7 @@ export class EditComponent implements OnInit {
       ),
     });
 
-    this.loadServiceOrder();
+   
   }
 
   editServiceOrder() {
@@ -107,25 +107,12 @@ export class EditComponent implements OnInit {
       });
   }
 
-  private loadServiceOrder() {
-    this.isLoading = true;
-    this.orderService
-      .findById(this.serviceOrder!.id)
-      .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe({
-        next: (response) => {
-          this.serviceOrder = response;
-        },
-        error: (e) => {
-          console.log(e);
-        },
-      });
-  }
+
 
   private mapLabelsToOptions = (labels: Record<string, string>): any[] =>
-    Object.entries(labels).map(([value, label]) => ({ label, value }));
+  Object.entries(labels).map(([value, label]) => ({ label, value }));
   getStatusLabel = (status: string) =>
-    ServiceOrderStatusLabels[status as ServiceOrderStatus] || status;
+  ServiceOrderStatusLabels[status as ServiceOrderStatus] || status;
   getCitiesLabel = (city: City) => CitiesLabels[city] || city;
   getTypeOfOsLabel = (type: TypeOfOs) => TypeOfOsLabels[type] || type;
   getPeriodLabel = (period: Period) => PeriodLabels[period] || period;

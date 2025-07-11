@@ -54,6 +54,7 @@ import { DialogModule } from "primeng/dialog";
 import { UnproductiveVisitsComponent } from "../../components/unproductive-visits/unproductive-visits.component";
 import { HelperTechComponent } from "../../components/helper-tech/helper-tech.component";
 import { EditComponent } from "../../components/edit/edit.component";
+import { ObservationComponent } from "../../components/observation/observation.component";
 @Component({
   selector: "app-admin-service-orders",
   imports: [
@@ -77,7 +78,8 @@ import { EditComponent } from "../../components/edit/edit.component";
     UnproductiveVisitsComponent,
     HelperTechComponent,
     EditComponent,
-  ],
+    ObservationComponent
+],
   templateUrl: "./admin-service-orders.component.html",
   styleUrl: "./admin-service-orders.component.scss",
   providers: [MessageService],
@@ -134,6 +136,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   isUnproductiveVisitDialogVisible = false;
   isHelperTechDialogVisible = false;
   isEditingTechDialogVisible = false;
+  isPostingObeservationTechDialogVisible = false
 
   constructor() {
     // this.statusOptions = this.mapLabelsToOptions(ServiceOrderStatusLabels);
@@ -163,6 +166,11 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.isEditingTechDialogVisible = true;
   }
 
+  openObservationTechDialog(selectedServiceOrder: ViewServiceOrderDto | null = null){
+    this.selectedServiceOrder = selectedServiceOrder;
+    this.isPostingObeservationTechDialogVisible = true;
+  }
+
   //Dialogs após ação no filho
   onEditSuccess() {
     this.messageService.add({
@@ -182,8 +190,20 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       life: 1000,
     });
     this.isHelperTechDialogVisible = false;
+  }
+
+  onObservationSuccess(){
+    this.messageService.add({
+      severity: "success",
+      summary: "Sucesso",
+      detail: "Observação adicionada com sucesso!",
+      life: 1000,
+    });
+    this.isPostingObeservationTechDialogVisible = false;
     this.loadServiceOrders();
   }
+
+
 
   
   // ciclo de vida
