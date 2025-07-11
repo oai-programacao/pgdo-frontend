@@ -1,9 +1,11 @@
 <form
   [formGroup]="helperForm"
   (ngSubmit)="onSubmitHelper()"
-  class="flex flex-col gap-4 py-3 justify-center align-center"
+  class="flex flex-col gap-6 py-6 px-4 bg-white border border-gray-200 rounded-xl shadow-md max-w-xl mx-auto"
 >
+  <!-- Seleção de Técnico -->
   <div class="flex flex-col gap-2">
+    <label for="technician" class="text-sm text-slate-600 font-medium">Técnico</label>
     <p-select
       id="technician"
       [options]="technicians"
@@ -14,41 +16,45 @@
       appendTo="body"
     ></p-select>
   </div>
-  <div class="flex flex-row gap-4 py-5">
-    <div class="">
+
+  <!-- Intervalo de Datas -->
+  <div class="flex flex-col md:flex-row gap-4">
+    <div class="flex-1">
+      <label for="start" class="text-sm text-slate-600 font-medium">Data Inicial</label>
       <p-datepicker
         formControlName="start"
         dateFormat="dd/mm/yy"
-        hourFormat="HH:mm"
         placeholder="Data Inicial"
+        inputId="calendar-start"
         appendTo="body"
-        inputId="calendar-24h"
         [showTime]="true"
         [hourFormat]="'24'"
         dataType="string"
       ></p-datepicker>
     </div>
 
-    <div>
+    <div class="flex-1">
+      <label for="end" class="text-sm text-slate-600 font-medium">Data Final</label>
       <p-datepicker
-        appendTo="body"
         formControlName="end"
         dateFormat="dd/mm/yy"
-        hourFormat="HH:mm"
-        dataType="string"
         placeholder="Data Final"
-        inputId="calendar-24h"
+        inputId="calendar-end"
+        appendTo="body"
         [showTime]="true"
         [hourFormat]="'24'"
+        dataType="string"
       ></p-datepicker>
     </div>
   </div>
 
-  <p-button
-    type="submit"
-    severity="success"
-    class="flex align-center justify-center"
-  >
-    Enviar
-  </p-button>
+  <!-- Botão de Envio -->
+  <div class="flex justify-center pt-2">
+    <p-button
+      type="submit"
+      severity="success"
+      label="Enviar"
+      class="w-full md:w-1/6"
+    ></p-button>
+  </div>
 </form>

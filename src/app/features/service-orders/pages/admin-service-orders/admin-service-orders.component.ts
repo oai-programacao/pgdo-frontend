@@ -76,8 +76,8 @@ import { EditComponent } from "../../components/edit/edit.component";
     DialogModule,
     UnproductiveVisitsComponent,
     HelperTechComponent,
-    EditComponent
-],
+    EditComponent,
+  ],
   templateUrl: "./admin-service-orders.component.html",
   styleUrl: "./admin-service-orders.component.scss",
   providers: [MessageService],
@@ -85,7 +85,9 @@ import { EditComponent } from "../../components/edit/edit.component";
 export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   @ViewChild("helperTech") helperTech!: HelperTechComponent;
   @ViewChild("dt") dt!: Table;
-  
+  @ViewChild("editOS") editOS!: EditComponent;
+  @ViewChild("helperTechDialog") helperTechDialog!: HelperTechComponent;
+
   // Injeções de dependências
   private readonly messageService = inject(MessageService);
   private readonly serviceOrderService = inject(ServiceOrderService);
@@ -127,12 +129,11 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   helperForm!: FormGroup;
   unproductiveVisitForm!: FormGroup;
   isSubmittingSubForm = false; // Flag de loading para os sub-formulários
- 
+
   // Dialogs
   isUnproductiveVisitDialogVisible = false;
   isHelperTechDialogVisible = false;
-  isEditingHelperTech = false;
-
+  isEditingTechDialogVisible = false;
 
   constructor() {
     // this.statusOptions = this.mapLabelsToOptions(ServiceOrderStatusLabels);
@@ -144,13 +145,12 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Dialogs functions
+  // abertura dos dialogs
   openUnproductiveVisitDialog(
     selectServiceOrder: ViewServiceOrderDto | null = null
   ) {
     this.isUnproductiveVisitDialogVisible = true;
     this.selectedServiceOrder = selectServiceOrder;
-    console.log("Dialog de Visita Não Produtiva aberto");
   }
 
   openHelperTechDialog(selectServiceOrder: ViewServiceOrderDto | null = null) {
@@ -158,11 +158,35 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.selectedServiceOrder = selectServiceOrder;
   }
 
-  openEditTechDialog(selectedServiceOrder: ViewServiceOrderDto){
+  openEditTechDialog(selectedServiceOrder: ViewServiceOrderDto | null = null) {
     this.selectedServiceOrder = selectedServiceOrder;
-    this.isEditingHelperTech = true;
+    this.isEditingTechDialogVisible = true;
   }
 
+  //Dialogs após ação no filho
+  onEditSuccess() {
+    this.messageService.add({
+      severity: "success",
+      summary: "Sucesso",
+      detail: "Ordem de serviço atualizada com sucesso!",
+      life: 1000,
+    });
+    this.isEditingTechDialogVisible = false;
+  }
+
+  onHelperSuccess() {
+    this.messageService.add({
+      severity: "success",
+      summary: "Sucesso",
+      detail: "Ajuda técnica adicionada com sucesso!",
+      life: 1000,
+    });
+    this.isHelperTechDialogVisible = false;
+    this.loadServiceOrders();
+  }
+
+  
+  // ciclo de vida
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -485,6 +509,4 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   getCitiesLabel = (city: City) => CitiesLabels[city] || city;
   getTypeOfOsLabel = (type: TypeOfOs) => TypeOfOsLabels[type] || type;
   getPeriodLabel = (period: Period) => PeriodLabels[period] || period;
-
-
 }

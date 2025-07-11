@@ -1,8 +1,18 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { CreateServiceOrderDto, CreateServiceOrderHelperDto, CreateServiceOrderUnproductiveVisitDto, CustomPageResponse, ServiceOrderFilters, UpdateServiceOrderDto, ViewServiceOrderDto, ViewTechnicalHelpDto, ViewUnproductiveVisits } from '../../../interfaces/service-order.model';
-import { environment } from '../../../../environments/environment';
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { inject, Injectable } from "@angular/core";
+import { Observable } from "rxjs";
+import {
+  CreateServiceOrderDto,
+  CreateServiceOrderHelperDto,
+  CreateServiceOrderUnproductiveVisitDto,
+  CustomPageResponse,
+  ServiceOrderFilters,
+  UpdateServiceOrderDto,
+  ViewServiceOrderDto,
+  ViewTechnicalHelpDto,
+  ViewUnproductiveVisits,
+} from "../../../interfaces/service-order.model";
+import { environment } from "../../../../environments/environment";
 
 @Injectable({
   providedIn: "root",
@@ -45,11 +55,11 @@ export class ServiceOrderService {
     if (filters.responsiblePersonId) {
       params = params.set("responsiblePersonId", filters.responsiblePersonId);
     }
-   
+
     if (filters.technicianId) {
       params = params.set("technicianId", filters.technicianId);
     }
- 
+
     if (filters.startDate) {
       params = params.set("startDate", filters.startDate);
     }
@@ -86,21 +96,47 @@ export class ServiceOrderService {
     return this.http.get<ViewServiceOrderDto>(`${this.apiUrl}/${id}`);
   }
 
-  update(id: string, dto: UpdateServiceOrderDto): Observable<ViewServiceOrderDto> {
+  update(
+    id: string,
+    dto: UpdateServiceOrderDto
+  ): Observable<ViewServiceOrderDto> {
     return this.http.patch<ViewServiceOrderDto>(`${this.apiUrl}/${id}`, dto);
   }
 
-  addHelper(serviceOrderId: string, dto: CreateServiceOrderHelperDto): Observable<ViewTechnicalHelpDto> {
-    return this.http.post<ViewTechnicalHelpDto>(`${this.apiUrl}/${serviceOrderId}/helpers`, dto);
+  addHelper(
+    serviceOrderId: string,
+    dto: CreateServiceOrderHelperDto
+  ): Observable<ViewTechnicalHelpDto> {
+    return this.http.post<ViewTechnicalHelpDto>(
+      `${this.apiUrl}/${serviceOrderId}/helpers`,
+      dto
+    );
   }
 
-  addUnproductiveVisit(serviceOrderId: string, dto: CreateServiceOrderUnproductiveVisitDto): Observable<ViewUnproductiveVisits> {
-    return this.http.post<ViewUnproductiveVisits>(`${this.apiUrl}/${serviceOrderId}/unproductive-visits`, dto);
+  addUnproductiveVisit(
+    serviceOrderId: string,
+    dto: CreateServiceOrderUnproductiveVisitDto
+  ): Observable<ViewUnproductiveVisits> {
+    return this.http.post<ViewUnproductiveVisits>(
+      `${this.apiUrl}/${serviceOrderId}/unproductive-visits`,
+      dto
+    );
   }
-  
+
   // Supondo um novo endpoint para o dashboard de contagem
   getStatusSummary(): Observable<Record<string, number>> {
-    return this.http.get<Record<string, number>>(`${this.apiUrl}/summary/by-status`);
+    return this.http.get<Record<string, number>>(
+      `${this.apiUrl}/summary/by-status`
+    );
   }
-  
+
+  patchServiceOrder(
+    serviceOrderId: string,
+    dto: UpdateServiceOrderDto
+  ): Observable<ViewServiceOrderDto> {
+    return this.http.patch<ViewServiceOrderDto>(
+      `${this.apiUrl}/${serviceOrderId}`,
+      dto
+    );
+  }
 }

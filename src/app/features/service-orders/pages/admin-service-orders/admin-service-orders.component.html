@@ -382,7 +382,7 @@
   [(visible)]="isUnproductiveVisitDialogVisible"
   [style]="{ width: '35rem' }"
 >
-  <ng-container *ngIf="selectedServiceOrder">
+  <ng-container *ngIf="isUnproductiveVisitDialogVisible && selectedServiceOrder">
     <app-unproductive-visits
       [technicians]="technicianOptions"
       [serviceOrder]="selectedServiceOrder"
@@ -398,10 +398,14 @@
   [(visible)]="isHelperTechDialogVisible"
   [style]="{ width: '30rem' }"
 >
+  @if(isHelperTechDialogVisible && selectedServiceOrder){
   <app-helper-tech
+  #helperTechDialog
+    (eventHelper)="onHelperSuccess()"
     [technicians]="technicianOptions"
     [serviceOrder]="selectedServiceOrder"
   ></app-helper-tech>
+  }
 </p-dialog>
 
 <p-dialog
@@ -409,12 +413,14 @@
   draggable="false"
   header="Editar OS"
   [modal]="true"
-  [(visible)]="isEditingHelperTech"
+  [(visible)]="isEditingTechDialogVisible"
   [style]="{ width: '50rem' }"
 >
-  @if(selectedServiceOrder){
+  @if(selectedServiceOrder && isEditingTechDialogVisible){
   <app-edit
-    [serviceOrder]="selectedServiceOrder!"
+    #editOS
+    (eventEdit)="onEditSuccess()"
+    [serviceOrder]="selectedServiceOrder"
   ></app-edit>
   }
 </p-dialog>

@@ -50,7 +50,6 @@ export class UnproductiveVisitsComponent implements OnInit {
     this.loadServiceOrder();
   }
 
-
   private loadServiceOrder(){
     this.isLoading = true;
     this.serviceOrderService.findById(this.serviceOrder.id).pipe(finalize(() => this.isLoading = false)).subscribe({
