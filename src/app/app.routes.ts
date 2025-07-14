@@ -22,6 +22,7 @@ export const routes: Routes = [
         title: 'Home', // Título da página, pode ser usado para SEO ou breadcrumbs
         // Não precisa de authGuard aqui de novo, pois a rota pai 'app' já está protegida
       },
+   
       {
         path: 'clientes/cliente-cadastrados',
         loadComponent: () =>
@@ -29,12 +30,12 @@ export const routes: Routes = [
         title: 'Clientes Cadastrados',
       },
 
-      // {
-      //   path: 'clientes/procurar',
-      //   loadComponent: () =>
-      //     import('./features/client-financial/pages/search-client-financial/search-client-financial.component').then((m) => m.SearchClientFinancialComponent),
-      //   title: 'Clientes',
-      // },
+      {
+        path: 'clientes/procurar',
+        loadComponent: () =>
+          import('./features/client-financial/pages/search-client-financial/search-client-financial.component').then((m) => m.SearchClientFinancialComponent),
+        title: 'Clientes',
+      },
       {
         path: 'colaboradores',
         loadComponent: () =>
@@ -160,6 +161,11 @@ export const routes: Routes = [
         loadComponent: () => 
           import('./features/register-new-client/pages/register-new-client/register-new-client.component').then((m) => m.RegisterNewClientComponent),
         title: 'Cadastrar Novo Cliente'
+      },
+      {
+        path: 'pesquisar-cliente',
+        loadComponent: () => import('./features/register-new-client/pages/search-client/search-client.component').then((m) => m.SearchClientComponent),
+        title: 'Pesquisar Cliente'
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' } // Rota padrão dentro de /app
     ]

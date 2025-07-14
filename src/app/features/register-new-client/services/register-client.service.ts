@@ -33,6 +33,7 @@ export class RegisterClientService {
     if (day) {
       params = params.set('day', day);
     }
+    
 
     const url = `${this.apiUrl}/clientRegister`;
     return this.http.get<CustomPageResponse<ViewRegisterClientResponseDto>>(url, { params });

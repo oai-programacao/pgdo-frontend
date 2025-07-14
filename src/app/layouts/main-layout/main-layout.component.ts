@@ -39,6 +39,13 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         //   exactMatch: true,
         // },
         {
+          id: 'pesquisar-cliente',
+          label: 'Pesquisar Cliente',
+          icon: 'pi pi-search',
+          route: '/app/pesquisar-cliente',
+          exactMatch: true
+        },
+        {
           id: 'register-client',
           label: 'Cadastrar Novo Cliente',
           icon: 'pi pi-user-plus',
