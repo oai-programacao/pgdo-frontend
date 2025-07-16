@@ -212,7 +212,8 @@ export class RegisterNewClientComponent implements OnInit {
     fileUploader.clear(); // Limpa os arquivos do componente p-FileUpload específico
   }
 
-  getCep(isContract: boolean): void {
+ 
+ getCep(isContract: boolean): void {
     const cepControlPath = isContract ? "address.zipCode" : "addresses.zipCode";
 
     const formGroup = isContract ? this.contractForm : this.form;
@@ -288,7 +289,6 @@ export class RegisterNewClientComponent implements OnInit {
       });
     }
   }
-
   public clearContractAddress(): void {
     // Limpa todos os campos dentro do form group 'address' do contractForm
     this.contractForm.get("address")?.reset();

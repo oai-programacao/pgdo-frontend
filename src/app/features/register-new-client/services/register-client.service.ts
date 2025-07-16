@@ -1,41 +1,66 @@
-import { inject, Injectable } from '@angular/core';
-import { environment } from '../../../../environments/environment';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { CreateRegisterClientDto, ViewRegisterClientResponseDto } from '../../../interfaces/register-client.model';
-import { Observable } from 'rxjs';
-import { CustomPageResponse } from '../../../interfaces/service-order.model';
+import { inject, Injectable } from "@angular/core";
+import { environment } from "../../../../environments/environment";
+import { HttpClient, HttpParams } from "@angular/common/http";
+import {
+  CreateRegisterClientDto,
+  ViewRegisterClientResponseDto,
+} from "../../../interfaces/register-client.model";
+import { Observable } from "rxjs";
+import { CustomPageResponse } from "../../../interfaces/service-order.model";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class RegisterClientService {
-
   private readonly http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl;
 
-  
-  registerClient(data: CreateRegisterClientDto): Observable<ViewRegisterClientResponseDto> {
+  registerClient(
+    data: CreateRegisterClientDto
+  ): Observable<ViewRegisterClientResponseDto> {
     const url = `${this.apiUrl}/clientRegister`;
     return this.http.post<ViewRegisterClientResponseDto>(url, data);
   }
 
-
-  getAllRegisteredClients(page: number, size: number, clientType?: 'PF' | 'PJ', day?: string): Observable<CustomPageResponse<ViewRegisterClientResponseDto>> {
-
+  getAllRegisteredClients(
+    page: number,
+    size: number,
+    clientType?: "PF" | "PJ",
+    day?: string
+  ): Observable<CustomPageResponse<ViewRegisterClientResponseDto>> {
     let params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString());
+      .set("page", page.toString())
+      .set("size", size.toString());
 
     if (clientType) {
-      params = params.set('clientType', clientType);
+      params = params.set("clientType", clientType);
     }
 
     if (day) {
-      params = params.set('day', day);
+      params = params.set("day", day);
     }
-    
 
     const url = `${this.apiUrl}/clientRegister`;
-    return this.http.get<CustomPageResponse<ViewRegisterClientResponseDto>>(url, { params });
+    return this.http.get<CustomPageResponse<ViewRegisterClientResponseDto>>(
+      url,
+      { params }
+    );
+  }
+
+  getFindOrCreateOnRBX(
+    cpfCnpj: string
+  ): Observable<ViewRegisterClientResponseDto> {
+    return this.http.get<ViewRegisterClientResponseDto>(
+      `${this.apiUrl}/clientRegister/find-or-create-rbx/${cpfCnpj}`
+    );
+  }
+
+  postClientContract(
+    contractData: any
+  ): Observable<ViewRegisterClientResponseDto> {
+    return this.http.post<ViewRegisterClientResponseDto>(
+      `${this.apiUrl}/clientContract`,
+      contractData
+    );
   }
 }

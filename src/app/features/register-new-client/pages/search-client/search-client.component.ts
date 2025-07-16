@@ -13,7 +13,11 @@ import { Router, RouterModule } from '@angular/router';
 import { PhonesPipe } from "../../../../shared/pipes/phones.pipe";
 import { NgxMaskDirective, provideNgxMask } from "ngx-mask";
 import { ClientSharedService } from "../../services/client-shared.service";
-
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmationService, MessageService } from "primeng/api";
+import { DialogModule } from 'primeng/dialog';
+import { CreateContractComponent } from "../../components/create-contract/create-contract.component";
 
 @Component({
   selector: "app-search-client",
@@ -29,10 +33,14 @@ import { ClientSharedService } from "../../services/client-shared.service";
     InputMaskModule,
     NgxMaskDirective,
     PhonesPipe,
+    ConfirmPopupModule,
+    ToastModule,
+    DialogModule,
+    CreateContractComponent
 ],
   templateUrl: "./search-client.component.html",
   styleUrl: "./search-client.component.scss",
-  providers: [provideNgxMask(),]
+  providers: [provideNgxMask(), MessageService, ConfirmationService, RegisterClientService]
 })
 export class SearchClientComponent implements OnInit {
   isLoading = false;
@@ -44,12 +52,25 @@ export class SearchClientComponent implements OnInit {
     { label: "Pessoa Jurídica", value: "PJ" },
   ];
 
+  hasSearched = false;
+
   registerClientService = inject(RegisterClientService);
   clientSharedService = inject(ClientSharedService);
   router = inject(Router)
-  
-  ngOnInit() {}
+  confirmationService = inject(ConfirmationService);
+  messageService = inject(MessageService);
 
+  // Dialog
+  createNewContractDialog = false;
+
+  ngOnInit() {
+  }
+
+
+  createNewContractVisible(client: any){
+    this.dataClient = client ? [client] : [];
+    this.createNewContractDialog = true;
+  }
 
   onClientTypeChange(){
     this.cpfCnpj = "";
@@ -82,21 +103,62 @@ export class SearchClientComponent implements OnInit {
       )
       .subscribe({
         next: (response) => {
-
           this.dataClient = (response.content || []).filter((client) =>
             this.clientType === "PF"
-              ? client.cpf?.replace(/\D/g, "") === cpfCnpjLimpo
-              : client.cnpj?.replace(/\D/g, "") === cpfCnpjLimpo
-          );
-
+          ? client.cpf?.replace(/\D/g, "") === cpfCnpjLimpo
+          : client.cnpj?.replace(/\D/g, "") === cpfCnpjLimpo
+        );
+        
+        this.hasSearched = true;
         },
         error: (e) => {
           console.log(e);
         },
       });
   }
+  
+confirmToRegisterNewClient(event: Event, cpfCnpj: string) {
+  this.confirmationService.confirm({
+    target: event?.target as EventTarget,
+    message: 'Deseja registrar um novo cliente?',
+    icon: 'pi pi-exclamation-triangle',
+    accept: () => {
+      const clientData: any = {
+        cpf: this.clientType === 'PF' ? cpfCnpj : null,
+        cnpj: this.clientType === 'PJ' ? cpfCnpj : null,
+        clientType: this.clientType
+      };
+      this.clientSharedService.setClientData(clientData);
+      this.router.navigate(['/app/cliente-cadastrar']);
+    },
+    reject: () => {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Registrar Cliente',
+        detail: 'Ação cancelada.'
+      });
+      this.hasSearched = false;
+    }
+  });
+}
 
+  registerNewClient(){
+    if(!this.cpfCnpj || !this.clientType) return;
+    console.log("Registering new client with CPF/CNPJ:", this.cpfCnpj);
+    this.registerClientService.getFindOrCreateOnRBX(this.cpfCnpj).subscribe({
+      next: (client) => {
+        if(client.id){
+          this.clientSharedService.setClientData(client);
+          return true;
+        } 
+        return false;
+      },
+      error: (e) => {
+        console.error(e);
+      }
+    })
 
+  }
 
 
 }

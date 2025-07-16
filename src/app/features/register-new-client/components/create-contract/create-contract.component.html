@@ -1,0 +1,137 @@
+<form [formGroup]="contractForm" class="bg-white p-6 rounded-xl shadow space-y-6">
+
+  <!-- Plano, Valor, Vencimento -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <p-select
+      [options]="isPJ ? pjPlans : pfPlans"
+      optionLabel="name"
+      optionValue="value"
+      placeholder="Plano"
+      appendTo="body"
+      formControlName="planCode"
+      styleClass="w-full"
+    />
+    <p-inputnumber
+      inputId="accessionValue"
+      mode="currency"
+      locale="pt-BR"
+      [minFractionDigits]="2"
+      placeholder="Valor de adesão"
+      currency="BRL"
+      currencyDisplay="symbol"
+      styleClass="w-full"
+    />
+    <p-select
+      [options]="dueDateOptions"
+      placeholder="Dia de vencimento"
+      appendTo="body"
+      styleClass="w-full"
+    />
+  </div>
+
+  <!-- Datas -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <p-datepicker
+      formControlName="beginningCollection"
+      placeholder="Data de Início"
+      appendTo="body"
+      styleClass="w-full"
+      dateFormat="yy-mm-dd"
+      dataType="string"
+    />
+    <p-datepicker
+      formControlName="signatureContract"
+      placeholder="Data de Assinatura"
+      appendTo="body"
+      styleClass="w-full"
+      dateFormat="yy-mm-dd"
+      dataType="string"
+    />
+  </div>
+
+  <!-- Endereço -->
+  <div>
+    <h3 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Endereço de Instalação</h3>
+
+    <form formGroupName="addressInstalation" class="space-y-6">
+
+      <!-- Linha 1: CEP, Rua, Número -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <input
+          type="tel"
+          pInputText
+          placeholder="CEP"
+          formControlName="zipCode"
+          (blur)="getCep(true)"
+          mask="00000-000"
+          unmask="true"
+          maxlength="10"
+          class="w-full"
+        />
+        <input
+          type="text"
+          pInputText
+          placeholder="Endereço"
+          formControlName="street"
+          class="w-full"
+        />
+        <input
+          type="tel"
+          pInputText
+          placeholder="Número*"
+          formControlName="number"
+          class="w-full"
+        />
+      </div>
+
+      <!-- Localização e Tipo -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <p-select
+          [options]="addressLocationOptions"
+          formControlName="addressLocation"
+          placeholder="Localização"
+          appendTo="body"
+          styleClass="w-full"
+        />
+        <p-select
+          [options]="addressTypeOptions"
+          formControlName="addressType"
+          placeholder="Tipo de Endereço"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </div>
+
+      <!-- Linha 2: Bairro, Cidade, Complemento -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <input
+          type="text"
+          pInputText
+          placeholder="Bairro"
+          formControlName="neighborhood"
+          class="w-full"
+        />
+        <input
+          type="text"
+          pInputText
+          placeholder="Cidade"
+          formControlName="city"
+          class="w-full"
+        />
+        <input
+          type="text"
+          pInputText
+          placeholder="Complemento"
+          formControlName="complement"
+          class="w-full"
+        />
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Botão -->
+  <div class="flex justify-end">
+    <p-button label="Criar Contrato" (onClick)="createNewContract()"></p-button>
+  </div>
+</form>
