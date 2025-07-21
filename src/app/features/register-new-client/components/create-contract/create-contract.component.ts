@@ -1,4 +1,4 @@
-import { FormatDurationPipe } from './../../../../shared/pipes/format-duration.pipe';
+import { FormatDurationPipe } from "./../../../../shared/pipes/format-duration.pipe";
 import { CommonModule } from "@angular/common";
 import {
   Component,
@@ -9,6 +9,7 @@ import {
   SimpleChanges,
 } from "@angular/core";
 import {
+  FormArray,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
@@ -21,9 +22,11 @@ import { ViaCepService } from "../../../../service/viacep.service";
 import { MessageService } from "primeng/api";
 import { RegisterClientService } from "../../services/register-client.service";
 import { Button } from "primeng/button";
-import { TextareaModule } from 'primeng/textarea';
-import { DatePickerModule } from 'primeng/datepicker';
+import { TextareaModule } from "primeng/textarea";
+import { DatePickerModule } from "primeng/datepicker";
 import { SignaturePadComponent } from "../../../../shared/components/signature-pad/signature-pad.component";
+import { GoogleMapsComponent } from "../../../../shared/components/google-maps/google-maps.component";
+import { StepperModule } from "primeng/stepper";
 
 @Component({
   selector: "app-create-contract",
@@ -36,8 +39,10 @@ import { SignaturePadComponent } from "../../../../shared/components/signature-p
     Button,
     TextareaModule,
     DatePickerModule,
-    SignaturePadComponent
-],
+    SignaturePadComponent,
+    GoogleMapsComponent,
+    StepperModule,
+  ],
   templateUrl: "./create-contract.component.html",
   styleUrl: "./create-contract.component.scss",
   providers: [ViaCepService, MessageService],
@@ -46,21 +51,24 @@ export class CreateContractComponent implements OnInit, OnChanges {
   @Input({ required: true }) isPJorPF!: string | null;
   @Input() clientData: any[] = [];
   isCepLoading: boolean = false;
-  signaturePadData: string = '';
+  signaturePadData: string = "";
   contractForm!: FormGroup;
   fb = new FormBuilder();
   viaCepService = inject(ViaCepService);
   messageService = inject(MessageService);
   contractService = inject(RegisterClientService);
   dueDateOptions: any = Array.from({ length: 30 }, (_, i) => i + 1);
+  public addressForMapSearch: any = null;
+
+  currentStep = 1;
 
   pfPlans = [
-    { name: "100 Megas - R$ 69,90", value: 10694 },
-    { name: "200 Megas - R$ 79,90", value: 411 },
-    { name: "300 Megas - R$ 89,90", value: 410 },
-    { name: "700 Megas - R$ 99,90", value: 510 },
-    { name: "750 Megas - R$ 99,90", value: 378 },
-    { name: "1 Giga - R$ 249,90", value: 416 },
+    { name: "250 Megas - R$ 69,90", value: 9009 },
+    { name: "500 Megas - R$ 79,90", value: 10697 },
+    { name: "600 Megas - R$ 89,90", value: 10700 },
+    { name: "750 Megas - R$ 99,90", value: 10703 },
+    { name: "850 Megas - R$ 109,90", value: 10706 },
+    { name: "1 Giga - R$ 199,90", value: 10710 },
   ];
 
   pjPlans = [
@@ -70,31 +78,50 @@ export class CreateContractComponent implements OnInit, OnChanges {
     { name: "700 Megas Empresarial - R$ 149,90", value: 514 },
   ];
 
-
   addressLocationOptions = [
     { label: "Urbano", value: "URBAN" },
     { label: "Rural", value: "RURAL" },
   ];
 
   addressTypeOptions = [
-    {label: "Cobrança", value: "BILLING"},
-    {label: "Instalação", value: "INSTALLATION"},
-  ]
-  
+    { label: "Cobrança", value: "BILLING" },
+    { label: "Instalação", value: "INSTALLATION" },
+  ];
 
+  installments = [
+    { label: "1x", value: 1 },
+    { label: "2x", value: 2 },
+    { label: "3x", value: 3 },
+    { label: "4x", value: 4 },
+    { label: "5x", value: 5 },
+    { label: "6x", value: 6 },
+    { label: "7x", value: 7 },
+    { label: "8x", value: 8 },
+    { label: "9x", value: 9 },
+    { label: "10x", value: 10 },
+    { label: "11x", value: 11 },
+    { label: "12x", value: 12 },
+  ];
 
+  billingCycleOptions: any = [
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+    22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+  ];
 
   ngOnInit() {
+    if (!this.contractForm) {
+      this.buildForm();
+    }
     this.contractForm
       .get("addressInstalation")
       ?.valueChanges.subscribe((val) => {
         this.contractForm.get("addressCobranca")?.patchValue(val);
+        this.updateAddressForMap(val);
       });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log("Cliente Data: ", this.clientData);
-    console.log("id", this.clientData?.[0]?.id);
+    console.log("data cliente", this.clientData);
     const clientChanged = changes["clientData"] && this.clientData;
     const typeChanged = changes["isPJorPF"];
 
@@ -112,7 +139,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
           number: null,
           complement: null,
           neighborhood: null,
-          district: 'Normalmente não informado',
+          district: "Normalmente não informado",
           referencePoint: this.clientData?.[0]?.addresses?.referencePoint || "",
           addressType: "",
           addressLocation: "",
@@ -126,9 +153,9 @@ export class CreateContractComponent implements OnInit, OnChanges {
           number: null,
           complement: null,
           neighborhood: null,
-          district: 'Normalmente não informado',
+          district: "Normalmente não informado",
           referencePoint: this.clientData?.[0]?.addresses?.referencePoint || "",
-          addressType:  null,
+          addressType: null,
           addressLocation: null,
           ibge: this.clientData?.[0]?.addresses?.ibge || 3504008,
         },
@@ -138,7 +165,24 @@ export class CreateContractComponent implements OnInit, OnChanges {
     if (typeChanged && this.contractForm) {
       this.contractForm.get("clientType")?.setValue(this.isPJorPF);
     }
+
+    if (this.contractForm) {
+      const address = this.contractForm.get("addressInstalation")?.value;
+      this.updateAddressForMap(address);
+    }
   }
+
+  private updateAddressForMap(address: any) {
+    if (address && address.street && address.number && address.city) {
+      this.addressForMapSearch = `${address.street}, ${address.number}, ${
+        address.neighborhood || ""
+      }, ${address.city}`;
+    } else {
+      this.addressForMapSearch = "";
+    }
+  }
+
+  
 
   buildForm() {
     const initialAddress = {
@@ -149,27 +193,40 @@ export class CreateContractComponent implements OnInit, OnChanges {
       number: [null],
       complement: [null],
       neighborhood: [null],
-      district: 'Normalmente não informado',
-      referencePoint: [this.clientData?.[0]?.addresses?.referencePoint || ""],
-      addressType: [null],
-      addressLocation: [null],
-      ibge: [this.clientData?.[0]?.addresses?.ibge || null ],
+      district: ["Normalmente não informado"],
+      referencePoint: [""],
+      addressType: ["", Validators.required],
+      addressLocation: ["", Validators.required],
+      ibge: [3504008],
     };
 
     this.contractForm = this.fb.group({
       client: [this.clientData?.[0]?.id ?? null, Validators.required],
       typeClient: ["C"],
-      billingCycle: [1],
+      billingCycle: [null, Validators.required],
       signatureContract: [null, Validators.required],
       seller: [null],
       userSeller: [null],
-      addressInstalation: this.fb.group(initialAddress),
-      addressCobranca: this.fb.group(initialAddress),
+      addressInstalation: this.fb.group({ ...initialAddress }),
+      addressCobranca: this.fb.group({ ...initialAddress }),
       typePlan: ["P"],
       planCode: [null],
+      numParcels: [1, Validators.required],
+      formPay: ["B"],
+      charging: ["S"],
+      bankAccount: [33],
+      agreement: [566558],
+      parcels: this.fb.array([
+        this.fb.group({
+          description: [null],
+          dueDate: [null, Validators.required],
+          price: [null, Validators.required],
+        }),
+      ]),
       typeItem: ["P"],
-      codeItem: this.clientData?.[0]?.contracts?.codeItem || null,
-      beginningCollection: [this.clientData?.[0]?.contracts?.beginningCollection || ""],
+      codeItem: [null, Validators.required],
+      subscriptionDiscount: [null],
+      beginningCollection: ["", Validators.required],
       bundleCollection: ["N"],
     });
   }
@@ -182,10 +239,16 @@ export class CreateContractComponent implements OnInit, OnChanges {
     return this.contractForm.get("clientType")?.value === "PJ";
   }
 
-  getCep(isContract: boolean): void {
-    const cepControlPath = isContract ? "address.zipCode" : "addresses.zipCode";
+  get contracts(): FormArray {
+    return this.contractForm.get("contract") as FormArray;
+  }
 
-    const formGroup = isContract ? this.contractForm : this.contractForm;
+  getCep(isContract: boolean): void {
+    const cepControlPath = isContract
+      ? "addressInstalation.zipCode"
+      : "addressCobranca.zipCode";
+    const addressPath = isContract ? "addressInstalation" : "addressCobranca";
+    const formGroup = this.contractForm;
 
     const cepRaw = formGroup.get(cepControlPath)?.value;
     const cep = cepRaw?.replace(/\D/g, "");
@@ -193,36 +256,24 @@ export class CreateContractComponent implements OnInit, OnChanges {
     if (cep && cep.length === 8) {
       this.isCepLoading = true;
 
-      // Caminho do FormGroup de endereço para facilitar o acesso
-      const addressPath = isContract ? "address" : "addresses";
-
       this.viaCepService.getAddress(cep).subscribe({
         next: (response) => {
-          // ====================================================================
-          // AQUI ESTÁ A LÓGICA DE VERIFICAÇÃO PRINCIPAL
-          // ====================================================================
-
-          // Verificamos se a resposta tem a propriedade "erro"
           if (response.erro) {
-            // 1. Se tiver, o CEP é inválido.
             this.messageService.add({
               severity: "warn",
               summary: "CEP não encontrado",
               detail: "O CEP digitado não retornou um endereço válido.",
             });
 
-            // Limpa os campos de endereço para não confundir o usuário com dados antigos,
-            // mas mantém o CEP que ele digitou.
             formGroup.get(addressPath)?.patchValue({
               state: "",
               city: "",
               street: "",
               neighborhood: "",
-              complement: "", // Corrigido de 'district' para 'complement' se for o caso
+              complement: "",
               referencePoint: "",
             });
           } else {
-            // 2. Se não tiver, o CEP é válido. Preenchemos o formulário.
             const endereco = {
               state: response.uf,
               city: response.localidade,
@@ -232,20 +283,16 @@ export class CreateContractComponent implements OnInit, OnChanges {
             };
 
             formGroup.get(addressPath)?.patchValue(endereco);
-            this.contractForm.get("ibge")?.setValue(response.ibge);
+            formGroup.get(addressPath + ".ibge")?.setValue(response.ibge);
 
             // Foca no campo "número" para o usuário continuar o preenchimento
-            // (Esta é uma melhoria de UX opcional)
             document
               .querySelector<HTMLInputElement>(`[formcontrolname="number"]`)
               ?.focus();
           }
-
-          // Finalmente, desativa o loading
           this.isCepLoading = false;
         },
         error: (error) => {
-          // Este bloco agora só será chamado para erros de rede reais (ex: sem internet)
           this.isCepLoading = false;
           this.messageService.add({
             severity: "error",
@@ -260,45 +307,91 @@ export class CreateContractComponent implements OnInit, OnChanges {
   }
 
   createNewContract() {
-    // if (this.contractForm.valid) {
-      const contractData = {
-        ...this.contractForm.value,
-        addressInstalation: {
-          ...this.contractForm.value.addressInstalation,
-          zipCode: this.contractForm.value.addressInstalation.zipCode.replace(/\D/g, ""),
-        },
-        addressCobranca: {
-          ...this.contractForm.value.addressCobranca,
-          zipCode: this.contractForm.value.addressCobranca.zipCode.replace(/\D/g, ""),
-        },
-      }
-      
-      this.contractService.postClientContract(contractData).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: "success",
-            summary: "Contrato Criado",
-            detail: "O contrato foi criado com sucesso.",
-          });
-          this.contractForm.reset();
-        },
-        error: (error) => {
-          this.messageService.add({
-            severity: "error",
-            summary: "Erro ao Criar Contrato",
-            detail: "Ocorreu um erro ao criar o contrato.",
-          });
-          console.error("Erro ao criar contrato:", error);
-        },
-      });
-    // } else {
-    //   this.messageService.add({
-    //     severity: "warn",
-    //     summary: "Formulário Inválido",
-    //     detail: "Por favor, preencha todos os campos obrigatórios.",
-    //   });
-    // }
+    const contractData = {
+      ...this.contractForm.value,
+
+      codeItem: this.contractForm.value.codeItem,
+      addressInstalation: {
+        ...this.contractForm.value.addressInstalation,
+        zipCode: this.contractForm.value.addressInstalation.zipCode.replace(
+          /\D/g,
+          ""
+        ),
+      },
+      addressCobranca: {
+        ...this.contractForm.value.addressCobranca,
+        zipCode: this.contractForm.value.addressCobranca.zipCode.replace(
+          /\D/g,
+          ""
+        ),
+      },
+    };
+
+    this.contractService.postClientContract(contractData).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: "success",
+          summary: "Contrato Criado",
+          detail: "O contrato foi criado com sucesso.",
+        });
+        this.contractForm.reset();
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: "error",
+          summary: "Erro ao Criar Contrato",
+          detail: "Ocorreu um erro ao criar o contrato.",
+        });
+        console.error("Erro ao criar contrato:", error);
+      },
+    });
+
   }
 
-  
+  public searchAddressOnMap(): void {
+    this.contractForm.get("addressInstalation")?.markAllAsTouched();
+    const addressForm = this.contractForm.get("addressInstalation");
+    console.log("Endereço para o mapa:", this.addressForMapSearch);
+
+    if (
+      !addressForm ||
+      !addressForm.get("street")?.value ||
+      !addressForm.get("number")?.value ||
+      !addressForm.get("city")?.value
+    ) {
+      this.messageService.add({
+        severity: "warn",
+        summary: "Dados Incompletos",
+        detail:
+          "Por favor, preencha pelo menos a rua, número e cidade para pesquisar no mapa.",
+      });
+      this.addressForMapSearch = null;
+      return;
+    }
+    const addressValue = addressForm.value;
+    this.addressForMapSearch = {
+      logradouro: addressValue.street,
+      numero: addressValue.number,
+      bairro: addressValue.neighborhood,
+      localidade: addressValue.city,
+    };
+  }
+  removeContract(index: number): void {
+    this.contracts.removeAt(index);
+  }
+
+  getPlanLabel(codePlan: number | string): string {
+    const code = Number(codePlan);
+    const plan = [...this.pfPlans, ...this.pjPlans].find(
+      (p) => p.value === code
+    );
+    return plan
+      ? `${plan.value} - ${plan.name}`
+      : `${codePlan} - Plano Desconhecido`;
+  }
+
+  get parcelsControls() {
+    return (this.contractForm.get("parcels") as FormArray).controls;
+  }
+
 }

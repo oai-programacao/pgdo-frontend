@@ -229,7 +229,7 @@
             </ng-template>
           </p-step-panel>
         </p-step-item>
-
+<!-- 
         <p-step-item [value]="2">
           <p-step>Cadastrar Contratos</p-step>
           <p-step-panel>
@@ -456,9 +456,9 @@
               </div>
             </ng-template>
           </p-step-panel>
-        </p-step-item>
+        </p-step-item> -->
 
-      <p-step-item [value]="3">
+      <p-step-item [value]="2">
         <p-step>Documentos do Cliente</p-step>
         <p-step-panel>
           <ng-template #content let-activateCallback="activateCallback">
@@ -525,18 +525,18 @@
                 label="Voltar"
                 icon="pi pi-arrow-left"
                 severity="secondary"
-                (onClick)="activateCallback(2)"
+                (onClick)="activateCallback(1)"
               />
               <p-button
                 label="Próximo"
-                (onClick)="activateCallback(4)"
+                (onClick)="activateCallback(3)"
               />
             </div>
           </ng-template>
         </p-step-panel>
       </p-step-item>
 
-        <p-step-item [value]="4">
+        <p-step-item [value]="3">
           <p-step>Assinatura do Cliente</p-step>
           <p-step-panel>
             <ng-template #content let-activateCallback="activateCallback">

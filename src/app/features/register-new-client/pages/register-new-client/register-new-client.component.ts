@@ -107,7 +107,7 @@ export class RegisterNewClientComponent implements OnInit {
         referencePoint: [""],
         addressType: ["BILLING"],
       }),
-      contract: this.fb.array([]),
+      // contract: this.fb.array([]),
       ibge: [""],
       commercialPhone: [""],
       residentialPhone: ["", Validators.required],

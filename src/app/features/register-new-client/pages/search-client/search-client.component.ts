@@ -18,6 +18,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from "primeng/api";
 import { DialogModule } from 'primeng/dialog';
 import { CreateContractComponent } from "../../components/create-contract/create-contract.component";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: "app-search-client",
@@ -36,7 +37,8 @@ import { CreateContractComponent } from "../../components/create-contract/create
     ConfirmPopupModule,
     ToastModule,
     DialogModule,
-    CreateContractComponent
+    CreateContractComponent,
+    TooltipModule
 ],
   templateUrl: "./search-client.component.html",
   styleUrl: "./search-client.component.scss",
@@ -144,11 +146,11 @@ confirmToRegisterNewClient(event: Event, cpfCnpj: string) {
 
   registerNewClient(){
     if(!this.cpfCnpj || !this.clientType) return;
-    console.log("Registering new client with CPF/CNPJ:", this.cpfCnpj);
     this.registerClientService.getFindOrCreateOnRBX(this.cpfCnpj).subscribe({
       next: (client) => {
         if(client.id){
           this.clientSharedService.setClientData(client);
+          this.dataClient = [client];
           return true;
         } 
         return false;
