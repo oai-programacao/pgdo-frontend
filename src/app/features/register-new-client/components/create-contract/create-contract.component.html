@@ -6,34 +6,39 @@
       <p-step-panel>
         <ng-template #content let-activateCallback="activateCallback">
           <!-- Linha 1: Plano e Desconto -->
-          <div class="flex flex-col md:flex-row gap-4 w-full py-2">
-            <p-select
-              [options]="isPJ ? pjPlans : pfPlans"
-              optionLabel="name"
-              optionValue="value"
-              placeholder="Plano"
-              appendTo="body"
-              formControlName="planCode"
-              class="min-w-0 flex-1"
-              fluid
-            />
-            <p-inputnumber
-              formControlName="subscriptionDiscount"
-              inputId="subscriptionDiscount"
-              mode="currency"
-              locale="pt-BR"
-              [minFractionDigits]="2"
-              placeholder="Desconto de Assinatura"
-              currency="BRL"
-              currencyDisplay="symbol"
-              class="min-w-0 flex-1"
-              fluid
-            />
+
+          <div class="flex flex-wrap md:flex-nowrap gap-4 w-full py-2">
+            <div class="flex-1 min-w-[220px]">
+              <p-select
+                [options]="isPJ ? pjPlans : pfPlans"
+                optionLabel="name"
+                optionValue="value"
+                placeholder="Plano"
+                appendTo="body"
+                formControlName="planCode"
+                class="w-full"
+                fluid
+              />
+            </div>
+            <div class="flex-1 min-w-[220px]">
+              <p-inputnumber
+                formControlName="subscriptionDiscount"
+              
+                mode="currency"
+                locale="pt-BR"
+                [minFractionDigits]="2"
+                placeholder="Desconto de Adesão"
+                currency="BRL"
+                currencyDisplay="symbol"
+                class="w-full"
+                fluid
+              />
+            </div>
           </div>
 
-          <!-- Linha 2: Datas -->
-          <div class="flex flex-col md:flex-row flex-wrap gap-4 w-full">
-            <div class="min-w-0 flex-1">
+          <!-- Linha 2: Datas, Parcelas e Ciclo -->
+          <div class="flex flex-wrap gap-4 w-full items-end">
+            <div class="flex-1 min-w-[200px]">
               <p-datepicker
                 formControlName="beginningCollection"
                 placeholder="Data de Início"
@@ -44,7 +49,7 @@
                 fluid
               />
             </div>
-            <div class="min-w-0 flex-1">
+            <div class="flex-1 min-w-[200px]">
               <p-datepicker
                 formControlName="signatureContract"
                 placeholder="Data de Assinatura"
@@ -55,45 +60,61 @@
                 fluid
               />
             </div>
-            <input 
-              pInputText
-              formControlName="numParcels"
-              placeholder="Número de Parcelas"
-              class="min-w-0 flex-1 w-full"
-            />
+            <div class="flex-1 min-w-[200px]">
+              <p-select
+                [options]="installments"
+                formControlName="numParcels"
+                placeholder="Número de Parcelas"
+                class="w-full"
+              />
+            </div>
+            <div class="flex-1 min-w-[200px]">
+              <p-select
+                [options]="billingCycleOptions"
+                formControlName="billingCycle"
+                placeholder="Dia do Vencimento"
+                appendTo="body"
+                class="w-full"
+                styleClass="w-full"
+              />
+            </div>
           </div>
 
           <!-- Valor do Contrato -->
-          <div class="flex flex-col gap-2 border border-gray-200 rounded-lg p-4 mt-4">
+          <div
+            class="flex flex-col gap-3 border border-gray-200 rounded-lg p-4 mt-6 bg-gray-50"
+          >
             <h3 class="text-lg font-semibold text-gray-700">
               Valor do Contrato
             </h3>
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
+
+            <div class="flex flex-wrap justify-between items-center gap-2">
               <span class="text-gray-600">Valor Base da Adesão:</span>
               <span class="font-bold text-blue-600">
                 @if(isPJ){
-                  {{ 1000 | currency:'BRL' }}
+                {{ 1000 | currency : "BRL" }}
                 }@else{
-                  {{ 1000 | currency:'BRL' }}
+                {{ 1000 | currency : "BRL" }}
                 }
               </span>
             </div>
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
+
+            <div class="flex flex-wrap justify-between items-center gap-2">
               <span class="text-gray-600">Desconto de Assinatura:</span>
               <span class="font-bold text-blue-600">
                 {{
                   contractForm.get("subscriptionDiscount")?.value || 0
-                  | currency : "BRL"
+                    | currency : "BRL"
                 }}
               </span>
             </div>
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
+
+            <div class="flex flex-wrap justify-between items-center gap-2">
               <span class="text-gray-600">Valor Final:</span>
               <span class="font-bold text-blue-600">
                 {{
-                  1000 -
-                  (contractForm.get("subscriptionDiscount")?.value || 0)
-                  | currency : "BRL"
+                  1000 - (contractForm.get("subscriptionDiscount")?.value || 0)
+                    | currency : "BRL"
                 }}
               </span>
             </div>
@@ -104,50 +125,36 @@
             <div
               *ngFor="let parcela of parcelsControls; let i = index"
               [formGroupName]="i"
-              class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-4"
+              class="flex flex-wrap md:flex-nowrap gap-4 mb-4"
             >
-              <p-select
-                [options]="billingCycleOptions"
-                formControlName="billingCycle"
-                placeholder="Ciclo de Faturamento"
-                appendTo="body"
-                class="w-full"
-                styleClass="w-full"
-              ></p-select>
-
-              <input
-                type="text"
-                pInputText
-                formControlName="description"
-                placeholder="Descrição da Parcela"
-                class="w-full"
-              />
-
-              <p-inputnumber
-                formControlName="price"
-                mode="currency"
-                locale="pt-BR"
-                [minFractionDigits]="2"
-                placeholder="Valor"
-                currency="BRL"
-                currencyDisplay="symbol"
-                class="w-full"
-              ></p-inputnumber>
-
-              <p-datepicker
-                formControlName="dueDate"
-                placeholder="Data de Vencimento"
-                appendTo="body"
-                dateFormat="yy-mm-dd"
-                dataType="string"
-                class="w-full"
-                styleClass="w-full"
-              ></p-datepicker>
+              <div class="flex-1 min-w-[200px]">
+                <p-datepicker
+                  formControlName="dueDate"
+                  placeholder="Data de Vencimento da Adesão"
+                  appendTo="body"
+                  dateFormat="yy-mm-dd"
+                  dataType="string"
+                  class="w-full"
+                  styleClass="w-full"
+                />
+              </div>
+              <div class="flex-1 min-w-[200px]">
+                <p-inputnumber
+                  formControlName="price"
+                  mode="currency"
+                  locale="pt-BR"
+                  [minFractionDigits]="2"
+                  placeholder="Valor da Adesão"
+                  currency="BRL"
+                  currencyDisplay="symbol"
+                  class="w-full"
+                />
+              </div>
             </div>
           </div>
 
           <!-- Botão Próximo -->
-          <div class="flex justify-end mt-4">
+          <div class="flex justify-end mt-6">
             <p-button label="Próximo" (onClick)="activateCallback(2)" />
           </div>
         </ng-template>
@@ -156,14 +163,10 @@
 
     <!-- Passo 2: Endereço -->
     <p-step-item [value]="2">
-      <p-step>Endereço</p-step>
+      <p-step>Endereço do Contrato</p-step>
       <p-step-panel>
         <ng-template #content let-activateCallback="activateCallback">
           <div>
-            <h3 class="text-xl font-semibold text-gray-700 border-b">
-              Endereço de Instalação
-            </h3>
-
             <div formGroupName="addressInstalation" class="space-y-6">
               <!-- Linha 1: CEP, Rua, Número -->
               <div class="flex flex-col md:flex-row flex-wrap gap-4 py-2 mt-3">
@@ -266,65 +269,6 @@
               (onClick)="activateCallback(1)"
             />
             <p-button label="Próximo" (onClick)="activateCallback(3)" />
-          </div>
-        </ng-template>
-      </p-step-panel>
-    </p-step-item>
-
-    <!-- Passo 3: Visualizar Contratos -->
-    <p-step-item [value]="3">
-      <p-step>Visualizar Contratos</p-step>
-      <p-step-panel>
-        <ng-template #content let-activateCallback="activateCallback">
-          <div *ngIf="clientData?.length && clientData[0]?.contracts?.length">
-            <div
-              *ngFor="let contract of clientData[0].contracts; let i = index"
-              class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-md p-5 flex flex-col gap-3 mb-6 mt-6"
-            >
-              <div class="flex flex-wrap justify-between items-start gap-4">
-                <p class="text-lg font-semibold text-slate-800 dark:text-white">
-                  {{ getPlanLabel(contract.codePlan) }}
-                </p>
-                <p-button
-                  icon="pi pi-trash"
-                  severity="danger"
-                  styleClass="p-button-sm"
-                  (onClick)="removeContract(i)"
-                  label="Remover"
-                ></p-button>
-              </div>
-              <div class="flex flex-col gap-2 justify-center py-1">
-                <div class="text-sm text-slate-600 dark:text-slate-300 mt-2">
-                  <div>
-                    <strong>Valor de Adesão:</strong>
-                    {{ contract.accesionNumber | currency : "BRL" }}
-                  </div>
-                  <div>
-                    <strong>Dia de Vencimento:</strong>
-                    {{ contract.beginningCollection }}
-                  </div>
-                  <div>
-                    <strong>Endereço:</strong>
-                    {{ contract.addressInstalation?.street }},
-                    {{ contract.addressInstalation?.number }}<br />
-                    {{ contract.addressInstalation?.neighborhood }} -
-                    {{ contract.addressInstalation?.city }} /
-                    {{ contract.address?.state }}<br />
-                    CEP: {{ contract.addressCobranca?.zipCode }}
-                  </div>
-                  <div *ngIf="contract.observation">
-                    <strong>Observação:</strong> {{ contract.observation }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="flex flex-wrap justify-end gap-2 mt-6">
-            <p-button
-              label="Voltar"
-                severity="secondary"
-              (onClick)="activateCallback(2)"
-            />
           </div>
         </ng-template>
       </p-step-panel>

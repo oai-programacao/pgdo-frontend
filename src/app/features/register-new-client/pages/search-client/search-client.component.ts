@@ -19,6 +19,7 @@ import { ConfirmationService, MessageService } from "primeng/api";
 import { DialogModule } from 'primeng/dialog';
 import { CreateContractComponent } from "../../components/create-contract/create-contract.component";
 import { TooltipModule } from 'primeng/tooltip';
+import { ViewContractsComponent } from "../../components/view-contracts/view-contracts.component";
 
 @Component({
   selector: "app-search-client",
@@ -38,7 +39,8 @@ import { TooltipModule } from 'primeng/tooltip';
     ToastModule,
     DialogModule,
     CreateContractComponent,
-    TooltipModule
+    TooltipModule,
+    ViewContractsComponent
 ],
   templateUrl: "./search-client.component.html",
   styleUrl: "./search-client.component.scss",
@@ -64,7 +66,7 @@ export class SearchClientComponent implements OnInit {
 
   // Dialog
   createNewContractDialog = false;
-
+  viewContractsDialog = false
   ngOnInit() {
   }
 
@@ -72,6 +74,11 @@ export class SearchClientComponent implements OnInit {
   createNewContractVisible(client: any){
     this.dataClient = client ? [client] : [];
     this.createNewContractDialog = true;
+  }
+
+  viewContractsDialogVisible(client: any){
+    this.dataClient = client ? [client] : [];
+    this.viewContractsDialog = true;
   }
 
   onClientTypeChange(){

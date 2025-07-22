@@ -475,7 +475,7 @@ export class RegisterNewClientComponent implements OnInit {
     });
 
     if (Array.isArray(client.contracts)) {
-      this.contracts.clear();
+      // this.contracts.clear();
       client.contracts.forEach((c: any) => {
         this.contracts.push(
           this.fb.group({

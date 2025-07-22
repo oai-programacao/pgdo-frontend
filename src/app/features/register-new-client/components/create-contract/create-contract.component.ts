@@ -60,8 +60,6 @@ export class CreateContractComponent implements OnInit, OnChanges {
   dueDateOptions: any = Array.from({ length: 30 }, (_, i) => i + 1);
   public addressForMapSearch: any = null;
 
-  currentStep = 1;
-
   pfPlans = [
     { name: "250 Megas - R$ 69,90", value: 9009 },
     { name: "500 Megas - R$ 79,90", value: 10697 },
@@ -105,7 +103,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
 
   billingCycleOptions: any = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-    22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+    22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
   ];
 
   ngOnInit() {
@@ -117,6 +115,16 @@ export class CreateContractComponent implements OnInit, OnChanges {
       ?.valueChanges.subscribe((val) => {
         this.contractForm.get("addressCobranca")?.patchValue(val);
         this.updateAddressForMap(val);
+      });
+
+    this.contractForm
+      .get("subscriptionDiscount")
+      ?.valueChanges.subscribe((val) => {
+        const parcels = this.contractForm.get("parcels") as FormArray;
+        if (parcels && parcels.length > 0) {
+          const price = val ? Number(val) - 800 : null;
+          parcels.at(0).get("price")?.setValue(price);
+        }
       });
   }
 
@@ -182,8 +190,6 @@ export class CreateContractComponent implements OnInit, OnChanges {
     }
   }
 
-  
-
   buildForm() {
     const initialAddress = {
       zipCode: [""],
@@ -199,6 +205,9 @@ export class CreateContractComponent implements OnInit, OnChanges {
       addressLocation: ["", Validators.required],
       ibge: [3504008],
     };
+
+    const discount = this.contractForm?.get("subscriptionDiscount")?.value ?? null;
+    const price = discount ? Number(discount) - 800 : null;
 
     this.contractForm = this.fb.group({
       client: [this.clientData?.[0]?.id ?? null, Validators.required],
@@ -218,14 +227,14 @@ export class CreateContractComponent implements OnInit, OnChanges {
       agreement: [566558],
       parcels: this.fb.array([
         this.fb.group({
-          description: [null],
+          description: ["Parcela Adesão"],
           dueDate: [null, Validators.required],
-          price: [null, Validators.required],
+          price: [price, Validators.required],
         }),
       ]),
       typeItem: ["P"],
       codeItem: [null, Validators.required],
-      subscriptionDiscount: [null],
+      subscriptionDiscount: [discount],
       beginningCollection: ["", Validators.required],
       bundleCollection: ["N"],
     });
@@ -241,6 +250,10 @@ export class CreateContractComponent implements OnInit, OnChanges {
 
   get contracts(): FormArray {
     return this.contractForm.get("contract") as FormArray;
+  }
+
+  get parcelsControls() {
+    return (this.contractForm.get("parcels") as FormArray).controls;
   }
 
   getCep(isContract: boolean): void {
@@ -345,7 +358,6 @@ export class CreateContractComponent implements OnInit, OnChanges {
         console.error("Erro ao criar contrato:", error);
       },
     });
-
   }
 
   public searchAddressOnMap(): void {
@@ -376,9 +388,6 @@ export class CreateContractComponent implements OnInit, OnChanges {
       localidade: addressValue.city,
     };
   }
-  removeContract(index: number): void {
-    this.contracts.removeAt(index);
-  }
 
   getPlanLabel(codePlan: number | string): string {
     const code = Number(codePlan);
@@ -389,9 +398,4 @@ export class CreateContractComponent implements OnInit, OnChanges {
       ? `${plan.value} - ${plan.name}`
       : `${codePlan} - Plano Desconhecido`;
   }
-
-  get parcelsControls() {
-    return (this.contractForm.get("parcels") as FormArray).controls;
-  }
-
 }
