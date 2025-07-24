@@ -357,6 +357,8 @@ export class CreateContractComponent implements OnInit, OnChanges {
     });
   }
 
+  
+
   public searchAddressOnMap(): void {
     this.contractForm.get("addressInstalation")?.markAllAsTouched();
     const addressForm = this.contractForm.get("addressInstalation");

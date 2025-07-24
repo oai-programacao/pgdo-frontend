@@ -3,6 +3,7 @@ import { environment } from "../../../../environments/environment";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import {
   CodePlans,
+  ContactAttemptResponse,
   CreateRegisterClientDto,
   ViewRegisterClientResponseDto,
 } from "../../../interfaces/register-client.model";
@@ -91,4 +92,45 @@ export class RegisterClientService {
       { params }
     );
   }
+ 
+
+getContactAttempts(status: string, contractId?: string, page: number = 0, size: number = 10): Observable<CustomPageResponse<ContactAttemptResponse>> {
+  let params = new HttpParams()
+    .set("status", status)
+    .set("page", page.toString())
+    .set("size", size.toString());
+
+  if (contractId) {
+    params = params.set("contractId", contractId);
+  }
+
+  return this.http.get<CustomPageResponse<ContactAttemptResponse>>(
+    `${this.apiUrl}/contactsSales`,
+    { params }
+  );
 }
+
+getContactAttemptById(id: string): Observable<ContactAttemptResponse> {
+  return this.http.get<ContactAttemptResponse>(
+    `${this.apiUrl}/contactsSales/${id}`
+  );
+}
+
+getContactByIdAttempts(id: string): Observable<ContactAttemptResponse[]>{
+  return this.http.get<ContactAttemptResponse[]>(
+    `${this.apiUrl}/contactsSales/${id}/attempts`
+  );
+}
+
+postContactAttempt(contractId: string, attemptData: ContactAttemptResponse): Observable<ContactAttemptResponse>{
+  return this.http.post<ContactAttemptResponse>(
+    `${this.apiUrl}/contactsSales/${contractId}/attempts`, attemptData
+  );
+}
+
+
+
+}
+
+
+

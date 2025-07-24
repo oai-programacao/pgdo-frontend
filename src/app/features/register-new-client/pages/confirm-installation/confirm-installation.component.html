@@ -138,11 +138,10 @@
           <p-button
             icon="pi pi-phone"
             [rounded]="true"
-            
             [text]="true"
-            (onClick)="registerNewTrytoContact()"
+            (onClick)="openAttemptDialog(contracts)"
             pTooltip="Registrar Tentativa de Contato"
-          ></p-button>
+          />
           <p-button
             icon="pi pi-eye"
             [rounded]="true"
@@ -164,7 +163,6 @@
   </p-table>
 </div>
 
-
 @if(responseData){
 <p-dialog
   header="Detalhes do Contrato"
@@ -174,57 +172,148 @@
   [draggable]="false"
   (onHide)="detailsVisible = false"
 >
-<p-fieldset legend="Dados do Contrato Associado" [toggleable]="true">
-   <div class="grid grid-cols-2 gap-4 text-sm" *ngIf="selectedContract">
+  <p-fieldset legend="Dados do Contrato Associado" [toggleable]="true">
+    <div class="grid grid-cols-2 gap-4 text-sm" *ngIf="selectedContract">
       <div>
-        <strong>Nome:</strong> {{ selectedContract.clientName  || ' - '}}
+        <strong>Nome:</strong> {{ selectedContract.clientName || " - " }}
       </div>
       <div>
-        <strong>CPF/CNPJ</strong>: {{ selectedContract.cpfClient || ' - ' | cpfCnpj }}
+        <strong>CPF/CNPJ</strong>:
+        {{ selectedContract.cpfClient || " - " | cpfCnpj }}
       </div>
       <div>
-        <strong>Endereço:</strong> {{ selectedContract.addressInstalation.street || ' - ' }}
-        {{ selectedContract.addressInstalation.neighborhood || ' - ' }},
-        {{ selectedContract.addressInstalation.number || ' - ' }} -
-        {{ selectedContract.addressInstalation.city || ' - '}}/{{ selectedContract.addressInstalation.state || ' - ' }}
+        <strong>Endereço:</strong>
+        {{ selectedContract.addressInstalation.street || " - " }}
+        {{ selectedContract.addressInstalation.neighborhood || " - " }},
+        {{ selectedContract.addressInstalation.number || " - " }} -
+        {{ selectedContract.addressInstalation.city || " - " }}/{{
+          selectedContract.addressInstalation.state || " - "
+        }}
       </div>
       <div>
-        <strong>Data de Assinatura do Contrato:</strong> {{ selectedContract.signatureContract || ' - ' | date : "dd/MM/yyyy" }}
+        <strong>Data de Assinatura do Contrato:</strong>
+        {{ selectedContract.signatureContract || " - " | date : "dd/MM/yyyy" }}
       </div>
       <div>
-        <strong>Telefone 1:</strong> {{selectedContract.clientMobilePhone || ' - ' | phones}}
+        <strong>Telefone 1:</strong>
+        {{ selectedContract.clientMobilePhone || " - " | phones }}
       </div>
       <div>
-        <strong>Telefone 2:</strong> {{selectedContract.clientPhoneComercial || ' - ' | phones}}
+        <strong>Telefone 2:</strong>
+        {{ selectedContract.clientPhoneComercial || " - " | phones }}
       </div>
     </div>
-</p-fieldset>
-<p-fieldset legend="Histórico de Contatos" [toggleable]="true">
-  <p-timeline [value]="selectedContract?.contactHistory" align="alternate" styleClass="p-timeline-basic">
-    <ng-template pTemplate="marker" let-event>
-      <span class="custom-marker shadow-2">
-        <i [class]="'pi pi-phone'"></i>
-      </span>
-    </ng-template>
-    <ng-template pTemplate="content" let-attempt>
-      <small class="p-text-secondary">
-        {{ attempt.date | date:'dd/MM/yyyy HH:mm' }} - por {{ attempt.user }}
-      </small>
-      <p class="mt-2">{{ attempt.notes }}</p>
-      <p-tag
-        [value]="getContactAttemptOutcomeLabel(attempt.result)"
-        [severity]="getStatusSeverity(attempt.outcome)" 
-        class="mt-2"
-      ></p-tag>
-    </ng-template>
-  </p-timeline>
-  <div *ngIf="!selectedContract?.contactHistory || selectedContract.contactHistory.length === 0" class="text-center text-slate-500 p-4">
-    Nenhuma tentativa de contato registrada.
-  </div>
-</p-fieldset>
+  </p-fieldset>
+  <p-fieldset legend="Histórico de Contatos" [toggleable]="true">
+    <p-timeline
+      [value]="selectedContract?.contactHistory"
+      align="alternate"
+      styleClass="p-timeline-basic"
+    >
+      <ng-template pTemplate="marker" let-event>
+        <span class="custom-marker shadow-2">
+          <i [class]="'pi pi-phone'"></i>
+        </span>
+      </ng-template>
+      <ng-template pTemplate="content" let-attempt>
+        <small class="p-text-secondary">
+          {{ attempt.date | date : "dd/MM/yyyy HH:mm" }} - por
+          {{ attempt.user }}
+        </small>
+        <p class="mt-2">{{ attempt.notes }}</p>
+        <p-tag
+          [value]="getContactAttemptOutcomeLabel(attempt.result)"
+          [severity]="getStatusSeverity(attempt.outcome)"
+          class="mt-2"
+        ></p-tag>
+      </ng-template>
+    </p-timeline>
+    <div
+      *ngIf="
+        !selectedContract?.contactHistory ||
+        selectedContract.contactHistory.length === 0
+      "
+      class="text-center text-slate-500 p-4"
+    >
+      Nenhuma tentativa de contato registrada.
+    </div>
+  </p-fieldset>
 </p-dialog>
 }
 
+@if(responseData){
+<p-dialog [modal]="true" [(visible)]="attemptFormVisibleDialog" [style]="{ width: '50vw' }" [draggable]="false" (onHide)="attemptFormVisibleDialog = false">
+  <p-fieldset legend="Dados do Contrato Associado" [toggleable]="true">
+    <div class="grid grid-cols-2 gap-4 text-sm" *ngIf="selectedContract">
+      <div>
+        <strong>Nome:</strong> {{ selectedContract.clientName || " - " }}
+      </div>
+      <div>
+        <strong>CPF/CNPJ</strong>:
+        {{ selectedContract.cpfClient || " - " | cpfCnpj }}
+      </div>
+      <div>
+        <strong>Endereço:</strong>
+        {{ selectedContract.addressInstalation.street || " - " }}
+        {{ selectedContract.addressInstalation.neighborhood || " - " }},
+        {{ selectedContract.addressInstalation.number || " - " }} -
+        {{ selectedContract.addressInstalation.city || " - " }}/{{
+          selectedContract.addressInstalation.state || " - "
+        }}
+      </div>
+      <div>
+        <strong>Data de Assinatura do Contrato:</strong>
+        {{ selectedContract.signatureContract || " - " | date : "dd/MM/yyyy" }}
+      </div>
+      <div>
+        <strong>Telefone 1:</strong>
+        {{ selectedContract.clientMobilePhone || " - " | phones }}
+      </div>
+      <div>
+        <strong>Telefone 2:</strong>
+        {{ selectedContract.clientPhoneComercial || " - " | phones }}
+      </div>
+    </div>
+  </p-fieldset>
+  <form [formGroup]="attemptForm">
+    <p-fieldset legend="Registrar Tentativa de Contato" [toggleable]="true">
+      <div class="grid grid-cols-1 gap-4">
 
+        <div class="flex flex-col">
+          <label class="text-sm font-medium">Resultado:</label>
+          <p-select
+            [options]="contactAttemptResults"
+            formControlName="outcome"
+            placeholder="Selecione o Resultado"
+            appendTo="body"
+            styleClass="w-full"
+          />
+        </div>
+        <div class="flex flex-col">
+          <label class="text-sm font-medium">Observações:</label>
+          <textarea
+            formControlName="notes"
+            rows="3"
+            class="p-inputtext p-component w-full resize-none"
+            placeholder="Observações sobre a tentativa de contato..."
+          ></textarea>
+        </div>
+      </div>
+      <div class="flex justify-end mt-4">
+        <button
+          pButton
+          type="button"
+          label="Registrar Tentativa"
+          icon="pi pi-check"
+          class="p-button-outlined p-button-primary"
+          (click)="submitContactAttempt()"
+          [disabled]="attemptForm.invalid"
+        ></button>
+      </div>
+    </p-fieldset>
+  </form>
+</p-dialog>
+}
 
 <p-toast />
+<p-confirmPopup></p-confirmPopup>

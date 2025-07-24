@@ -138,3 +138,27 @@ export interface Parcel {
 }
 
   
+
+
+export interface ContactAttemptResponse {
+  id: string;
+  contractId: string;
+  contractClientName: string;
+  status: string;
+  attempts: number;
+  lastAttemptedByName: string | null;
+  lastAttemptedAt: string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface Attempt{
+  id: string;
+  contactAfterSaleId: string;
+  attemptedByName: string;
+  outcomer: string;
+  attemptTimestamp: string;
+  attemptNotes: string;
+  createdAt: string;
+}
