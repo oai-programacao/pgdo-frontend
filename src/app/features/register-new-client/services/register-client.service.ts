@@ -2,6 +2,7 @@ import { inject, Injectable } from "@angular/core";
 import { environment } from "../../../../environments/environment";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import {
+  CodePlans,
   CreateRegisterClientDto,
   ViewRegisterClientResponseDto,
 } from "../../../interfaces/register-client.model";
@@ -61,6 +62,33 @@ export class RegisterClientService {
     return this.http.post<ViewRegisterClientResponseDto>(
       `${this.apiUrl}/clientContract`,
       contractData
+    );
+  }
+
+  postCodePlans(): Observable<CodePlans[]> {
+    return this.http.post<CodePlans[]>(
+      `${this.apiUrl}/clientContract/plans/codes`,
+      {}
+    );
+  }
+
+  getContractsByDateStatus(
+    startDate: string,
+    endDate: string,
+    status: string,
+    page: number,
+    size: number
+  ): Observable<CustomPageResponse<ViewRegisterClientResponseDto>> {
+    let params = new HttpParams()
+      .set("startDate", startDate)
+      .set("endDate", endDate)
+      .set("status", status)
+      .set("page", page.toString())
+      .set("size", size.toString());
+
+    return this.http.get<CustomPageResponse<ViewRegisterClientResponseDto>>(
+      `${this.apiUrl}/clientContract/by-date-status`,
+      { params }
     );
   }
 }

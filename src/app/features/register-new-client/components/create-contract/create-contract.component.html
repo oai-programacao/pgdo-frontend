@@ -11,12 +11,13 @@
             <div class="flex-1 min-w-[220px]">
               <p-select
                 [options]="isPJ ? pjPlans : pfPlans"
-                optionLabel="name"
-                optionValue="value"
+                optionLabel="Descricao"
+                optionValue="Codigo"
                 placeholder="Plano"
                 appendTo="body"
                 formControlName="planCode"
                 class="w-full"
+                filter="true"
                 fluid
               />
             </div>
@@ -152,7 +153,6 @@
               </div>
             </div>
           </div>
-
           <!-- Botão Próximo -->
           <div class="flex justify-end mt-6">
             <p-button label="Próximo" (onClick)="activateCallback(2)" />

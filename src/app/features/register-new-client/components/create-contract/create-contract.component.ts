@@ -27,6 +27,7 @@ import { DatePickerModule } from "primeng/datepicker";
 import { SignaturePadComponent } from "../../../../shared/components/signature-pad/signature-pad.component";
 import { GoogleMapsComponent } from "../../../../shared/components/google-maps/google-maps.component";
 import { StepperModule } from "primeng/stepper";
+import { CodePlans } from "../../../../interfaces/register-client.model";
 
 @Component({
   selector: "app-create-contract",
@@ -48,6 +49,7 @@ import { StepperModule } from "primeng/stepper";
   providers: [ViaCepService, MessageService],
 })
 export class CreateContractComponent implements OnInit, OnChanges {
+
   @Input({ required: true }) isPJorPF!: string | null;
   @Input() clientData: any[] = [];
   isCepLoading: boolean = false;
@@ -60,20 +62,13 @@ export class CreateContractComponent implements OnInit, OnChanges {
   dueDateOptions: any = Array.from({ length: 30 }, (_, i) => i + 1);
   public addressForMapSearch: any = null;
 
-  pfPlans = [
-    { name: "250 Megas - R$ 69,90", value: 9009 },
-    { name: "500 Megas - R$ 79,90", value: 10697 },
-    { name: "600 Megas - R$ 89,90", value: 10700 },
-    { name: "750 Megas - R$ 99,90", value: 10703 },
-    { name: "850 Megas - R$ 109,90", value: 10706 },
-    { name: "1 Giga - R$ 199,90", value: 10710 },
-  ];
+  pfPlans: any[] = [
+    { Codigo: 9009, Descricao: "9009 - Plano Básico" },
 
-  pjPlans = [
-    { name: "100 Megas Empresarial - R$ 119,90", value: 481 },
-    { name: "200 Megas Empresarial - R$ 129,90", value: 485 },
-    { name: "300 Megas Empresarial - R$ 139,90", value: 486 },
-    { name: "700 Megas Empresarial - R$ 149,90", value: 514 },
+  ];
+  
+  pjPlans: any[] = [
+     { Codigo: 9009, Descricao: "9009 - Plano Básico" },
   ];
 
   addressLocationOptions = [
@@ -107,6 +102,8 @@ export class CreateContractComponent implements OnInit, OnChanges {
   ];
 
   ngOnInit() {
+    // this.getCodesPlans();
+
     if (!this.contractForm) {
       this.buildForm();
     }
@@ -129,7 +126,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log("data cliente", this.clientData);
+   
     const clientChanged = changes["clientData"] && this.clientData;
     const typeChanged = changes["isPJorPF"];
 
@@ -398,4 +395,23 @@ export class CreateContractComponent implements OnInit, OnChanges {
       ? `${plan.value} - ${plan.name}`
       : `${codePlan} - Plano Desconhecido`;
   }
+  
+  // getCodesPlans() {
+  //     this.contractService.postCodePlans().subscribe({
+  //       next: (response: CodePlans[]) => {
+  //         const pfPlans = response.filter(plan => !plan.Descricao?.toLowerCase().includes('empresarial'));
+  //         const pjPlans = response.filter(plan => plan.Descricao?.toLowerCase().includes('empresarial'));
+
+  //         this.pfPlans = pfPlans.map(plan => ({
+  //           Codigo: plan.Codigo,
+  //           Descricao: plan.Codigo + " - " + plan.Descricao,
+  //         }));
+  //         this.pjPlans = pjPlans.map(plan => ({
+  //           Codigo: plan.Codigo,
+  //           Descricao: plan.Codigo + " - " + plan.Descricao,
+  //         }));
+
+  //       }
+  //     })
+  // }
 }

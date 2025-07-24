@@ -20,6 +20,7 @@ export interface CreateRegisterClientDto {
 }
 
 export interface ViewRegisterClientResponseDto {
+[x: string]: any;
     id: string;
     clientType: 'PF' | 'PJ';
     cpf?: string;
@@ -63,3 +64,77 @@ export interface Contract {
     accessionValue: number;
     address: Address;
 }
+
+export interface CodePlans{
+    Codigo: string;
+    Descricao: string;
+    Grupo?: string;
+}
+
+export interface ClientContract {
+  id: string
+  client: string
+  cpfClient: string
+  clientName: string
+  typeClient: string
+  billingCycle: number
+  signatureContract: string
+  ViewRegisterClientResponseDto: ViewRegisterClientResponseDto;
+  seller: any
+  userSeller: any
+  addressInstalation: AddressInstalation
+  addressCobranca: AddressCobranca
+  typePlan: string
+  codePlan: number
+  numParcels: number
+  formPay: string
+  charging: string
+  bankAccount: number
+  agreement: number
+  parcels: Parcel[]
+  typeItem: string
+  codeItem: any
+  subscriptionDiscount: number
+  beginningCollection: string
+  bundleCollection: string
+  createAt: string
+  confirmInstallation: string
+}
+
+export interface AddressInstalation {
+  zipCode: number
+  state: string
+  city: string
+  street: string
+  number: string
+  complement: string
+  neighborhood: string
+  district: string
+  referencePoint: string
+  addressType: string
+  addressLocation: string
+  ibge: string
+}
+
+export interface AddressCobranca {
+  zipCode: number
+  state: string
+  city: string
+  street: string
+  number: string
+  complement: string
+  neighborhood: string
+  district: string
+  referencePoint: string
+  addressType: string
+  addressLocation: string
+  ibge: string
+}
+
+export interface Parcel {
+  description: string
+  dueDate: string
+  price: number
+}
+
+  

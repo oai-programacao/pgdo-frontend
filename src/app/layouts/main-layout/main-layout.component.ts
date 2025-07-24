@@ -58,6 +58,13 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           icon: 'pi pi-users',
           route: '/app/clientes/cliente-cadastrados',
           exactMatch: true
+        },
+        {
+          id: 'confirm-installation',
+          label: 'Confirmar Instalação',
+          icon: 'pi pi-check',
+          route: '/app/confirmar-instalacao',
+          exactMatch: true
         }
       ]
     },

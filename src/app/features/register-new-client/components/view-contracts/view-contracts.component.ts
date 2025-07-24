@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 
 @Component({
@@ -8,11 +8,17 @@ import { ButtonModule } from 'primeng/button';
   templateUrl: './view-contracts.component.html',
   styleUrl: './view-contracts.component.scss'
 })
-export class ViewContractsComponent {
+export class ViewContractsComponent implements OnInit, OnChanges {
   @Input() clientData: any[] = [];
   @Input({ required: true }) isPJorPF!: string | null;
 
+  ngOnInit() {
+    console.log('Client Data:', this.clientData);
+  }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('Client Data')
+  }
 
    get contracts(){
     return this.clientData?.[0]?.contracts || [];

@@ -97,7 +97,7 @@
             class="text-[0.6875rem] text-gray-400 uppercase tracking-wider mb-1 block"
             >Código do plano</span
           >
-          <span class="text-gray-700 font-medium truncate block">
+          <span class="text-gray-700 w-[5rem] text-center font-medium truncate block">
             {{ client.contracts[0]?.planCode || " - " }}
           </span>
         </div>
@@ -108,7 +108,7 @@
             class="text-[0.6875rem] text-gray-400 uppercase tracking-wider mb-1 block"
             >Endereço</span
           >
-          <span class="text-gray-600 font-medium truncate block">
+          <span class="text-gray-600 text-center font-medium truncate block">
             {{ client.addresses[0]?.street }},
             {{ client.addresses[0]?.number }},
             {{ client.addresses[0]?.neighborhood }},
@@ -122,7 +122,7 @@
             class="text-[0.6875rem] text-gray-400 uppercase tracking-wider mb-1 block"
             >Telefone</span
           >
-          <span class="text-gray-700 font-medium truncate block">
+          <span class="text-gray-700 text-center w-[3rem] font-medium truncate block">
             {{
               clientType === "PJ"
                 ? client.mobilePhone
@@ -137,7 +137,7 @@
             class="text-[0.6875rem] text-gray-400 uppercase tracking-wider mb-1 block"
             >Qtd. de Contrato</span
           >
-          <span class="text-gray-700 font-medium truncate block">
+          <span class="text-gray-700 text-center font-medium truncate block">
             @if(client.contracts && client.contracts.length > 0) {
             {{ client.contracts.length }}
             } @else { 0 }

@@ -229,6 +229,147 @@
             </ng-template>
           </p-step-panel>
         </p-step-item>
+
+      <p-step-item [value]="2">
+        <p-step>Documentos do Cliente</p-step>
+        <p-step-panel>
+          <ng-template #content let-activateCallback="activateCallback">
+            <div class="flex flex-wrap gap-4">
+              <div class="flex-grow-1">
+                <label>Foto da Frente do Documento</label>
+
+                <div *ngIf="!form.get('photoRg')?.value" class="mt-2">
+                  <p-fileUpload
+                    #fileUploadFront
+                    name="photoRg"
+                    accept="image/*"
+                    [showUploadButton]="false"
+                    [showCancelButton]="false"
+                    chooseLabel="Anexar Frente"
+                    chooseIcon="pi pi-upload"
+                    (onSelect)="onUpload($event, 'photoRg')"
+                    [auto]="true"
+                  ></p-fileUpload>
+                </div>
+
+                <div *ngIf="form.get('photoRg')?.value" class="mt-2 flex flex-column align-items-center gap-3">
+                  <img [src]="form.get('photoRg')?.value" alt="Preview Frente do Documento" class="w-full border-round" />
+                  <p-button
+                    rounded
+                    icon="pi pi-trash"
+                    styleClass="p-button-danger"
+                    (onClick)="clearImage('photoRg', fileUploadFront)"
+                  ></p-button>
+                </div>
+              </div>
+
+              <div class="flex-grow-1">
+                <label>Foto do Verso do Documento</label>
+                
+                <div *ngIf="!form.get('photoRgVerse')?.value" class="mt-2">
+                  <p-fileUpload
+                    #fileUploadVerse
+                    name="photoRgVerse"
+                    accept="image/*"
+                    [showUploadButton]="false"
+                    [showCancelButton]="false"
+                    chooseLabel="Anexar Verso"
+                    chooseIcon="pi pi-upload"
+                    (onSelect)="onUpload($event, 'photoRgVerse')"
+                    [auto]="true"
+                  ></p-fileUpload>
+                </div>
+
+                <div *ngIf="form.get('photoRgVerse')?.value" class="mt-2 flex flex-column align-items-center gap-3">
+                  <img [src]="form.get('photoRgVerse')?.value" alt="Preview Verso do Documento" class="w-full border-round" />
+                  <p-button
+                    rounded
+                    icon="pi pi-trash"
+                    styleClass="p-button-danger"
+                    (onClick)="clearImage('photoRgVerse', fileUploadVerse)"
+                  ></p-button>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex py-6 gap-2 justify-between mt-4">
+              <p-button
+                label="Voltar"
+                icon="pi pi-arrow-left"
+                severity="secondary"
+                (onClick)="activateCallback(1)"
+              />
+              <p-button
+                label="Próximo"
+                (onClick)="activateCallback(3)"
+              />
+            </div>
+          </ng-template>
+        </p-step-panel>
+      </p-step-item>
+
+        <p-step-item [value]="3">
+          <p-step>Assinatura do Cliente</p-step>
+          <p-step-panel>
+            <ng-template #content let-activateCallback="activateCallback">
+              <div class="flex flex-col w-full">
+                <div class="w-full">
+                  <app-signature-pad
+                    (signatureData)="onSignatureDataReceived($event)"
+                  />
+                </div>
+              </div>
+
+              <div class="flex py-6 gap-2 justify-between">
+                <div class="py-6">
+                  <p-button
+                    label="Voltar"
+                    severity="secondary"
+                    (onClick)="activateCallback(2)"
+                  />
+                </div>
+                <div class="py-6">
+                  <p-button
+                    label="Concluir"
+                    severity="success"
+                    (onClick)="submitRegistration()"
+                    [disabled]="form.invalid"
+                  />
+                </div>
+              </div>
+            </ng-template>
+          </p-step-panel>
+        </p-step-item>
+       
+      </p-stepper>
+    </div>
+  </form>
+</div>
+
+<p-toast />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- 
         <p-step-item [value]="2">
           <p-step>Cadastrar Contratos</p-step>
@@ -457,123 +598,3 @@
             </ng-template>
           </p-step-panel>
         </p-step-item> -->
-
-      <p-step-item [value]="2">
-        <p-step>Documentos do Cliente</p-step>
-        <p-step-panel>
-          <ng-template #content let-activateCallback="activateCallback">
-            <div class="flex flex-wrap gap-4">
-              <div class="flex-grow-1">
-                <label>Foto da Frente do Documento</label>
-
-                <div *ngIf="!form.get('photoRg')?.value" class="mt-2">
-                  <p-fileUpload
-                    #fileUploadFront
-                    name="photoRg"
-                    accept="image/*"
-                    [showUploadButton]="false"
-                    [showCancelButton]="false"
-                    chooseLabel="Anexar Frente"
-                    chooseIcon="pi pi-upload"
-                    (onSelect)="onUpload($event, 'photoRg')"
-                    [auto]="true"
-                  ></p-fileUpload>
-                </div>
-
-                <div *ngIf="form.get('photoRg')?.value" class="mt-2 flex flex-column align-items-center gap-3">
-                  <img [src]="form.get('photoRg')?.value" alt="Preview Frente do Documento" class="w-full border-round" />
-                  <p-button
-                    rounded
-                    icon="pi pi-trash"
-                    styleClass="p-button-danger"
-                    (onClick)="clearImage('photoRg', fileUploadFront)"
-                  ></p-button>
-                </div>
-              </div>
-
-              <div class="flex-grow-1">
-                <label>Foto do Verso do Documento</label>
-                
-                <div *ngIf="!form.get('photoRgVerse')?.value" class="mt-2">
-                  <p-fileUpload
-                    #fileUploadVerse
-                    name="photoRgVerse"
-                    accept="image/*"
-                    [showUploadButton]="false"
-                    [showCancelButton]="false"
-                    chooseLabel="Anexar Verso"
-                    chooseIcon="pi pi-upload"
-                    (onSelect)="onUpload($event, 'photoRgVerse')"
-                    [auto]="true"
-                  ></p-fileUpload>
-                </div>
-
-                <div *ngIf="form.get('photoRgVerse')?.value" class="mt-2 flex flex-column align-items-center gap-3">
-                  <img [src]="form.get('photoRgVerse')?.value" alt="Preview Verso do Documento" class="w-full border-round" />
-                  <p-button
-                    rounded
-                    icon="pi pi-trash"
-                    styleClass="p-button-danger"
-                    (onClick)="clearImage('photoRgVerse', fileUploadVerse)"
-                  ></p-button>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex py-6 gap-2 justify-between mt-4">
-              <p-button
-                label="Voltar"
-                icon="pi pi-arrow-left"
-                severity="secondary"
-                (onClick)="activateCallback(1)"
-              />
-              <p-button
-                label="Próximo"
-                (onClick)="activateCallback(3)"
-              />
-            </div>
-          </ng-template>
-        </p-step-panel>
-      </p-step-item>
-
-        <p-step-item [value]="3">
-          <p-step>Assinatura do Cliente</p-step>
-          <p-step-panel>
-            <ng-template #content let-activateCallback="activateCallback">
-              <div class="flex flex-col w-full">
-                <div class="w-full">
-                  <app-signature-pad
-                    (signatureData)="onSignatureDataReceived($event)"
-                  />
-                </div>
-              </div>
-
-              <div class="flex py-6 gap-2 justify-between">
-                <div class="py-6">
-                  <p-button
-                    label="Voltar"
-                    severity="secondary"
-                    (onClick)="activateCallback(2)"
-                  />
-                </div>
-                <div class="py-6">
-                  <p-button
-                    label="Concluir"
-                    severity="success"
-                    (onClick)="submitRegistration()"
-                    [disabled]="form.invalid"
-                  />
-                </div>
-              </div>
-            </ng-template>
-          </p-step-panel>
-        </p-step-item>
-       
-      </p-stepper>
-    </div>
-  </form>
-</div>
-
-<p-toast />
-
-

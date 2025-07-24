@@ -1,0 +1,230 @@
+<div
+  class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md"
+>
+  <p-toolbar
+    styleClass="mb-6 rounded-lg bg-slate-50 dark:bg-slate-800 border dark:border-slate-700"
+  >
+    <ng-template pTemplate="left">
+      <h1 class="text-xl font-bold">Confirmar Instalação</h1>
+    </ng-template>
+  </p-toolbar>
+
+  <p-fieldset legend="Filtros" [toggleable]="true" [collapsed]="true">
+    <form [formGroup]="form" class="flex flex-row gap-4">
+      <div class="flex flex-col">
+        <label class="text-sm font-medium">Data Inicio:</label>
+        <p-datepicker
+          placeholder="Data Inicio"
+          appendTo="body"
+          dateFormat="dd/mm/yy"
+          dataType="string"
+          formControlName="startDate"
+        />
+      </div>
+      <div class="flex flex-col">
+        <label class="text-sm font-medium">Data Final:</label>
+        <p-datepicker
+          placeholder="Data Final"
+          appendTo="body"
+          [maxDate]="maxDate"
+          formControlName="endDate"
+          dateFormat="dd/mm/yy"
+          dataType="string"
+        />
+      </div>
+      <div class="flex flex-col w-full">
+        <label class="text-sm font-medium">Status:</label>
+        <p-select
+          [options]="statusOptions"
+          placeholder="Selecione o Status"
+          appendTo="body"
+          formControlName="status"
+          styleClass="w-full"
+          [showClear]="true"
+        />
+      </div>
+      <div class="flex flex-row items-end gap-2">
+        <button
+          pButton
+          type="button"
+          label="Filtrar"
+          icon="pi pi-filter"
+          class="p-button-outlined p-button-primary"
+          (click)="applyFilters()"
+          [disabled]="form.invalid"
+        ></button>
+        <button
+          pButton
+          type="button"
+          label="Limpar"
+          icon="pi pi-filter-slash"
+          class="p-button-outlined p-button-secondary"
+          (click)="clearFilters()"
+        ></button>
+      </div>
+    </form>
+  </p-fieldset>
+
+  <p-table
+    [value]="responseData"
+    [loading]="isLoading"
+    #dt
+    styleClass="p-datatable-striped p-datatable-gridlines text-sm"
+    [paginator]="true"
+    [rows]="rows"
+    [totalRecords]="totalRecords"
+    [lazy]="true"
+    (onPage)="loadContracts($event)"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+    [rowsPerPageOptions]="[10, 20, 50]"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="w-[15%] text-center">Cliente</th>
+        <th class="w-[15%] text-center">Data do Vencimento</th>
+        <th class="w-[15%] text-center">Data de Assinatura</th>
+        <th class="w-[10%] text-center">Vendedor</th>
+        <th class="w-[15%] text-center">Status</th>
+        <th class="w-[15%] text-center">Cidade/UF</th>
+        <th class="w-[15%] text-center">Valor Parcela</th>
+        <th class="w-[15%] text-center">Início Cobrança</th>
+        <th class="w-[15%] text-center">Ações</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-contracts>
+      <tr>
+        <td class="text-center">{{ contracts.clientName }}</td>
+        <td class="text-center">
+          {{ contracts.beginningCollection | date : "dd/MM/yyyy" }}
+        </td>
+        <td class="text-center">
+          {{ contracts.signatureContract | date : "dd/MM/yyyy" }}
+        </td>
+        <td class="text-center">{{ contracts.seller }}</td>
+        <td class="text-center">
+          <ng-container
+            *ngIf="
+              contracts.confirmInstallation === 'NOT_INSTALLED';
+              else installedOrPending
+            "
+          >
+            <p-tag value="Não Instalado" severity="danger"></p-tag>
+          </ng-container>
+          <ng-template #installedOrPending>
+            <ng-container
+              *ngIf="
+                contracts.confirmInstallation === 'INSTALLED';
+                else pending
+              "
+            >
+              <p-tag value="Instalado" severity="success"></p-tag>
+            </ng-container>
+            <ng-template #pending>
+              <p-tag value="Pendente" severity="warn"></p-tag>
+            </ng-template>
+          </ng-template>
+        </td>
+        <td class="text-center">
+          {{ contracts.addressInstalation.city }}/{{
+            contracts.addressInstalation.state
+          }}
+        </td>
+
+        <td class="text-center">
+          {{ contracts.parcels[0]?.price | currency : "BRL" }}
+        </td>
+        <td>{{ contracts.beginningCollection | date : "dd/MM/yyyy" }}</td>
+        <td class="flex flex-row gap-2 justify-start">
+          <p-button
+            icon="pi pi-phone"
+            [rounded]="true"
+            
+            [text]="true"
+            (onClick)="registerNewTrytoContact()"
+            pTooltip="Registrar Tentativa de Contato"
+          ></p-button>
+          <p-button
+            icon="pi pi-eye"
+            [rounded]="true"
+            [text]="true"
+            severity="info"
+            pTooltip="Ver Detalhes"
+            (onClick)="detailsVisibleTrue(contracts)"
+          ></p-button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="9" class="text-center text-slate-500 p-6">
+          Nenhum registro encontrado.
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+
+@if(responseData){
+<p-dialog
+  header="Detalhes do Contrato"
+  [(visible)]="detailsVisible"
+  [modal]="true"
+  [style]="{ width: '60vw', minWidth: '450px' }"
+  [draggable]="false"
+  (onHide)="detailsVisible = false"
+>
+<p-fieldset legend="Dados do Contrato Associado" [toggleable]="true">
+   <div class="grid grid-cols-2 gap-4 text-sm" *ngIf="selectedContract">
+      <div>
+        <strong>Nome:</strong> {{ selectedContract.clientName  || ' - '}}
+      </div>
+      <div>
+        <strong>CPF/CNPJ</strong>: {{ selectedContract.cpfClient || ' - ' | cpfCnpj }}
+      </div>
+      <div>
+        <strong>Endereço:</strong> {{ selectedContract.addressInstalation.street || ' - ' }}
+        {{ selectedContract.addressInstalation.neighborhood || ' - ' }},
+        {{ selectedContract.addressInstalation.number || ' - ' }} -
+        {{ selectedContract.addressInstalation.city || ' - '}}/{{ selectedContract.addressInstalation.state || ' - ' }}
+      </div>
+      <div>
+        <strong>Data de Assinatura do Contrato:</strong> {{ selectedContract.signatureContract || ' - ' | date : "dd/MM/yyyy" }}
+      </div>
+      <div>
+        <strong>Telefone 1:</strong> {{selectedContract.clientMobilePhone || ' - ' | phones}}
+      </div>
+      <div>
+        <strong>Telefone 2:</strong> {{selectedContract.clientPhoneComercial || ' - ' | phones}}
+      </div>
+    </div>
+</p-fieldset>
+<p-fieldset legend="Histórico de Contatos" [toggleable]="true">
+  <p-timeline [value]="selectedContract?.contactHistory" align="alternate" styleClass="p-timeline-basic">
+    <ng-template pTemplate="marker" let-event>
+      <span class="custom-marker shadow-2">
+        <i [class]="'pi pi-phone'"></i>
+      </span>
+    </ng-template>
+    <ng-template pTemplate="content" let-attempt>
+      <small class="p-text-secondary">
+        {{ attempt.date | date:'dd/MM/yyyy HH:mm' }} - por {{ attempt.user }}
+      </small>
+      <p class="mt-2">{{ attempt.notes }}</p>
+      <p-tag
+        [value]="getContactAttemptOutcomeLabel(attempt.result)"
+        [severity]="getStatusSeverity(attempt.outcome)" 
+        class="mt-2"
+      ></p-tag>
+    </ng-template>
+  </p-timeline>
+  <div *ngIf="!selectedContract?.contactHistory || selectedContract.contactHistory.length === 0" class="text-center text-slate-500 p-4">
+    Nenhuma tentativa de contato registrada.
+  </div>
+</p-fieldset>
+</p-dialog>
+}
+
+
+
+<p-toast />

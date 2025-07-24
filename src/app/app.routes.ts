@@ -167,6 +167,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/register-new-client/pages/search-client/search-client.component').then((m) => m.SearchClientComponent),
         title: 'Pesquisar Cliente'
       },
+      {
+        path: 'confirmar-instalacao',
+        loadComponent: () => import('./features/register-new-client/pages/confirm-installation/confirm-installation.component').then((m) => m.ConfirmInstalationComponent),
+        title: 'Confirmar Instalação'
+      },
       { path: '', redirectTo: 'home', pathMatch: 'full' } // Rota padrão dentro de /app
     ]
   },
