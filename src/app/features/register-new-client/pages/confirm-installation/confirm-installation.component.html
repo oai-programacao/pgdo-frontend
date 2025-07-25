@@ -120,7 +120,7 @@
               <p-tag value="Instalado" severity="success"></p-tag>
             </ng-container>
             <ng-template #pending>
-              <p-tag value="Pendente" severity="warn"></p-tag>
+              <p-tag value="Fechado Sem Contato" severity="warn"></p-tag>
             </ng-template>
           </ng-template>
         </td>
@@ -139,6 +139,7 @@
             icon="pi pi-phone"
             [rounded]="true"
             [text]="true"
+            [disabled]="contracts.attempts >= 5"
             (onClick)="openAttemptDialog(contracts)"
             pTooltip="Registrar Tentativa de Contato"
           />
@@ -217,12 +218,12 @@
       </ng-template>
       <ng-template pTemplate="content" let-attempt>
         <small class="p-text-secondary">
-          {{ attempt.date | date : "dd/MM/yyyy HH:mm" }} - por
-          {{ attempt.user }}
+          {{ attempt.attemptTimestamp }} - por
+          {{ attempt.attemptedByName }}
         </small>
-        <p class="mt-2">{{ attempt.notes }}</p>
+        <p class="mt-2">{{ attempt.attemptNotes }}</p>
         <p-tag
-          [value]="getContactAttemptOutcomeLabel(attempt.result)"
+          [value]="getContactAttemptOutcomeLabel(attempt.outcome)"
           [severity]="getStatusSeverity(attempt.outcome)"
           class="mt-2"
         ></p-tag>
@@ -239,10 +240,14 @@
     </div>
   </p-fieldset>
 </p-dialog>
-}
-
-@if(responseData){
-<p-dialog [modal]="true" [(visible)]="attemptFormVisibleDialog" [style]="{ width: '50vw' }" [draggable]="false" (onHide)="attemptFormVisibleDialog = false">
+} @if(responseData){
+<p-dialog
+  [modal]="true"
+  [(visible)]="attemptFormVisibleDialog"
+  [style]="{ width: '50vw' }"
+  [draggable]="false"
+  (onHide)="closeAttemptDialog()"
+>
   <p-fieldset legend="Dados do Contrato Associado" [toggleable]="true">
     <div class="grid grid-cols-2 gap-4 text-sm" *ngIf="selectedContract">
       <div>
@@ -278,7 +283,6 @@
   <form [formGroup]="attemptForm">
     <p-fieldset legend="Registrar Tentativa de Contato" [toggleable]="true">
       <div class="grid grid-cols-1 gap-4">
-
         <div class="flex flex-col">
           <label class="text-sm font-medium">Resultado:</label>
           <p-select
@@ -292,7 +296,7 @@
         <div class="flex flex-col">
           <label class="text-sm font-medium">Observações:</label>
           <textarea
-            formControlName="notes"
+            formControlName="attemptNotes"
             rows="3"
             class="p-inputtext p-component w-full resize-none"
             placeholder="Observações sobre a tentativa de contato..."

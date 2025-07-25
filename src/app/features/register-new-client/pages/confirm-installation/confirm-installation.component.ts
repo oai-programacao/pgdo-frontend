@@ -93,21 +93,27 @@ export class ConfirmInstalationComponent implements OnInit, OnChanges {
   statusOptions = [
     { label: "Instalado", value: "INSTALLED" },
     { label: "Não Instalado", value: "NOT_INSTALLED" },
+    { label: "Fechado Sem Contato", value: "CLOSED_WITHOUT_CONTACT" },
   ];
-
 
   contactAttemptResults: any[] = [
     { label: "Falou com o Cliente", value: "SPOKE_TO_CLIENT" },
     { label: "Falou com o Familiar", value: "SPOKE_TO_RELATIVE" },
-    { label: "Linha Ocupada", value: "BUSY_LINE" },
-    { label: "Número Inválido", value: "INVALID_NUMBER" },
+    {
+      label: "Cliente Validou a Instalação",
+      value: "CLIENT_VALIDATED_INSTALATION",
+    },
     {
       label: "Cliente Solicitou Retorno",
-      value: " CLIENT_REQUESTED_CALLBACK_LATER",
+      value: "CLIENT_REQUESTED_CALLBACK_LATER",
     },
+    {
+      label: "Cliente Rejeitou a Instalação",
+      value: "CLIENT_REJECTED_INSTALATION",
+    },
+    { label: "Linha Ocupada", value: "BUSY_LINE" },
+    { label: "Número Inválido", value: "INVALID_NUMBER" },
     { label: "Não Atendido", value: "NO_ANSWER" },
-    { label: "Cliente Validou o Contrato", value: "CLIENT_VALIDATED_CONTRACT" },
-    { label: "Cliente Rejeitou o Contrato", value: "CLIENT_REJECTED_CONTRACT" },
     {
       label: "Cliente Solicitou Alterações",
       value: "CLIENT_REQUESTED_CHANGES",
@@ -122,83 +128,124 @@ export class ConfirmInstalationComponent implements OnInit, OnChanges {
   private initAttemptForm(): void {
     this.attemptForm = this.fb.group({
       outcome: [null, Validators.required],
-      notes: ["", Validators.required],
-      attemptNotes: ["string"],
+      notes: [""],
+      attemptNotes: ["", Validators.required],
     });
   }
 
   openAttemptDialog(contract: any) {
+    this.registerClientService.getContactAttempts("", contract.id).subscribe({
+      next: (response) => {
+        const contactAttempt = response.content[0];
+        if (!contactAttempt) {
+          this.messageService.add({
+            severity: "warn",
+            summary: "Atenção",
+            detail: "Nenhum contato encontrado para este contrato.",
+          });
+          return;
+        }
 
-    this.registerClientService
-      .getContactAttempts("", contract.id)
-      .subscribe({
-        next: (response) => {
-          console.log("Resposta getContactAttempts:", response);
-
-          const contactAttempt = response.content[0];
-          if (!contactAttempt) {
-            this.messageService.add({
-              severity: "warn",
-              summary: "Atenção",
-              detail: "Nenhum contato encontrado para este contrato.",
-            });
-            return;
+        if (
+          contactAttempt.status === "CLOSED_WITHOUT_CONTACT" ||
+          contactAttempt.status === "EXECUTED_WITH_CONTACT"
+        ) {
+          let detailMsg = "O contato foi fechado.";
+          if (contactAttempt.status === "CLOSED_WITHOUT_CONTACT") {
+            detailMsg +=
+              " O contato foi fechado sem sucesso e o status do contrato foi atualizado para 'Fechado Sem Contato'.";
+          } else if (contactAttempt.status === "EXECUTED_WITH_CONTACT") {
+            detailMsg += " O contato foi fechado com sucesso.";
           }
+          this.messageService.add({
+            severity: "warn",
+            summary: "Limite atingido",
+            detail: detailMsg,
+          });
+          this.loadContracts();
+          return;
+        }
 
-          this.selectedContract = {
-            ...contract,
-            contactAttempts: response.content,
-            id: contactAttempt.id,
-          };
+        if (contactAttempt.attempts >= 5) {
+          this.messageService.add({
+            severity: "warn",
+            summary: "Atenção",
+            detail:
+              "Já foram realizadas 5 tentativas, aguarde atualização do status.",
+          });
+          this.loadContracts();
+          return;
+        }
 
-          console.log("ID do contato para buscar detalhes:", contactAttempt.id);
+        this.selectedContract = {
+          ...contract,
+          contactAttempts: response.content,
+          id: contactAttempt.id,
+        };
 
-          this.registerClientService
-            .getContactAttemptById(contactAttempt.id)
-            .subscribe({
-              next: (contact) => {
-                console.log("Resposta getContactAttemptById:", contact);
-                this.selectedContract = {
-                  ...this.selectedContract,
-                  ...contact,
-                };
-                console.log(
-                  "ID do contato salvo em selectedContract.id:",
-                  this.selectedContract.id
-                );
-                this.attemptFormVisibleDialog = true;
-              },
-              error: (err) => {
-                console.log("Erro getContactAttemptById:", err);
-                this.messageService.add({
-                  severity: "error",
-                  summary: "Erro",
-                  detail: "Não foi possível buscar o contato.",
-                });
-              },
-            });
-        },
-        error: (err) => {
-          console.log("Erro getContactAttempts:", err);
-        },
-      });
+        this.registerClientService
+          .getContactAttemptById(contactAttempt.id)
+          .subscribe({
+            next: (contact) => {
+              this.selectedContract = {
+                ...this.selectedContract,
+                ...contact,
+              };
+              this.attemptFormVisibleDialog = true;
+            },
+            error: (err) => {
+              this.messageService.add({
+                severity: "error",
+                summary: "Erro",
+                detail: "Não foi possível buscar o contato.",
+              });
+            },
+          });
+      },
+      error: (err) => {
+        console.log("Erro getContactAttempts:", err);
+      },
+    });
   }
 
-detailsVisibleTrue(contract: any) {
-  this.detailsVisible = true;
-  this.selectedContract = contract;
+  closeAttemptDialog() {
+    this.attemptFormVisibleDialog = false;
+    this.attemptForm.reset();
+  }
+  detailsVisibleTrue(contract: any) {
+    this.detailsVisible = true;
+    this.selectedContract = contract;
 
-  const taskId = contract.taskId || contract.id;
+    this.registerClientService.getContactAttempts("", contract.id).subscribe({
+      next: (response) => {
+        const contactAttempt = response.content[0];
+        if (!contactAttempt) {
+          this.messageService.add({
+            severity: "warn",
+            summary: "Atenção",
+            detail: "Nenhum contato encontrado para este contrato.",
+          });
+          this.selectedContract.contactHistory = [];
+          this.attemptsData = [];
+          return;
+        }
 
-  this.registerClientService.getContactByIdAttempts(taskId).subscribe({
-    next: (response) => {
-      this.attemptsData = response;
-    },
-    error: (e) => {
-      console.log(e);
-    }
-  });
-}
+        const contactId = contactAttempt.id;
+        this.registerClientService.getContactByIdAttempts(contactId).subscribe({
+          next: (attempts) => {
+            this.selectedContract.contactHistory = attempts;
+            this.attemptsData = attempts;
+          },
+          error: (e) => {
+            console.log(e);
+          },
+        });
+      },
+      error: (e) => {
+        console.log(e);
+      },
+    });
+  }
 
   private initFilterForm(): void {
     this.filterForm = this.fb.group({
@@ -263,7 +310,6 @@ detailsVisibleTrue(contract: any) {
           this.responseData = response.content;
           this.totalRecords = response.page.totalElements;
           this.isLoading = false;
-          this.form.reset();
 
           this.messageService.add({
             severity: "success",
@@ -284,11 +330,31 @@ detailsVisibleTrue(contract: any) {
   }
 
   getContactAttemptOutcomeLabel(outcome: string): string {
-    if (outcome === "Atendido") return "Atendido";
-    if (outcome === "Não atendido") return "Não Atendido";
-    return "Outro";
+    switch (outcome) {
+      case "SPOKE_TO_CLIENT":
+        return "Falou com o Cliente";
+      case "SPOKE_TO_RELATIVE":
+        return "Falou com o Familiar";
+      case "BUSY_LINE":
+        return "Linha Ocupada";
+      case "INVALID_NUMBER":
+        return "Número Inválido";
+      case "CLIENT_REQUESTED_CALLBACK_LATER":
+        return "Cliente Solicitou Retorno";
+      case "NO_ANSWER":
+        return "Não Atendido";
+      case "CLIENT_VALIDATED_CONTRACT":
+        return "Cliente Validou o Contrato";
+      case "CLIENT_REJECTED_CONTRACT":
+        return "Cliente Rejeitou o Contrato";
+      case "CLIENT_REQUESTED_CHANGES":
+        return "Cliente Solicitou Alterações";
+      case "VOICEMAIL_LEFT":
+        return "Deixou Recado na Caixa Postal";
+      default:
+        return "Outro";
+    }
   }
-
   getStatusSeverity(
     outcome: string
   ):
@@ -304,37 +370,45 @@ detailsVisibleTrue(contract: any) {
         return "success";
       case "Não Atendido":
         return "danger";
+      case "CLOSED_WITHOUT_CONTACT":
+        return "warn";
       default:
         return "info";
     }
   }
 
-  showTheAttemptNotes(){
+  showTheAttemptNotes() {
     const id = this.selectedContract.id;
+    console.log("Buscando histórico para id:", id);
 
     this.registerClientService.getContactByIdAttempts(id).subscribe({
       next: (response) => {
+        console.log("Histórico recebido:", response);
+        this.selectedContract.contactHistory = response;
         this.attemptsData = response;
       },
       error: (e) => {
-        console.log(e)
-      }
-    })
+        console.log(e);
+      },
+    });
   }
 
   submitContactAttempt() {
-    const contactId = this.selectedContract.id;
+    const contactId =
+      this.selectedContract.contactAfterSaleId || this.selectedContract.id;
     this.registerClientService
       .postContactAttempt(contactId, this.attemptForm.value)
       .subscribe({
         next: (response) => {
-         this.attemptForm.reset();
+          this.attemptForm.reset();
           this.messageService.add({
             severity: "success",
             summary: "Sucesso",
             detail: "Tentativa de contato registrada com sucesso!",
           });
           this.attemptFormVisibleDialog = false;
+          this.showTheAttemptNotes();
+          this.loadContracts();
         },
         error: (e) => {
           console.log("Erro postContactAttempt:", e);
