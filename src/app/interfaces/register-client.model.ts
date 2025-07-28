@@ -35,9 +35,9 @@ export interface ViewRegisterClientResponseDto {
     alias?: string;
     addresses: Address[];
     ibge: string;
-    commercialPhone: string;
+    clientPhoneComercial: string;
     residentialPhone: string;
-    mobilePhone: string;
+    clientMobilePhone: string;
     email: string;
     contract: Contract[];
 }

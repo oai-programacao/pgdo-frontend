@@ -24,7 +24,6 @@
             <div class="flex-1 min-w-[220px]">
               <p-inputnumber
                 formControlName="subscriptionDiscount"
-              
                 mode="currency"
                 locale="pt-BR"
                 [minFractionDigits]="2"
@@ -40,12 +39,17 @@
           <!-- Linha 2: Datas, Parcelas e Ciclo -->
           <div class="flex flex-wrap gap-4 w-full items-end">
             <div class="flex-1 min-w-[200px]">
+              <span
+                class="block text-xs text-gray-400 mt-2 mb-1 whitespace-nowrap"
+              >
+                *A data de inicio da cobranca nao pode ser menor do que a data de assinatura.
+              </span>
               <p-datepicker
                 formControlName="beginningCollection"
                 placeholder="Data de Início"
                 appendTo="body"
                 styleClass="w-full"
-                dateFormat="yy-mm-dd"
+                dateFormat="dd/mm/yy"
                 dataType="string"
                 fluid
               />
@@ -56,7 +60,7 @@
                 placeholder="Data de Assinatura"
                 appendTo="body"
                 styleClass="w-full"
-                dateFormat="yy-mm-dd"
+                dateFormat="dd/mm/yy"
                 dataType="string"
                 fluid
               />
@@ -81,48 +85,18 @@
             </div>
           </div>
 
-          <!-- Valor do Contrato -->
-          <div
-            class="flex flex-col gap-3 border border-gray-200 rounded-lg p-4 mt-6 bg-gray-50"
-          >
-            <h3 class="text-lg font-semibold text-gray-700">
-              Valor do Contrato
-            </h3>
-
-            <div class="flex flex-wrap justify-between items-center gap-2">
-              <span class="text-gray-600">Valor Base da Adesão:</span>
-              <span class="font-bold text-blue-600">
-                @if(isPJ){
-                {{ 1000 | currency : "BRL" }}
-                }@else{
-                {{ 1000 | currency : "BRL" }}
-                }
-              </span>
-            </div>
-
-            <div class="flex flex-wrap justify-between items-center gap-2">
-              <span class="text-gray-600">Desconto de Assinatura:</span>
-              <span class="font-bold text-blue-600">
-                {{
-                  contractForm.get("subscriptionDiscount")?.value || 0
-                    | currency : "BRL"
-                }}
-              </span>
-            </div>
-
-            <div class="flex flex-wrap justify-between items-center gap-2">
-              <span class="text-gray-600">Valor Final:</span>
-              <span class="font-bold text-blue-600">
-                {{
-                  1000 - (contractForm.get("subscriptionDiscount")?.value || 0)
-                    | currency : "BRL"
-                }}
-              </span>
-            </div>
-          </div>
-
           <!-- Parcelas -->
+
           <div formArrayName="parcels" class="mt-6">
+            <div class="border-b border-gray-700 pb-2 mb-4">
+              <h3 class="text-gray-700 font-semibold text-lg">Vencimento</h3>
+            </div>
+            <div>
+              <h3 class="text-xs text-gray-400 font-normal mb-2">
+                *Este campo indica o dia selecionado pelo cliente para o
+                vencimento da taxa de adesão
+              </h3>
+            </div>
             <div
               *ngFor="let parcela of parcelsControls; let i = index"
               [formGroupName]="i"
@@ -133,22 +107,10 @@
                   formControlName="dueDate"
                   placeholder="Data de Vencimento da Adesão"
                   appendTo="body"
-                  dateFormat="yy-mm-dd"
+                  dateFormat="dd/mm/yy"
                   dataType="string"
                   class="w-full"
                   styleClass="w-full"
-                />
-              </div>
-              <div class="flex-1 min-w-[200px]">
-                <p-inputnumber
-                  formControlName="price"
-                  mode="currency"
-                  locale="pt-BR"
-                  [minFractionDigits]="2"
-                  placeholder="Valor da Adesão"
-                  currency="BRL"
-                  currencyDisplay="symbol"
-                  class="w-full"
                 />
               </div>
             </div>
@@ -203,13 +165,6 @@
                   [options]="addressLocationOptions"
                   formControlName="addressLocation"
                   placeholder="Localização"
-                  appendTo="body"
-                  styleClass="min-w-0 flex-1"
-                />
-                <p-select
-                  [options]="addressTypeOptions"
-                  formControlName="addressType"
-                  placeholder="Tipo de Endereço"
                   appendTo="body"
                   styleClass="min-w-0 flex-1"
                 />

@@ -92,13 +92,20 @@
         </div>
 
         <!-- Código do plano -->
-        <div class="flex-1 min-w-[7.5rem] text-center lg:text-left">
+        <div class="flex-1 w-full text-center lg:text-left">
           <span
             class="text-[0.6875rem] text-gray-400 uppercase tracking-wider mb-1 block"
-            >Código do plano</span
           >
-          <span class="text-gray-700 w-[5rem] text-center font-medium truncate block">
-            {{ client.contracts[0]?.planCode || " - " }}
+            Tipo do Plano
+          </span>
+          <span
+            class="text-gray-700 w-auto text-center font-medium truncate block"
+          >
+            {{
+              client.typePlan === "P"
+                ? "Plano Principal"
+                : client.typePlan || " - "
+            }}
           </span>
         </div>
 
@@ -117,15 +124,18 @@
         </div>
 
         <!-- Telefone -->
-        <div class="min-w-[6.25rem] text-center lg:text-left">
+        <div class="min-w-[10rem] w-full text-center lg:text-left">
           <span
             class="text-[0.6875rem] text-gray-400 uppercase tracking-wider mb-1 block"
-            >Telefone</span
           >
-          <span class="text-gray-700 text-center w-[3rem] font-medium truncate block">
+            Telefone
+          </span>
+          <span
+            class="text-gray-700 text-center w-full font-medium truncate block"
+          >
             {{
               clientType === "PJ"
-                ? client.mobilePhone
+                ? client.clientMobilePhone
                 : (client.phone | phones) || " - "
             }}
           </span>
@@ -194,6 +204,7 @@
   <app-create-contract
     [isPJorPF]="clientType"
     [clientData]="dataClient"
+    (contractCreated)="createdContract()"
   ></app-create-contract>
 </p-dialog>
 
@@ -204,10 +215,12 @@
   [draggable]="false"
   position="top"
   [resizable]="false"
-  [style]="{width: '40rem', height: '70vh'}"
+  [style]="{ width: '40rem', height: '70vh' }"
 >
   <app-view-contracts
     [clientData]="dataClient"
     [isPJorPF]="clientType"
   ></app-view-contracts>
 </p-dialog>
+
+<p-toast />

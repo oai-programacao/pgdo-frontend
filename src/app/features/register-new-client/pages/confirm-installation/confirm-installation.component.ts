@@ -366,7 +366,7 @@ export class ConfirmInstalationComponent implements OnInit, OnChanges {
     | "contrast"
     | undefined {
     switch (outcome) {
-      case "Atendido":
+      case "CLIENT_VALIDATED_INSTALATION":
         return "success";
       case "Não Atendido":
         return "danger";

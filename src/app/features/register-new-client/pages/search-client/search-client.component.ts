@@ -70,7 +70,14 @@ export class SearchClientComponent implements OnInit {
   ngOnInit() {
   }
 
-
+  createdContract(){
+    this.createNewContractDialog = false;
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Contrato Criado',
+      detail: 'O contrato foi criado com sucesso!'
+    })
+  }
   createNewContractVisible(client: any){
     this.dataClient = client ? [client] : [];
     this.createNewContractDialog = true;

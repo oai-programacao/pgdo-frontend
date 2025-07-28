@@ -2,10 +2,12 @@ import { FormatDurationPipe } from "./../../../../shared/pipes/format-duration.p
 import { CommonModule } from "@angular/common";
 import {
   Component,
+  EventEmitter,
   inject,
   Input,
   OnChanges,
   OnInit,
+  Output,
   SimpleChanges,
 } from "@angular/core";
 import {
@@ -49,7 +51,7 @@ import { CodePlans } from "../../../../interfaces/register-client.model";
   providers: [ViaCepService, MessageService],
 })
 export class CreateContractComponent implements OnInit, OnChanges {
-
+  @Output() contractCreated = new EventEmitter<void>();
   @Input({ required: true }) isPJorPF!: string | null;
   @Input() clientData: any[] = [];
   isCepLoading: boolean = false;
@@ -62,9 +64,11 @@ export class CreateContractComponent implements OnInit, OnChanges {
   dueDateOptions: any = Array.from({ length: 30 }, (_, i) => i + 1);
   public addressForMapSearch: any = null;
 
+  // Definindo o valor base da adesão como uma propriedade da classe
+  readonly valorBaseAdesao = 1000;
+
   pfPlans: any[] = [
     { Codigo: 9009, Descricao: "9009 - Plano Básico" },
-
   ];
   
   pjPlans: any[] = [
@@ -102,8 +106,6 @@ export class CreateContractComponent implements OnInit, OnChanges {
   ];
 
   ngOnInit() {
-    // this.getCodesPlans();
-
     if (!this.contractForm) {
       this.buildForm();
     }
@@ -114,19 +116,36 @@ export class CreateContractComponent implements OnInit, OnChanges {
         this.updateAddressForMap(val);
       });
 
+    // Lógica para calcular e mapear os valores de desconto e preço final
     this.contractForm
       .get("subscriptionDiscount")
-      ?.valueChanges.subscribe((val) => {
+      ?.valueChanges.subscribe((valorDigitadoPeloUsuario) => {
         const parcels = this.contractForm.get("parcels") as FormArray;
+        
+        // O valor que o usuário digita no campo 'subscriptionDiscount' é o VALOR FINAL (ex: 900)
+        const finalPrice = Number(valorDigitadoPeloUsuario) || 0;
+
+        // Calculamos o DESCONTO a partir do valor final digitado (ex: 1000 - 900 = 100)
+        let discountAmount = this.valorBaseAdesao - finalPrice;
+
+        // Garante que o desconto não seja negativo
+        if (discountAmount < 0) {
+          discountAmount = 0;
+        }
+
         if (parcels && parcels.length > 0) {
-          const price = val ? Number(val) - 800 : null;
-          parcels.at(0).get("price")?.setValue(price);
+          // Mapeamento conforme a sua regra FINAL:
+          // 1. 'price' da parcela deve receber o VALOR DO DESCONTO (ex: 100)
+          parcels.at(0).get("price")?.setValue(discountAmount, { emitEvent: false });
+
+          // 2. 'subscriptionDiscount' já contém o VALOR FINAL (ex: 900)
+          // Não precisamos setar ele aqui, pois o usuário já o alterou no input.
+          // O importante é que o 'price' da parcela seja atualizado com o desconto.
         }
       });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-   
     const clientChanged = changes["clientData"] && this.clientData;
     const typeChanged = changes["isPJorPF"];
 
@@ -146,7 +165,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
           neighborhood: null,
           district: "Normalmente não informado",
           referencePoint: this.clientData?.[0]?.addresses?.referencePoint || "",
-          addressType: "",
+          addressType: "INSTALLATION",
           addressLocation: "",
           ibge: 3504008,
         },
@@ -160,7 +179,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
           neighborhood: null,
           district: "Normalmente não informado",
           referencePoint: this.clientData?.[0]?.addresses?.referencePoint || "",
-          addressType: null,
+          addressType: "INSTALLATION",
           addressLocation: null,
           ibge: this.clientData?.[0]?.addresses?.ibge || 3504008,
         },
@@ -187,7 +206,20 @@ export class CreateContractComponent implements OnInit, OnChanges {
     }
   }
 
+  // Esta função não é mais usada para o cálculo principal, mas pode ser mantida se tiver outro uso.
+  private calculateParcelValueWithDiscount(discount: number | null): number | null {
+    const baseValue = 1000;
+    if (discount == null || isNaN(Number(discount))) return baseValue;
+    return baseValue - Number(discount);
+  }
+
   buildForm() {
+    // Na inicialização, o usuário não digitou nada, então o 'subscriptionDiscount' é 0.
+    // Isso significa que o 'price' da parcela (que é o desconto) é 0.
+    // E o 'subscriptionDiscount' (que é o valor final) é o valor base.
+    const initialDiscountAmountForPrice = 0; // O desconto inicial é 0, então o 'price' da parcela é 0.
+    const initialFinalPriceForSubscriptionDiscount = this.valorBaseAdesao; // O valor final inicial é o valor base.
+
     const initialAddress = {
       zipCode: [""],
       state: ["SP"],
@@ -198,13 +230,10 @@ export class CreateContractComponent implements OnInit, OnChanges {
       neighborhood: [null],
       district: ["Normalmente não informado"],
       referencePoint: [""],
-      addressType: ["", Validators.required],
+      addressType: ["INSTALLATION"],
       addressLocation: ["", Validators.required],
       ibge: [3504008],
     };
-
-    const discount = this.contractForm?.get("subscriptionDiscount")?.value ?? null;
-    const price = discount ? Number(discount) - 800 : null;
 
     this.contractForm = this.fb.group({
       client: [this.clientData?.[0]?.id ?? null, Validators.required],
@@ -226,12 +255,14 @@ export class CreateContractComponent implements OnInit, OnChanges {
         this.fb.group({
           description: ["Parcela Adesão"],
           dueDate: [null, Validators.required],
-          price: [price, Validators.required],
+          // 'price' da parcela deve receber o VALOR DO DESCONTO (inicialmente 0)
+          price: [initialDiscountAmountForPrice, Validators.required],
         }),
       ]),
       typeItem: ["P"],
       codeItem: [null, Validators.required],
-      subscriptionDiscount: [discount],
+      // 'subscriptionDiscount' deve receber o VALOR FINAL DA ADESÃO (inicialmente 1000)
+      subscriptionDiscount: [initialFinalPriceForSubscriptionDiscount],
       beginningCollection: ["", Validators.required],
       bundleCollection: ["N"],
     });
@@ -283,7 +314,8 @@ export class CreateContractComponent implements OnInit, OnChanges {
               complement: "",
               referencePoint: "",
             });
-          } else {
+          }
+          else {
             const endereco = {
               state: response.uf,
               city: response.localidade,
@@ -295,7 +327,6 @@ export class CreateContractComponent implements OnInit, OnChanges {
             formGroup.get(addressPath)?.patchValue(endereco);
             formGroup.get(addressPath + ".ibge")?.setValue(response.ibge);
 
-            // Foca no campo "número" para o usuário continuar o preenchimento
             document
               .querySelector<HTMLInputElement>(`[formcontrolname="number"]`)
               ?.focus();
@@ -317,34 +348,46 @@ export class CreateContractComponent implements OnInit, OnChanges {
   }
 
   createNewContract() {
+    function formatDateToBackend(date: string): string {
+      if (!date) return "";
+      if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+      const [day, month, year] = date.split("/");
+      return `${year}-${month}-${day}`;
+    }
+
+    const parcels = this.contractForm.value.parcels.map((parcel: any) => ({
+      ...parcel,
+      dueDate: formatDateToBackend(parcel.dueDate),
+    }));
+
+    const beginningCollection = formatDateToBackend(this.contractForm.value.beginningCollection);
+    const signatureContract = formatDateToBackend(this.contractForm.value.signatureContract);
+
     const contractData = {
       ...this.contractForm.value,
-
+      parcels,
+      beginningCollection,
+      signatureContract,
       codeItem: this.contractForm.value.codeItem,
       addressInstalation: {
         ...this.contractForm.value.addressInstalation,
-        zipCode: this.contractForm.value.addressInstalation.zipCode.replace(
-          /\D/g,
-          ""
-        ),
+        zipCode: this.contractForm.value.addressInstalation.zipCode.replace(/\D/g, ""),
       },
       addressCobranca: {
         ...this.contractForm.value.addressCobranca,
-        zipCode: this.contractForm.value.addressCobranca.zipCode.replace(
-          /\D/g,
-          ""
-        ),
+        zipCode: this.contractForm.value.addressCobranca.zipCode.replace(/\D/g, ""),
       },
     };
 
     this.contractService.postClientContract(contractData).subscribe({
       next: () => {
+        this.contractForm.reset();
+        this.contractCreated.emit()
         this.messageService.add({
           severity: "success",
           summary: "Contrato Criado",
           detail: "O contrato foi criado com sucesso.",
         });
-        this.contractForm.reset();
       },
       error: (error) => {
         this.messageService.add({
@@ -357,7 +400,6 @@ export class CreateContractComponent implements OnInit, OnChanges {
     });
   }
 
-  
 
   public searchAddressOnMap(): void {
     this.contractForm.get("addressInstalation")?.markAllAsTouched();
@@ -388,6 +430,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
     };
   }
 
+
   getPlanLabel(codePlan: number | string): string {
     const code = Number(codePlan);
     const plan = [...this.pfPlans, ...this.pjPlans].find(
@@ -397,23 +440,4 @@ export class CreateContractComponent implements OnInit, OnChanges {
       ? `${plan.value} - ${plan.name}`
       : `${codePlan} - Plano Desconhecido`;
   }
-  
-  // getCodesPlans() {
-  //     this.contractService.postCodePlans().subscribe({
-  //       next: (response: CodePlans[]) => {
-  //         const pfPlans = response.filter(plan => !plan.Descricao?.toLowerCase().includes('empresarial'));
-  //         const pjPlans = response.filter(plan => plan.Descricao?.toLowerCase().includes('empresarial'));
-
-  //         this.pfPlans = pfPlans.map(plan => ({
-  //           Codigo: plan.Codigo,
-  //           Descricao: plan.Codigo + " - " + plan.Descricao,
-  //         }));
-  //         this.pjPlans = pjPlans.map(plan => ({
-  //           Codigo: plan.Codigo,
-  //           Descricao: plan.Codigo + " - " + plan.Descricao,
-  //         }));
-
-  //       }
-  //     })
-  // }
 }
