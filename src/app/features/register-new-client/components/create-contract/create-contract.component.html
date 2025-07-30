@@ -43,7 +43,8 @@
               <span
                 class="block text-xs text-gray-400 mt-2 mb-1 whitespace-nowrap"
               >
-                *A data de inicio da cobranca nao pode ser menor do que a data de assinatura.
+                *A data de inicio da cobranca nao pode ser menor do que a data
+                de assinatura.
               </span>
               <p-datepicker
                 formControlName="beginningCollection"
@@ -204,10 +205,6 @@
             <!-- Botões -->
             <div class="flex flex-wrap justify-end gap-2 mt-4">
               <p-button
-                label="Criar Contrato"
-                (onClick)="createNewContract()"
-              ></p-button>
-              <p-button
                 label="Procurar endereço no Mapa"
                 icon="pi pi-map-marker"
                 styleClass="p-button-outlined"
@@ -227,5 +224,39 @@
         </ng-template>
       </p-step-panel>
     </p-step-item>
+
+    <p-step-item [value]="3">
+      <p-step>Assinatura do Cliente</p-step>
+      <p-step-panel>
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="flex flex-col w-full">
+            <div class="w-full">
+              <app-signature-pad
+                (signatureData)="onSignatureDataReceived($event)"
+              />
+            </div>
+          </div>
+
+          <div class="flex py-6 gap-2 justify-between">
+            <div class="py-6">
+              <p-button
+                label="Voltar"
+                severity="secondary"
+                (onClick)="activateCallback(2)"
+              />
+            </div>
+            <div class="py-6"></div>
+            <div class="py-6">
+              <p-button
+                label="Criar Contrato"
+                (onClick)="createNewContract()"
+              ></p-button>
+            </div>
+          </div>
+        </ng-template>
+      </p-step-panel>
+    </p-step-item>
   </p-stepper>
 </form>
+
+<p-toast />

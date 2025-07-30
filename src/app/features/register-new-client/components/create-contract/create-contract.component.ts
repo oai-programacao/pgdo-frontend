@@ -30,6 +30,7 @@ import { SignaturePadComponent } from "../../../../shared/components/signature-p
 import { GoogleMapsComponent } from "../../../../shared/components/google-maps/google-maps.component";
 import { StepperModule } from "primeng/stepper";
 import { CodePlans } from "../../../../interfaces/register-client.model";
+import { ToastModule } from "primeng/toast";
 
 @Component({
   selector: "app-create-contract",
@@ -45,6 +46,7 @@ import { CodePlans } from "../../../../interfaces/register-client.model";
     SignaturePadComponent,
     GoogleMapsComponent,
     StepperModule,
+    ToastModule
   ],
   templateUrl: "./create-contract.component.html",
   styleUrl: "./create-contract.component.scss",
@@ -63,19 +65,14 @@ export class CreateContractComponent implements OnInit, OnChanges {
   contractService = inject(RegisterClientService);
   dueDateOptions: any = Array.from({ length: 30 }, (_, i) => i + 1);
   public addressForMapSearch: any = null;
-  
   stepOne = 1;
-
+  signaturePadComponent!: SignaturePadComponent;
   // Definindo o valor base da adesão como uma propriedade da classe
   readonly valorBaseAdesao = 1000;
 
-  pfPlans: any[] = [
-    { Codigo: 9009, Descricao: "9009 - Plano Básico" },
-  ];
-  
-  pjPlans: any[] = [
-     { Codigo: 9009, Descricao: "9009 - Plano Básico" },
-  ];
+  pfPlans: any[] = [{ Codigo: 9009, Descricao: "9009 - Plano Básico" }];
+
+  pjPlans: any[] = [{ Codigo: 9009, Descricao: "9009 - Plano Básico" }];
 
   addressLocationOptions = [
     { label: "Urbano", value: "URBAN" },
@@ -108,7 +105,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
   ];
 
   ngOnInit() {
-  this.stepOne = 1;
+    this.stepOne = 1;
 
     if (!this.contractForm) {
       this.buildForm();
@@ -125,7 +122,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
       .get("subscriptionDiscount")
       ?.valueChanges.subscribe((valorDigitadoPeloUsuario) => {
         const parcels = this.contractForm.get("parcels") as FormArray;
-        
+
         // O valor que o usuário digita no campo 'subscriptionDiscount' é o VALOR FINAL (ex: 900)
         const finalPrice = Number(valorDigitadoPeloUsuario) || 0;
 
@@ -140,7 +137,10 @@ export class CreateContractComponent implements OnInit, OnChanges {
         if (parcels && parcels.length > 0) {
           // Mapeamento conforme a sua regra FINAL:
           // 1. 'price' da parcela deve receber o VALOR DO DESCONTO (ex: 100)
-          parcels.at(0).get("price")?.setValue(discountAmount, { emitEvent: false });
+          parcels
+            .at(0)
+            .get("price")
+            ?.setValue(discountAmount, { emitEvent: false });
 
           // 2. 'subscriptionDiscount' já contém o VALOR FINAL (ex: 900)
           // Não precisamos setar ele aqui, pois o usuário já o alterou no input.
@@ -211,7 +211,9 @@ export class CreateContractComponent implements OnInit, OnChanges {
   }
 
   // Esta função não é mais usada para o cálculo principal, mas pode ser mantida se tiver outro uso.
-  private calculateParcelValueWithDiscount(discount: number | null): number | null {
+  private calculateParcelValueWithDiscount(
+    discount: number | null
+  ): number | null {
     const baseValue = 1000;
     if (discount == null || isNaN(Number(discount))) return baseValue;
     return baseValue - Number(discount);
@@ -267,6 +269,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
       subscriptionDiscount: [null, Validators.required],
       beginningCollection: ["", Validators.required],
       bundleCollection: ["N"],
+      signaturePad: [null, Validators.required],
     });
   }
 
@@ -316,8 +319,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
               complement: "",
               referencePoint: "",
             });
-          }
-          else {
+          } else {
             const endereco = {
               state: response.uf,
               city: response.localidade,
@@ -349,7 +351,6 @@ export class CreateContractComponent implements OnInit, OnChanges {
     }
   }
 
-
   createNewContract() {
     function formatDateToBackend(date: string): string {
       if (!date) return "";
@@ -363,8 +364,12 @@ export class CreateContractComponent implements OnInit, OnChanges {
       dueDate: formatDateToBackend(parcel.dueDate),
     }));
 
-    const beginningCollection = formatDateToBackend(this.contractForm.value.beginningCollection);
-    const signatureContract = formatDateToBackend(this.contractForm.value.signatureContract);
+    const beginningCollection = formatDateToBackend(
+      this.contractForm.value.beginningCollection
+    );
+    const signatureContract = formatDateToBackend(
+      this.contractForm.value.signatureContract
+    );
 
     const contractData = {
       ...this.contractForm.value,
@@ -374,18 +379,24 @@ export class CreateContractComponent implements OnInit, OnChanges {
       codeItem: this.contractForm.value.codeItem,
       addressInstalation: {
         ...this.contractForm.value.addressInstalation,
-        zipCode: this.contractForm.value.addressInstalation.zipCode.replace(/\D/g, ""),
+        zipCode: this.contractForm.value.addressInstalation.zipCode.replace(
+          /\D/g,
+          ""
+        ),
       },
       addressCobranca: {
         ...this.contractForm.value.addressCobranca,
-        zipCode: this.contractForm.value.addressCobranca.zipCode.replace(/\D/g, ""),
+        zipCode: this.contractForm.value.addressCobranca.zipCode.replace(
+          /\D/g,
+          ""
+        ),
       },
     };
 
     this.contractService.postClientContract(contractData).subscribe({
       next: () => {
         this.contractForm.reset();
-        this.contractCreated.emit()
+        this.contractCreated.emit();
         this.messageService.add({
           severity: "success",
           summary: "Contrato Criado",
@@ -432,7 +443,6 @@ export class CreateContractComponent implements OnInit, OnChanges {
     };
   }
 
-
   getPlanLabel(codePlan: number | string): string {
     const code = Number(codePlan);
     const plan = [...this.pfPlans, ...this.pjPlans].find(
@@ -441,5 +451,53 @@ export class CreateContractComponent implements OnInit, OnChanges {
     return plan
       ? `${plan.value} - ${plan.name}`
       : `${codePlan} - Plano Desconhecido`;
+  }
+
+  submitRegistration(): void {
+    if (this.contractForm.valid) {
+      const clientData = this.contractForm.value;
+      const addresses = clientData.addresses;
+
+      const test = {
+        ...clientData,
+        alias: clientData.name,
+        companyName: clientData.clientType === "PJ" ? clientData.name : null,
+        fantasyName: clientData.clientType === "PJ" ? clientData.name : null,
+        addresses: [addresses],
+      };
+
+      this.contractService.registerClient(test).subscribe({
+        next: (response) => {
+          // Aqui você pode redirecionar ou mostrar uma mensagem de sucesso
+          this.messageService.add({
+            severity: "success",
+            summary: "Cadastro realizado com sucesso",
+            detail: `Cliente ${response.name} cadastrado com sucesso!`,
+          });
+          this.stepOne = 1; // Reseta o stepper para o início
+          this.contractForm.reset();
+          this.contracts.clear();
+          this.signaturePadData = ""; // Limpa a assinatura
+          this.contractForm.get("signaturePad")?.setValue(null); // Limpa o campo de assinatura
+          this.signaturePadComponent.clearPad(); // Limpa o pad de assinatura
+        },
+        error: (error) => {
+          console.error("Erro ao registrar cliente:", error);
+          // Aqui você pode mostrar uma mensagem de erro
+        },
+      });
+    } else {
+      this.contractForm.markAllAsTouched();
+    }
+  }
+
+  onSignatureDataReceived(signatureData: string): void {
+    this.signaturePadData = signatureData;
+    this.messageService.add({
+      severity: "success",
+      summary: "Assinatura Capturada",
+      detail: "A assinatura foi capturada com sucesso.",
+    });
+    this.contractForm.get("signaturePad")?.setValue(signatureData);
   }
 }
