@@ -504,4 +504,6 @@ export class CreateContractComponent implements OnInit, OnChanges {
     });
     this.contractForm.get("signaturePad")?.setValue(signatureData);
   }
+
+  
 }
