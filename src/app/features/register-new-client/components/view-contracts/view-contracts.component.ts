@@ -17,6 +17,7 @@ import { InputGroupAddonModule } from "primeng/inputgroupaddon";
 import { InputGroup } from "primeng/inputgroup";
 import { ProgressSpinner } from "primeng/progressspinner";
 import { Router } from "@angular/router";
+import { MessageService } from "primeng/api";
 
 @Component({
   selector: "app-view-contracts",
@@ -30,28 +31,27 @@ import { Router } from "@angular/router";
     ProgressSpinner,
   ],
   templateUrl: "./view-contracts.component.html",
-  styleUrl: "./view-contracts.component.scss",
+  styleUrls: ["./view-contracts.component.scss"],
+  providers: [RegisterClientService, MessageService, Router],
 })
 export class ViewContractsComponent implements OnInit, OnChanges {
   @Input() clientData: any[] = [];
   @Input({ required: true }) isPJorPF!: string | null;
-  
-  
+
   contractsList: any[] = [];
   link!: string;
   isLoadingLink = false;
 
+  messageService = inject(MessageService);
   registerClientService = inject(RegisterClientService);
   cdr = inject(ChangeDetectorRef);
   router = inject(Router);
 
-  ngOnInit() {
-    console.log("Client Data:", this.clientData[0]?.contracts);
-  }
-
- 
+  ngOnInit() {}
 
   ngOnChanges(changes: SimpleChanges): void {
+    console.log("clientData:", this.clientData);
+    console.log("contractsFromRbxAndDb:", this.contractsFromRbxAndDb);
     if (
       this.clientData &&
       this.clientData.length > 0 &&
@@ -68,6 +68,9 @@ export class ViewContractsComponent implements OnInit, OnChanges {
     }
   }
 
+  get contractsFromRbxAndDb() {
+    return this.clientData[0]?.contracts || [];
+  }
 
   getPaymentByBillet(contractId: string) {
     this.isLoadingLink = true;
@@ -79,6 +82,11 @@ export class ViewContractsComponent implements OnInit, OnChanges {
           this.link = response;
           this.isLoadingLink = false;
           this.cdr.detectChanges();
+          this.messageService.add({
+            severity: "success",
+            summary: "Sucesso",
+            detail: "Boleto gerado com sucesso!",
+          });
         },
         error: () => {
           this.isLoadingLink = false;
@@ -86,6 +94,7 @@ export class ViewContractsComponent implements OnInit, OnChanges {
         },
       });
   }
+
   pfPlans = [
     { name: "250 Megas - R$ 69,90", value: 9009 },
     { name: "500 Megas - R$ 79,90", value: 10697 },
@@ -111,10 +120,10 @@ export class ViewContractsComponent implements OnInit, OnChanges {
       ? `${plan.value} - ${plan.name}`
       : `${codePlan} - Plano Desconhecido`;
   }
+
   copyToClipboard(link: string) {
     navigator.clipboard.writeText(link).then(() => {
-      console.log("Link copiado com sucesso!");
-     window.open(link, "_blank");
+      window.open(link, "_blank");
     });
   }
 }
