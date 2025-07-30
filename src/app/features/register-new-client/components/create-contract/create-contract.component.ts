@@ -70,9 +70,13 @@ export class CreateContractComponent implements OnInit, OnChanges {
   // Definindo o valor base da adesão como uma propriedade da classe
   readonly valorBaseAdesao = 1000;
 
-  pfPlans: any[] = [{ Codigo: 9009, Descricao: "9009 - Plano Básico" }];
+  pfPlans: any[] = [
+    { Codigo: 9009, Descricao: "9009 - Plano Básico" }
+  ];
 
-  pjPlans: any[] = [{ Codigo: 9009, Descricao: "9009 - Plano Básico" }];
+  pjPlans: any[] = [
+    { Codigo: 9009, Descricao: "9009 - Plano Básico" }
+  ];
 
   addressLocationOptions = [
     { label: "Urbano", value: "URBAN" },
