@@ -63,6 +63,8 @@ export class CreateContractComponent implements OnInit, OnChanges {
   contractService = inject(RegisterClientService);
   dueDateOptions: any = Array.from({ length: 30 }, (_, i) => i + 1);
   public addressForMapSearch: any = null;
+  
+  stepOne = 1;
 
   // Definindo o valor base da adesão como uma propriedade da classe
   readonly valorBaseAdesao = 1000;
@@ -106,6 +108,8 @@ export class CreateContractComponent implements OnInit, OnChanges {
   ];
 
   ngOnInit() {
+  this.stepOne = 1;
+
     if (!this.contractForm) {
       this.buildForm();
     }
@@ -217,8 +221,6 @@ export class CreateContractComponent implements OnInit, OnChanges {
     // Na inicialização, o usuário não digitou nada, então o 'subscriptionDiscount' é 0.
     // Isso significa que o 'price' da parcela (que é o desconto) é 0.
     // E o 'subscriptionDiscount' (que é o valor final) é o valor base.
-    const initialDiscountAmountForPrice = 0; // O desconto inicial é 0, então o 'price' da parcela é 0.
-    const initialFinalPriceForSubscriptionDiscount = this.valorBaseAdesao; // O valor final inicial é o valor base.
 
     const initialAddress = {
       zipCode: [""],
@@ -246,7 +248,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
       addressCobranca: this.fb.group({ ...initialAddress }),
       typePlan: ["P"],
       planCode: [null],
-      numParcels: [1, Validators.required],
+      numParcels: [null, Validators.required],
       formPay: ["B"],
       charging: ["S"],
       bankAccount: [33],
@@ -256,13 +258,13 @@ export class CreateContractComponent implements OnInit, OnChanges {
           description: ["Parcela Adesão"],
           dueDate: [null, Validators.required],
           // 'price' da parcela deve receber o VALOR DO DESCONTO (inicialmente 0)
-          price: [initialDiscountAmountForPrice, Validators.required],
+          price: [null, Validators.required],
         }),
       ]),
       typeItem: ["P"],
       codeItem: [null, Validators.required],
       // 'subscriptionDiscount' deve receber o VALOR FINAL DA ADESÃO (inicialmente 1000)
-      subscriptionDiscount: [initialFinalPriceForSubscriptionDiscount],
+      subscriptionDiscount: [null, Validators.required],
       beginningCollection: ["", Validators.required],
       bundleCollection: ["N"],
     });
@@ -347,6 +349,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
     }
   }
 
+
   createNewContract() {
     function formatDateToBackend(date: string): string {
       if (!date) return "";
@@ -399,7 +402,6 @@ export class CreateContractComponent implements OnInit, OnChanges {
       },
     });
   }
-
 
   public searchAddressOnMap(): void {
     this.contractForm.get("addressInstalation")?.markAllAsTouched();

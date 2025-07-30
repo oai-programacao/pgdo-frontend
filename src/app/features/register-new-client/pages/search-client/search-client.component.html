@@ -75,114 +75,104 @@
     </div>
     } @else {
 
-    <div class="flex flex-col gap-4 w-full">
-      <div
-        *ngFor="let client of dataClient; let i = index"
-        class="flex flex-col lg:flex-row lg:items-start justify-between p-6 gap-6 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 w-full"
-      >
-        <!-- Nome -->
-        <div class="flex-1 text-center min-w-[9.375rem]">
-          <span
-            class="text-[11px] text-gray-400 uppercase tracking-wider mb-1 block"
-            >Nome</span
-          >
-          <span class="font-semibold text-gray-800 truncate block">
-            {{ clientType === "PJ" ? client.companyName : client.name }}
-          </span>
-        </div>
-
-        <!-- Código do plano -->
-        <div class="flex-1 w-full text-center lg:text-left">
-          <span
-            class="text-[0.6875rem] text-gray-400 uppercase tracking-wider mb-1 block"
-          >
-            Tipo do Plano
-          </span>
-          <span
-            class="text-gray-700 w-auto text-center font-medium truncate block"
-          >
-            {{
-              client.typePlan === "P"
-                ? "Plano Principal"
-                : client.typePlan || " - "
-            }}
-          </span>
-        </div>
-
-        <!-- Endereço -->
-        <div class="flex-1 min-w-[12.5rem] text-center">
-          <span
-            class="text-[0.6875rem] text-gray-400 uppercase tracking-wider mb-1 block"
-            >Endereço</span
-          >
-          <span class="text-gray-600 text-center font-medium truncate block">
-            {{ client.addresses[0]?.street }},
-            {{ client.addresses[0]?.number }},
-            {{ client.addresses[0]?.neighborhood }},
-            {{ client.addresses[0]?.city }}
-          </span>
-        </div>
-
-        <!-- Telefone -->
-        <div class="min-w-[10rem] w-full text-center lg:text-left">
-          <span
-            class="text-[0.6875rem] text-gray-400 uppercase tracking-wider mb-1 block"
-          >
-            Telefone
-          </span>
-          <span
-            class="text-gray-700 text-center w-full font-medium truncate block"
-          >
-            {{
-              clientType === "PJ"
-                ? client.clientMobilePhone
-                : (client.phone | phones) || " - "
-            }}
-          </span>
-        </div>
-
-        <!-- Qtd. de Contrato -->
-        <div class="f min-w-[6.25rem] text-center lg:text-left">
-          <span
-            class="text-[0.6875rem] text-gray-400 uppercase tracking-wider mb-1 block"
-            >Qtd. de Contrato</span
-          >
-          <span class="text-gray-700 text-center font-medium truncate block">
-            @if(client.contracts && client.contracts.length > 0) {
-            {{ client.contracts.length }}
-            } @else { 0 }
-          </span>
-        </div>
-
-        <!-- Botões -->
-        <div class="flex gap-2 justify-center lg:justify-end lg:mt-0">
-          <p-button
-            icon="pi pi-plus"
-            [rounded]="true"
-            [text]="true"
-            pTooltip="Criar Novo Contrato"
-            severity="success"
-            (onClick)="createNewContractVisible(client)"
-          />
-          <p-button
-            icon="pi pi-eye"
-            [rounded]="true"
-            [text]="true"
-            pTooltip="Ver Detalhes"
-            severity="info"
-            (onClick)="viewClient(client)"
-          />
-          <p-button
-            icon="pi pi-file"
-            [rounded]="true"
-            [text]="true"
-            pTooltip="Visualizar Contratos"
-            severity="secondary"
-            (onClick)="viewContractsDialogVisible(client)"
-          />
-        </div>
-      </div>
+<div class="flex flex-col gap-4 w-full">
+  <div
+    *ngFor="let client of dataClient; let i = index"
+    class="grid grid-cols-1 lg:grid-cols-6 gap-4 p-6 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 w-full"
+  >
+    <!-- Nome -->
+    <div class="min-w-[9.375rem] text-left lg:text-center">
+      <span class="text-[11px] text-center text-gray-400 uppercase tracking-wider mb-1 block">
+        Nome
+      </span>
+      <span class="font-semibold text-center text-gray-800 truncate block">
+        {{ clientType === "PJ" ? client.companyName : client.name }}
+      </span>
     </div>
+
+    <!-- Tipo do Plano -->
+    <div class="min-w-[8rem] text-center text-left lg:text-center">
+      <span class="text-[11px] text-center text-gray-400 uppercase tracking-wider mb-1 block">
+        Tipo do Plano
+      </span>
+      <span class="text-gray-700 text-center font-medium truncate block">
+        {{
+          client.typePlan === "P"
+            ? "Plano Principal"
+            : client.typePlan || " - "
+        }}
+      </span>
+    </div>
+
+    <!-- Endereço -->
+    <div class="min-w-[12.5rem] text-left lg:text-center">
+      <span class="text-[11px] text-center text-gray-400 uppercase tracking-wider mb-1 block">
+        Endereço
+      </span>
+      <span class="text-gray-600 text-center font-medium truncate block">
+        {{ client.addresses[0]?.street }},
+        {{ client.addresses[0]?.number }},
+        {{ client.addresses[0]?.neighborhood }},
+        {{ client.addresses[0]?.city }}
+      </span>
+    </div>
+
+    <!-- Telefone -->
+    <div class="min-w-[10rem] text-left  lg:text-center">
+      <span class="text-[11px] text-gray-400 text-center uppercase tracking-wider mb-1 block">
+        Telefone
+      </span>
+      <span class="text-gray-700 text-center font-medium truncate block">
+        {{
+          clientType === "PJ"
+            ? client.clientMobilePhone
+            : (client.phone | phones) || " - "
+        }}
+      </span>
+    </div>
+
+    <!-- Qtd. de Contrato -->
+    <div class="min-w-[6.25rem] text-left lg:text-center">
+      <span class="text-[11px] text-center text-gray-400 uppercase tracking-wider mb-1 block">
+        Qtd. de Contrato
+      </span>
+      <span class="text-gray-700 text-center font-medium truncate block">
+        @if(client.contracts && client.contracts.length > 0) {
+        {{ client.contracts.length }}
+        } @else { 0 }
+      </span>
+    </div>
+
+    <!-- Botões -->
+    <div class="flex items-center justify-center lg:justify-end gap-2 lg:mt-0">
+      <p-button
+        icon="pi pi-plus"
+        [rounded]="true"
+        [text]="true"
+        pTooltip="Criar Novo Contrato"
+        severity="success"
+        (onClick)="createNewContractVisible(client)"
+      />
+      <p-button
+        icon="pi pi-eye"
+        [rounded]="true"
+        [text]="true"
+        pTooltip="Ver Detalhes"
+        severity="info"
+        (onClick)="viewClient(client)"
+      />
+      <p-button
+        icon="pi pi-file"
+        [rounded]="true"
+        [text]="true"
+        pTooltip="Visualizar Contratos"
+        severity="secondary"
+        (onClick)="viewContractsDialogVisible(client)"
+      />
+    </div>
+  </div>
+</div>
+
     }
   </div>
 </div>
@@ -190,7 +180,6 @@
 <p-toast />
 <p-confirmpopup />
 
-<p-dialog> </p-dialog>
 
 <p-dialog
   [(visible)]="createNewContractDialog"

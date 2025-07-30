@@ -1,7 +1,7 @@
 <form [formGroup]="contractForm" class="bg-white p-2 rounded-xl shadow">
-  <p-stepper [value]="1">
+  <p-stepper [value]="stepOne">
     <!-- Passo 1: Dados do Contrato -->
-    <p-step-item [value]="1">
+    <p-step-item [value]="stepOne">
       <p-step>Dados do Contrato</p-step>
       <p-step-panel>
         <ng-template #content let-activateCallback="activateCallback">
@@ -37,6 +37,7 @@
           </div>
 
           <!-- Linha 2: Datas, Parcelas e Ciclo -->
+
           <div class="flex flex-wrap gap-4 w-full items-end">
             <div class="flex-1 min-w-[200px]">
               <span
@@ -86,7 +87,6 @@
           </div>
 
           <!-- Parcelas -->
-
           <div formArrayName="parcels" class="mt-6">
             <div class="border-b border-gray-700 pb-2 mb-4">
               <h3 class="text-gray-700 font-semibold text-lg">Vencimento</h3>
@@ -158,7 +158,6 @@
                   class="min-w-0 flex-1"
                 />
               </div>
-
               <!-- Localização e Tipo -->
               <div class="flex flex-col md:flex-row flex-wrap gap-4">
                 <p-select

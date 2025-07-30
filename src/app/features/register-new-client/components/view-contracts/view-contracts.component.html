@@ -1,38 +1,37 @@
-<div *ngIf="contracts?.length">
+<div *ngIf="contractsList.length">
   <div
-    *ngFor="let contract of contracts; let i = index"
+    *ngFor="let contract of contractsList; let i = index"
     class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-md p-5 flex flex-col gap-3 mb-6 mt-6"
   >
     <div class="flex flex-wrap justify-between items-start gap-4">
       <p class="text-lg font-semibold text-slate-800 dark:text-white">
         {{ getPlanLabel(contract.codePlan) }}
       </p>
-      <!-- <p-button
-        icon="pi pi-trash"
-        severity="danger"
+      <p-button
+        severity="success"
         styleClass="p-button-sm"
-        (onClick)="removeContract(i)"
-        label="Remover"
-      ></p-button> -->
+       (onClick)="op.toggle($event); getPaymentByBillet(contract.id)"
+        label="Gerar Boleto"
+      ></p-button>
     </div>
     <div class="flex flex-col gap-2 justify-center py-1">
       <div class="text-sm text-slate-600 dark:text-slate-300 mt-2">
+
         <div>
           <strong>Valor de Adesão:</strong>
-          {{ contract.accesionNumber | currency : "BRL" }}
+          {{ contract.subscriptionDiscount | currency : "BRL" }}
         </div>
         <div>
           <strong>Dia de Vencimento:</strong>
-          {{ contract.beginningCollection }}
+          {{ contract.beginningCollection | date : "dd/MM/yyyy" }}
         </div>
         <div>
           <strong>Endereço:</strong>
-          {{ contract.addressInstalation?.street }},
-          {{ contract.addressInstalation?.number }}<br />
-          {{ contract.addressInstalation?.neighborhood }} -
-          {{ contract.addressInstalation?.city }} /
-          {{ contract.address?.state }}<br />
-          CEP: {{ contract.addressCobranca?.zipCode }}
+          {{ contract.addressCobranca.street }},
+          {{ contract.addressCobranca.number }}
+          {{ contract.addressCobranca.neighborhood }} -
+          {{ contract.addressCobranca.city }} <br />
+          <strong>CEP</strong>: {{ contract.addressCobranca.zipCode }}
         </div>
         <div *ngIf="contract.observation">
           <strong>Observação:</strong> {{ contract.observation }}
@@ -41,3 +40,38 @@
     </div>
   </div>
 </div>
+
+<p-popover #op>
+  <div class="w-[30rem]">
+    <span class="font-medium text-surface-900 dark:text-surface-0 block mb-2">
+      Link de Pagamento
+    </span>
+
+    <p-inputgroup>
+      <ng-container *ngIf="isLoadingLink; else showLink">
+        <p-progressSpinner styleClass="w-6 h-6" strokeWidth="4"></p-progressSpinner>
+        <span class="ml-2">Gerando boleto...</span>
+      </ng-container>
+
+      <ng-template #showLink>
+        <ng-container *ngIf="link; else noLink">
+          <input
+            pInputText
+            [value]="link"
+            disabled
+            readonly
+            class="w-[10rem]"
+            fluid
+          />
+          <p-inputgroup-addon>
+            <i class="pi pi-eye cursor-pointer" (click)="copyToClipboard(link)"></i>
+          </p-inputgroup-addon>
+        </ng-container>
+
+        <ng-template #noLink>
+          <span class="text-sm text-gray-400">Nenhum link disponível.</span>
+        </ng-template>
+      </ng-template>
+    </p-inputgroup>
+  </div>
+</p-popover>

@@ -9,16 +9,16 @@ import { ProgressSpinnerModule } from "primeng/progressspinner";
 import { FormsModule } from "@angular/forms";
 import { SelectModule } from "primeng/select";
 import { InputMaskModule } from "primeng/inputmask";
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule } from "@angular/router";
 import { PhonesPipe } from "../../../../shared/pipes/phones.pipe";
 import { NgxMaskDirective, provideNgxMask } from "ngx-mask";
 import { ClientSharedService } from "../../services/client-shared.service";
-import { ConfirmPopupModule } from 'primeng/confirmpopup';
-import { ToastModule } from 'primeng/toast';
+import { ConfirmPopupModule } from "primeng/confirmpopup";
+import { ToastModule } from "primeng/toast";
 import { ConfirmationService, MessageService } from "primeng/api";
-import { DialogModule } from 'primeng/dialog';
+import { DialogModule } from "primeng/dialog";
 import { CreateContractComponent } from "../../components/create-contract/create-contract.component";
-import { TooltipModule } from 'primeng/tooltip';
+import { TooltipModule } from "primeng/tooltip";
 import { ViewContractsComponent } from "../../components/view-contracts/view-contracts.component";
 
 @Component({
@@ -40,11 +40,16 @@ import { ViewContractsComponent } from "../../components/view-contracts/view-con
     DialogModule,
     CreateContractComponent,
     TooltipModule,
-    ViewContractsComponent
-],
+    ViewContractsComponent,
+  ],
   templateUrl: "./search-client.component.html",
   styleUrl: "./search-client.component.scss",
-  providers: [provideNgxMask(), MessageService, ConfirmationService, RegisterClientService]
+  providers: [
+    provideNgxMask(),
+    MessageService,
+    ConfirmationService,
+    RegisterClientService,
+  ],
 })
 export class SearchClientComponent implements OnInit {
   isLoading = false;
@@ -56,47 +61,50 @@ export class SearchClientComponent implements OnInit {
     { label: "Pessoa Jurídica", value: "PJ" },
   ];
 
+
   hasSearched = false;
 
   registerClientService = inject(RegisterClientService);
   clientSharedService = inject(ClientSharedService);
-  router = inject(Router)
+  router = inject(Router);
   confirmationService = inject(ConfirmationService);
   messageService = inject(MessageService);
 
   // Dialog
   createNewContractDialog = false;
-  viewContractsDialog = false
-  ngOnInit() {
-  }
+  viewContractsDialog = false;
+  ngOnInit() {}
 
-  createdContract(){
+  createdContract() {
     this.createNewContractDialog = false;
     this.messageService.add({
-      severity: 'success',
-      summary: 'Contrato Criado',
-      detail: 'O contrato foi criado com sucesso!'
-    })
+      severity: "success",
+      summary: "Contrato Criado",
+      detail: "O contrato foi criado com sucesso!",
+    });
   }
-  createNewContractVisible(client: any){
+
+  createNewContractVisible(client: any) {
     this.dataClient = client ? [client] : [];
     this.createNewContractDialog = true;
   }
 
-  viewContractsDialogVisible(client: any){
+  viewContractsDialogVisible(client: any) {
     this.dataClient = client ? [client] : [];
     this.viewContractsDialog = true;
   }
 
-  onClientTypeChange(){
+  onClientTypeChange() {
     this.cpfCnpj = "";
     this.dataClient = [];
   }
 
-
-  viewClient(client: any){
-    this.clientSharedService.setClientData({...client, contract: client.contract});
-    this.router.navigate(['/app/cliente-cadastrar'])
+  viewClient(client: any) {
+    this.clientSharedService.setClientData({
+      ...client,
+      contract: client.contract,
+    });
+    this.router.navigate(["/app/cliente-cadastrar"]);
   }
 
   consultClient() {
@@ -121,60 +129,57 @@ export class SearchClientComponent implements OnInit {
         next: (response) => {
           this.dataClient = (response.content || []).filter((client) =>
             this.clientType === "PF"
-          ? client.cpf?.replace(/\D/g, "") === cpfCnpjLimpo
-          : client.cnpj?.replace(/\D/g, "") === cpfCnpjLimpo
-        );
-        
-        this.hasSearched = true;
+              ? client.cpf?.replace(/\D/g, "") === cpfCnpjLimpo
+              : client.cnpj?.replace(/\D/g, "") === cpfCnpjLimpo
+          );
+
+          this.hasSearched = true;
         },
         error: (e) => {
           console.log(e);
         },
       });
   }
-  
-confirmToRegisterNewClient(event: Event, cpfCnpj: string) {
-  this.confirmationService.confirm({
-    target: event?.target as EventTarget,
-    message: 'Deseja registrar um novo cliente?',
-    icon: 'pi pi-exclamation-triangle',
-    accept: () => {
-      const clientData: any = {
-        cpf: this.clientType === 'PF' ? cpfCnpj : null,
-        cnpj: this.clientType === 'PJ' ? cpfCnpj : null,
-        clientType: this.clientType
-      };
-      this.clientSharedService.setClientData(clientData);
-      this.router.navigate(['/app/cliente-cadastrar']);
-    },
-    reject: () => {
-      this.messageService.add({
-        severity: 'info',
-        summary: 'Registrar Cliente',
-        detail: 'Ação cancelada.'
-      });
-      this.hasSearched = false;
-    }
-  });
-}
 
-  registerNewClient(){
-    if(!this.cpfCnpj || !this.clientType) return;
+  confirmToRegisterNewClient(event: Event, cpfCnpj: string) {
+    this.confirmationService.confirm({
+      target: event?.target as EventTarget,
+      message: "Deseja registrar um novo cliente?",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => {
+        const clientData: any = {
+          cpf: this.clientType === "PF" ? cpfCnpj : null,
+          cnpj: this.clientType === "PJ" ? cpfCnpj : null,
+          clientType: this.clientType,
+        };
+        this.clientSharedService.setClientData(clientData);
+        this.router.navigate(["/app/cliente-cadastrar"]);
+      },
+      reject: () => {
+        this.messageService.add({
+          severity: "info",
+          summary: "Registrar Cliente",
+          detail: "Ação cancelada.",
+        });
+        this.hasSearched = false;
+      },
+    });
+  }
+
+  registerNewClient() {
+    if (!this.cpfCnpj || !this.clientType) return;
     this.registerClientService.getFindOrCreateOnRBX(this.cpfCnpj).subscribe({
       next: (client) => {
-        if(client.id){
+        if (client.id) {
           this.clientSharedService.setClientData(client);
           this.dataClient = [client];
           return true;
-        } 
+        }
         return false;
       },
       error: (e) => {
         console.error(e);
-      }
-    })
-
+      },
+    });
   }
-
-
 }
