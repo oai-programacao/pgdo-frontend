@@ -9,7 +9,7 @@ import { ProgressSpinnerModule } from "primeng/progressspinner";
 import { FormsModule } from "@angular/forms";
 import { SelectModule } from "primeng/select";
 import { InputMaskModule } from "primeng/inputmask";
-import { Router, RouterModule } from "@angular/router";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { PhonesPipe } from "../../../../shared/pipes/phones.pipe";
 import { NgxMaskDirective, provideNgxMask } from "ngx-mask";
 import { ClientSharedService } from "../../services/client-shared.service";
@@ -67,13 +67,25 @@ export class SearchClientComponent implements OnInit {
   registerClientService = inject(RegisterClientService);
   clientSharedService = inject(ClientSharedService);
   router = inject(Router);
+  route = inject(ActivatedRoute)
   confirmationService = inject(ConfirmationService);
   messageService = inject(MessageService);
 
   // Dialog
   createNewContractDialog = false;
   viewContractsDialog = false;
-  ngOnInit() {}
+
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      const type = params['type'];
+      const document = params['document'];
+      if (type && document) {
+        this.clientType = type;
+        this.cpfCnpj = document;
+        this.consultClient();
+      }
+    });
+  }
 
   createdContract() {
     this.createNewContractDialog = false;

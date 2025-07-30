@@ -1,4 +1,4 @@
-import { MessageService } from "primeng/api";
+import { ConfirmationService, MessageService } from "primeng/api";
 import { CommonModule } from "@angular/common";
 import { Component, inject, OnDestroy, OnInit, ViewChild } from "@angular/core";
 
@@ -32,6 +32,9 @@ import { FileUpload } from "primeng/fileupload"; // Importe o FileUpload
 import { FileUploadModule } from "primeng/fileupload";
 import { SearchClientComponent } from "../search-client/search-client.component";
 import { ClientSharedService } from "../../services/client-shared.service";
+import { Router } from "@angular/router";
+import { ConfirmPopupModule } from "primeng/confirmpopup";
+import { DialogModule } from "primeng/dialog";
 
 @Component({
   selector: "app-register-new-client",
@@ -57,16 +60,20 @@ import { ClientSharedService } from "../../services/client-shared.service";
     InputIconModule,
     FileUploadModule,
     SearchClientComponent,
+    ConfirmPopupModule,
+    DialogModule,
   ],
   templateUrl: "./register-new-client.component.html",
   styleUrl: "./register-new-client.component.scss",
-  providers: [provideNgxMask(), MessageService],
+  providers: [provideNgxMask(), MessageService, ConfirmationService],
 })
 export class RegisterNewClientComponent implements OnInit {
   private readonly viacepService = inject(ViaCepService);
   private readonly registerClientService = inject(RegisterClientService);
   private readonly messageService = inject(MessageService);
   private readonly clientSharedService = inject(ClientSharedService);
+  private readonly confirmationService = inject(ConfirmationService);
+  private readonly router = inject(Router);
   @ViewChild(SignaturePadComponent)
   signaturePadComponent!: SignaturePadComponent;
   @ViewChild("fileUploadFront") fileUploadFront!: FileUpload;
@@ -78,6 +85,9 @@ export class RegisterNewClientComponent implements OnInit {
   stepIndex = 1;
   signaturePadData: string = "";
   isCepLoading: boolean = false;
+  clientSignUpSuccess = false;
+  clientSignUp: any = null;
+  public showSuccessDialog = false;
   public addressForMapSearch: any = null;
 
   constructor() {
@@ -212,8 +222,7 @@ export class RegisterNewClientComponent implements OnInit {
     fileUploader.clear(); // Limpa os arquivos do componente p-FileUpload específico
   }
 
- 
- getCep(isContract: boolean): void {
+  getCep(isContract: boolean): void {
     const cepControlPath = isContract ? "address.zipCode" : "addresses.zipCode";
 
     const formGroup = isContract ? this.contractForm : this.form;
@@ -298,41 +307,44 @@ export class RegisterNewClientComponent implements OnInit {
   }
 
   submitRegistration(): void {
-    if (this.form.valid) {
-      const clientData = this.form.value;
-      const addresses = clientData.addresses;
+    const clientData = this.form.value;
+    const addresses = clientData.addresses;
 
-      const test = {
-        ...clientData,
-        alias: clientData.name,
-        companyName: clientData.clientType === "PJ" ? clientData.name : null,
-        fantasyName: clientData.clientType === "PJ" ? clientData.name : null,
-        addresses: [addresses],
-      };
+    const test = {
+      ...clientData,
+      alias: clientData.name,
+      companyName: clientData.clientType === "PJ" ? clientData.name : null,
+      fantasyName: clientData.clientType === "PJ" ? clientData.name : null,
+      addresses: [addresses],
+    };
 
-      this.registerClientService.registerClient(test).subscribe({
-        next: (response) => {
-          // Aqui você pode redirecionar ou mostrar uma mensagem de sucesso
-          this.messageService.add({
-            severity: "success",
-            summary: "Cadastro realizado com sucesso",
-            detail: `Cliente ${response.name} cadastrado com sucesso!`,
-          });
-          this.stepIndex = 1; // Reseta o stepper para o início
-          this.form.reset();
-          this.contracts.clear();
-          this.signaturePadData = ""; // Limpa a assinatura
-          this.form.get("signaturePad")?.setValue(null); // Limpa o campo de assinatura
-          this.signaturePadComponent.clearPad(); // Limpa o pad de assinatura
-        },
-        error: (error) => {
-          console.error("Erro ao registrar cliente:", error);
-          // Aqui você pode mostrar uma mensagem de erro
-        },
-      });
-    } else {
-      this.form.markAllAsTouched();
-    }
+    this.registerClientService.registerClient(test).subscribe({
+      next: (response) => {
+        // Aqui você pode redirecionar ou mostrar uma mensagem de sucesso
+        this.messageService.add({
+          severity: "success",
+          summary: "Cadastro realizado com sucesso",
+          detail: `Cliente ${response.name} cadastrado com sucesso!`,
+        });
+        this.stepIndex = 1; // Reseta o stepper para o início
+        this.form.reset();
+        this.contracts.clear();
+        this.signaturePadData = ""; // Limpa a assinatura
+        this.form.get("signaturePad")?.setValue(null); // Limpa o campo de assinatura
+        // Limpa o pad de assinatura
+        this.clientSignUpSuccess = true;
+        this.showSuccessDialog = true; // Mostra o dialog
+        this.clientSignUp = {
+          name: response.name,
+          type: response.cnpj ? "PJ" : "PF",
+          cpfCnpj: response.cnpj || response.cpf,
+        };
+      },
+      error: (error) => {
+        console.error("Erro ao registrar cliente:", error);
+        // Aqui você pode mostrar uma mensagem de erro
+      },
+    });
   }
 
   get isPF(): boolean {
@@ -439,66 +451,89 @@ export class RegisterNewClientComponent implements OnInit {
   }
 
   ngOnInit(): void {
-  const client = this.clientSharedService.getClientData();
-  if (client) {
-    this.form.patchValue({
-      clientType: client.cnpj ? "PJ" : "PF",
-      cpf: client.cpf || null,
-      rg: client.rg || null,
-      cnpj: client.cnpj || null,
-      birthDate: client.birthDate
-        ? new Date(client.birthDate)
-        : client.createdAt
+    const client = this.clientSharedService.getClientData();
+    if (client) {
+      this.form.patchValue({
+        clientType: client.cnpj ? "PJ" : "PF",
+        cpf: client.cpf || null,
+        rg: client.rg || null,
+        cnpj: client.cnpj || null,
+        birthDate: client.birthDate
+          ? new Date(client.birthDate)
+          : client.createdAt
           ? new Date(client.createdAt)
           : null,
-      companyName: client.companyName || null,
-      fantasyName: client.fantasyName || null,
-      stateRegistration: client.stateRegistration || null,
-      name: client.name || client.companyName || null,
-      alias: client.alias || null,
-      email: client.email || null,
-      residentialPhone: client.residentialPhone || null,
-      mobilePhone: client.mobilePhone || null,
-      commercialPhone: client.commercialPhone || null,
-      addresses: {
-        zipCode: client.addresses?.[0]?.zipCode || "",
-        state: client.addresses?.[0]?.state || "",
-        city: client.addresses?.[0]?.city || "",
-        street: client.addresses?.[0]?.street || "",
-        number: client.addresses?.[0]?.number || "",
-        complement: client.addresses?.[0]?.complement || "",
-        neighborhood: client.addresses?.[0]?.neighborhood || "",
-        district: client.addresses?.[0]?.district || "",
-        referencePoint: client.addresses?.[0]?.referencePoint || "",
-        addressType: client.addresses?.[0]?.addressType || "BILLING",
-      },
-    });
-
-    if (Array.isArray(client.contracts)) {
-      // this.contracts.clear();
-      client.contracts.forEach((c: any) => {
-        this.contracts.push(
-          this.fb.group({
-            dueDay: [c.dueDay || null],
-            planCode: [c.planCode || null],
-            accessionValue: [c.accessionValue || null],
-            observation: [c.observation || ""],
-            address: this.fb.group({
-              zipCode: [c.address?.zipCode || ""],
-              state: [c.address?.state || ""],
-              city: [c.address?.city || ""],
-              street: [c.address?.street || ""],
-              number: [c.address?.number || ""],
-              complement: [c.address?.complement || ""],
-              neighborhood: [c.address?.neighborhood || ""],
-              district: [c.address?.district || ""],
-              referencePoint: [c.address?.referencePoint || ""],
-            }),
-          })
-        );
+        companyName: client.companyName || null,
+        fantasyName: client.fantasyName || null,
+        stateRegistration: client.stateRegistration || null,
+        name: client.name || client.companyName || null,
+        alias: client.alias || null,
+        email: client.email || null,
+        residentialPhone: client.residentialPhone || null,
+        mobilePhone: client.mobilePhone || null,
+        commercialPhone: client.commercialPhone || null,
+        addresses: {
+          zipCode: client.addresses?.[0]?.zipCode || "",
+          state: client.addresses?.[0]?.state || "",
+          city: client.addresses?.[0]?.city || "",
+          street: client.addresses?.[0]?.street || "",
+          number: client.addresses?.[0]?.number || "",
+          complement: client.addresses?.[0]?.complement || "",
+          neighborhood: client.addresses?.[0]?.neighborhood || "",
+          district: client.addresses?.[0]?.district || "",
+          referencePoint: client.addresses?.[0]?.referencePoint || "",
+          addressType: client.addresses?.[0]?.addressType || "BILLING",
+        },
       });
+
+      if (Array.isArray(client.contracts)) {
+        // this.contracts.clear();
+        client.contracts.forEach((c: any) => {
+          this.contracts.push(
+            this.fb.group({
+              dueDay: [c.dueDay || null],
+              planCode: [c.planCode || null],
+              accessionValue: [c.accessionValue || null],
+              observation: [c.observation || ""],
+              address: this.fb.group({
+                zipCode: [c.address?.zipCode || ""],
+                state: [c.address?.state || ""],
+                city: [c.address?.city || ""],
+                street: [c.address?.street || ""],
+                number: [c.address?.number || ""],
+                complement: [c.address?.complement || ""],
+                neighborhood: [c.address?.neighborhood || ""],
+                district: [c.address?.district || ""],
+                referencePoint: [c.address?.referencePoint || ""],
+              }),
+            })
+          );
+        });
+      }
+      this.clientSharedService.clearClientData();
     }
-    this.clientSharedService.clearClientData();
   }
+
+
+goToSearchClient() {
+  const type = this.clientSignUp?.type;
+  const document = this.clientSignUp?.cpfCnpj;
+
+  if (!type || !document) {
+    this.messageService.add({
+      severity: "warn",
+      summary: "Dados Incompletos",
+      detail:
+        "Não foi possível obter os dados do cliente recém cadastrado.",
+    });
+    return;
+  }
+
+  this.router.navigate(["/app/pesquisar-cliente"], {
+    queryParams: {
+      type,
+      document,
+    },
+  });
 }
 }
