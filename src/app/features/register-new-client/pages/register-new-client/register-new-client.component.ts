@@ -35,6 +35,7 @@ import { ClientSharedService } from "../../services/client-shared.service";
 import { Router } from "@angular/router";
 import { ConfirmPopupModule } from "primeng/confirmpopup";
 import { DialogModule } from "primeng/dialog";
+import { Subject } from "rxjs";
 
 @Component({
   selector: "app-register-new-client",
@@ -67,13 +68,14 @@ import { DialogModule } from "primeng/dialog";
   styleUrl: "./register-new-client.component.scss",
   providers: [provideNgxMask(), MessageService, ConfirmationService],
 })
-export class RegisterNewClientComponent implements OnInit {
+export class RegisterNewClientComponent implements OnInit, OnDestroy {
   private readonly viacepService = inject(ViaCepService);
   private readonly registerClientService = inject(RegisterClientService);
   private readonly messageService = inject(MessageService);
   private readonly clientSharedService = inject(ClientSharedService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly router = inject(Router);
+  private readonly destroy$ = new Subject<void>();
   @ViewChild(SignaturePadComponent)
   signaturePadComponent!: SignaturePadComponent;
   @ViewChild("fileUploadFront") fileUploadFront!: FileUpload;
@@ -89,6 +91,8 @@ export class RegisterNewClientComponent implements OnInit {
   clientSignUp: any = null;
   public showSuccessDialog = false;
   public addressForMapSearch: any = null;
+
+  
 
   constructor() {
     this.fb = inject(FormBuilder);
@@ -155,6 +159,12 @@ export class RegisterNewClientComponent implements OnInit {
     { name: "Pessoa Física", value: "PF" },
     { name: "Pessoa Jurídica", value: "PJ" },
   ];
+
+  ngOnDestroy(): void {
+    console.log("[RegisterNewClientComponent] ngOnDestroy");
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   public searchAddressOnMap(): void {
     // Primeiro, marcamos os campos do endereço como "tocados" para mostrar erros de validação
@@ -307,6 +317,8 @@ export class RegisterNewClientComponent implements OnInit {
   }
 
   submitRegistration(): void {
+    
+
     const clientData = this.form.value;
     const addresses = clientData.addresses;
 
@@ -514,26 +526,26 @@ export class RegisterNewClientComponent implements OnInit {
     }
   }
 
+  public navigateToSearchAndCloseDialog(): void {
+    const type = this.clientSignUp?.type;
+    const document = this.clientSignUp?.cpfCnpj;
 
-goToSearchClient() {
-  const type = this.clientSignUp?.type;
-  const document = this.clientSignUp?.cpfCnpj;
+    if (!type || !document) {
+      this.messageService.add({
+        severity: "warn",
+        summary: "Dados Incompletos",
+        detail: "Não foi possível obter os dados do cliente recém-cadastrado.",
+      });
+      return;
+    }
+    this.showSuccessDialog = false;
 
-  if (!type || !document) {
-    this.messageService.add({
-      severity: "warn",
-      summary: "Dados Incompletos",
-      detail:
-        "Não foi possível obter os dados do cliente recém cadastrado.",
-    });
-    return;
+    this.router.navigate(['/app/clientes/pesquisar-cliente'], {
+      queryParams: {
+        type,
+        document,
+        timestamp: new Date().getTime()
+      }
+    })
   }
-
-  this.router.navigate(["/app/pesquisar-cliente"], {
-    queryParams: {
-      type,
-      document,
-    },
-  });
-}
 }

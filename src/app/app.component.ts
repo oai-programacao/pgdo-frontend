@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { PrimeNGConfigType } from 'primeng/config';
 import { Subscription } from 'rxjs';
 import { AuthService } from './core/auth/auth.service';
-import { SseService } from './core/sse/sse.service';
+// import { SseService } from './core/sse/sse.service';
 
 @Component({
   selector: "app-root",

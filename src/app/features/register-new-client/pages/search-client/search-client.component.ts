@@ -1,10 +1,10 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { ButtonModule } from "primeng/button";
 import { StepperModule } from "primeng/stepper";
 import { InputTextModule } from "primeng/inputtext";
 import { RegisterClientService } from "../../services/register-client.service";
-import { tap } from "rxjs/operators";
+import { takeUntil, tap } from "rxjs/operators";
 import { ProgressSpinnerModule } from "primeng/progressspinner";
 import { FormsModule } from "@angular/forms";
 import { SelectModule } from "primeng/select";
@@ -21,6 +21,8 @@ import { CreateContractComponent } from "../../components/create-contract/create
 import { TooltipModule } from "primeng/tooltip";
 import { ViewContractsComponent } from "../../components/view-contracts/view-contracts.component";
 import { CpfCnpjPipe } from "../../../../shared/pipes/cpf-cnpj.pipe";
+import { Subject, Subscription } from "rxjs";
+import { SseService } from "../../../../core/sse/sse.service";
 
 @Component({
   selector: "app-search-client",
@@ -42,8 +44,8 @@ import { CpfCnpjPipe } from "../../../../shared/pipes/cpf-cnpj.pipe";
     CreateContractComponent,
     TooltipModule,
     ViewContractsComponent,
-    CpfCnpjPipe
-],
+    CpfCnpjPipe,
+  ],
   templateUrl: "./search-client.component.html",
   styleUrl: "./search-client.component.scss",
   providers: [
@@ -53,7 +55,7 @@ import { CpfCnpjPipe } from "../../../../shared/pipes/cpf-cnpj.pipe";
     RegisterClientService,
   ],
 })
-export class SearchClientComponent implements OnInit {
+export class SearchClientComponent implements OnInit, OnDestroy {
   isLoading = false;
   cpfCnpj: string = "";
   clientType: "PF" | "PJ" | null = null;
@@ -63,31 +65,44 @@ export class SearchClientComponent implements OnInit {
     { label: "Pessoa Jurídica", value: "PJ" },
   ];
 
+  private queryParamsSubscription: Subscription | undefined;
 
   hasSearched = false;
-
   registerClientService = inject(RegisterClientService);
   clientSharedService = inject(ClientSharedService);
-  router = inject(Router);
-  route = inject(ActivatedRoute)
   confirmationService = inject(ConfirmationService);
   messageService = inject(MessageService);
+
+  constructor(private router: Router, private route: ActivatedRoute) {}
 
   // Dialog
   createNewContractDialog = false;
   viewContractsDialog = false;
 
+  private destroy$ = new Subject<void>();
+
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      const type = params['type'];
-      const document = params['document'];
-      if (type && document) {
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        const type = params["type"];
+        const document = params["document"];
+        if (type && document) {
+          this.clientType = type;
+          this.cpfCnpj = document;
+          this.consultClient();
+        } 
         this.clientType = type;
         this.cpfCnpj = document;
-        this.consultClient();
-      }
-    });
+        
+      });
   }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
 
   createdContract() {
     this.createNewContractDialog = false;
@@ -104,7 +119,6 @@ export class SearchClientComponent implements OnInit {
   }
 
   viewContractsDialogVisible(client: any) {
-    
     this.dataClient = client ? [client] : [];
     this.viewContractsDialog = true;
   }
@@ -119,7 +133,7 @@ export class SearchClientComponent implements OnInit {
       ...client,
       contract: client.contract,
     });
-    this.router.navigate(["/app/cliente-cadastrar"]);
+    this.router.navigate(["/app/clientes/cliente-cadastrar"]);
   }
 
   consultClient() {
@@ -140,6 +154,7 @@ export class SearchClientComponent implements OnInit {
           },
         })
       )
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
           this.dataClient = (response.content || []).filter((client) =>
@@ -168,7 +183,7 @@ export class SearchClientComponent implements OnInit {
           clientType: this.clientType,
         };
         this.clientSharedService.setClientData(clientData);
-        this.router.navigate(["/app/cliente-cadastrar"]);
+        this.router.navigate(["/app/clientes/cliente-cadastrar"]);
       },
       reject: () => {
         this.messageService.add({
@@ -183,7 +198,9 @@ export class SearchClientComponent implements OnInit {
 
   registerNewClient() {
     if (!this.cpfCnpj || !this.clientType) return;
-    this.registerClientService.getFindOrCreateOnRBX(this.cpfCnpj).subscribe({
+    this.registerClientService.getFindOrCreateOnRBX(this.cpfCnpj)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: (client) => {
         if (client.id) {
           this.clientSharedService.setClientData(client);
