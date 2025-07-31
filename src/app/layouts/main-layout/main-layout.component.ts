@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/auth/auth.service';
 import { MenuItem } from '../../interfaces/menu-item.model';
 import { SseService } from '../../core/sse/sse.service';
-import { Subscription } from 'rxjs';
+import { distinctUntilChanged, Subscription, tap } from 'rxjs';
 
 @Component({
   selector: "app-main-layout",
@@ -42,14 +42,14 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           id: 'pesquisar-cliente',
           label: 'Pesquisar Cliente',
           icon: 'pi pi-search',
-          route: '/app/pesquisar-cliente',
-          exactMatch: true
+          route: '/app/clientes/pesquisar-cliente',
+          exactMatch: true,
         },
         {
           id: 'register-client',
           label: 'Cadastrar Novo Cliente',
           icon: 'pi pi-user-plus',
-          route: '/app/cliente-cadastrar',
+          route: '/app/clientes/cliente-cadastrar',
           exactMatch: true
         },
         {
@@ -63,7 +63,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           id: 'confirm-installation',
           label: 'Confirmar Instalação',
           icon: 'pi pi-check',
-          route: '/app/confirmar-instalacao',
+          route: '/app/clientes/confirmar-instalacao',
           exactMatch: true
         }
       ]
@@ -286,7 +286,12 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Ouve as mudanças no estado do usuário
-    this.authStateSubscription = this.authService.currentUser$.subscribe(user => {
+    this.authStateSubscription = this.authService.currentUser$
+    .pipe(
+      tap((user: any) => console.log('Current user:', user)),
+      distinctUntilChanged()
+    )
+    .subscribe(user => {
       if (user) {
         // Se há um usuário, conecta o SSE
         console.log('User logged in, connecting to SSE...');
