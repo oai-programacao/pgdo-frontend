@@ -20,6 +20,7 @@ import { DialogModule } from "primeng/dialog";
 import { CreateContractComponent } from "../../components/create-contract/create-contract.component";
 import { TooltipModule } from "primeng/tooltip";
 import { ViewContractsComponent } from "../../components/view-contracts/view-contracts.component";
+import { CpfCnpjPipe } from "../../../../shared/pipes/cpf-cnpj.pipe";
 
 @Component({
   selector: "app-search-client",
@@ -41,7 +42,8 @@ import { ViewContractsComponent } from "../../components/view-contracts/view-con
     CreateContractComponent,
     TooltipModule,
     ViewContractsComponent,
-  ],
+    CpfCnpjPipe
+],
   templateUrl: "./search-client.component.html",
   styleUrl: "./search-client.component.scss",
   providers: [
