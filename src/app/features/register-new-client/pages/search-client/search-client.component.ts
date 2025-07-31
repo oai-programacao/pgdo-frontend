@@ -104,6 +104,7 @@ export class SearchClientComponent implements OnInit {
   }
 
   viewContractsDialogVisible(client: any) {
+    
     this.dataClient = client ? [client] : [];
     this.viewContractsDialog = true;
   }
