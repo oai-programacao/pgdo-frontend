@@ -24,6 +24,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
   menuItems: MenuItem[] = [
     { id: "home", label: "Home", icon: "pi pi-home", route: "/app/home" },
+    // Clientes
     {
       id: 'clients',
       label: 'Clientes',
@@ -68,6 +69,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         }
       ]
     },
+    // Companhia
     {
       id: "company",
       label: "Empresa",
@@ -100,6 +102,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         }
       ]
     },
+    // Ordens de Serviço
     {
       id: "service-orders",
       label: "Ordens de Serviço",
@@ -162,6 +165,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         }
       ],
     },
+    // Vendas
     {
       id: "sales",
       label: "Vendas",
@@ -187,6 +191,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         }
       ]
     },
+    // Pós Vendas
     {
       id: 'after-sales',
       label: 'Pós-Vendas',
@@ -194,6 +199,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       route: '/app/pos-vendas',
       allowedRoles: ['ROLE_ADMIN', 'ROLE_STORE_MANAGER', 'ROLE_ANALYST', 'ROLE_STORE_EMPLOYEE'],
     },
+    // ONUs
     {
       id: "olt",
       label: "Olt",
@@ -275,6 +281,13 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       icon: "pi pi-exclamation-triangle",
       route: "/app/avisos",
       allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_ANALYST"],
+    },
+    // Diagnósticos
+    {
+      id: 'diagnostics',
+      label: 'Diagnósticos',
+      icon: 'pi pi-chart-bar',
+      route: '/app/diagnosticos',
     },
     {
       id: "settings",
