@@ -1,0 +1,127 @@
+<div
+  class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md"
+>
+  <div>
+    <h1 class="text-3xl font-semibold mb-4">Diagnósticos</h1>
+  </div>
+  <form [formGroup]="form">
+    <div
+      class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 mb-6 border border-slate-200 dark:border-slate-700"
+    >
+      <div
+        class="flex flex-col md:flex-row items-start md:items-end justify-start gap-4"
+      >
+        <div class="flex flex-col gap-1 w-full md:w-auto">
+          <label
+            for="rangeDates"
+            class="text-sm font-medium text-slate-700 dark:text-slate-200"
+          >
+            Período de datas <span class="text-red-500">*</span>
+          </label>
+          <p-datepicker
+            formControlName="rangeDates"
+            selectionMode="range"
+            dateFormat="dd/mm/yy"
+            dataType="string"
+            [readonlyInput]="true"
+            inputStyleClass="w-full"
+            id="rangeDates"
+          ></p-datepicker>
+        </div>
+        <div class="w-full md:w-auto">
+          <p-button
+            label="Filtrar"
+            icon="pi pi-filter"
+            styleClass="w-full md:w-auto"
+            class="mt-1 md:mt-0"
+            (onClick)="onSubmit()"
+          />
+        </div>
+        <div class="w-full md:w-auto">
+          <p-button
+            label="Limpar"
+            severity="secondary"
+            icon="pi pi-filter-slash"
+            styleClass="w-full md:w-auto"
+            class="mt-1 md:mt-0"
+            (onClick)="clearFilter()"
+          />
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div>
+      <app-dashboard-chart
+        [title]="'Visitar Improdutivas'"
+        [chartType]="'pie'"
+        [chartData]="unproductiveVisitsCount"
+        [chartOptions]="{ responsive: true, maintainAspectRatio: false }"
+        [isLoading]="false"
+        [height]="'300px'"
+        [showGrid]="false"
+      ></app-dashboard-chart>
+    </div>
+    <div>
+      <app-dashboard-chart
+        [title]="'Serviços por Técnico'"
+        [chartType]="'bar'"
+        [chartData]="technicianServiceCount"
+        [chartOptions]="technicianServiceCountOptions"
+        [height]="'350px'"
+        [showGrid]="true"
+      >
+      </app-dashboard-chart>
+    </div>
+    <div>
+<app-dashboard-chart
+  [title]="'Ordens de Serviço'"
+  [chartType]="'bar'"
+  [chartData]="serviceOrderCount"
+  [chartOptions]="serviceOrderCountOptions"
+  [isLoading]="false"
+  [height]="'300px'"
+  [showGrid]="false"
+></app-dashboard-chart>
+    </div>
+  </div>
+  <div class="mt-6">
+    <div *ngIf="mainSummaryData">
+      <div class="flex flex-wrap gap-4 mb-2">
+        <span
+          *ngIf="mainSummaryData.osTypes"
+          class="font-semibold text-slate-700 dark:text-slate-200"
+        >
+          Total Ordens de Serviço: {{ mainSummaryData.osTypes.total }}
+        </span>
+        <span
+          *ngIf="mainSummaryData.cities"
+          class="font-semibold text-slate-700 dark:text-slate-200"
+        >
+          Total Cidades: {{ mainSummaryData.cities.total }}
+        </span>
+        <span
+          *ngIf="mainSummaryData.demandingAreas"
+          class="font-semibold text-slate-700 dark:text-slate-200"
+        >
+          Total Áreas Demandantes: {{ mainSummaryData.demandingAreas.total }}
+        </span>
+        <span
+          *ngIf="mainSummaryData.technologies"
+          class="font-semibold text-slate-700 dark:text-slate-200"
+        >
+          Total Tecnologias: {{ mainSummaryData.technologies.total }}
+        </span>
+      </div>
+    </div>
+    <app-dashboard-chart
+      [title]="'Resumo Principal'"
+      [chartType]="'bar'"
+      [chartData]="mainSummaryCount"
+      [chartOptions]="mainSummaryCountOptions"
+      [height]="'400px'"
+      [showGrid]="true"
+    >
+    </app-dashboard-chart>
+  </div>
+</div>

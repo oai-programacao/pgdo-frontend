@@ -228,6 +228,11 @@ export const routes: Routes = [
           ).then((m) => m.SystemWarningListComponent),
         title: "Avisos do Sistema",
       },
+      {
+        path: 'diagnosticos',
+        loadComponent: () => import('./features/diagnosis/pages/diagnostic/diagnostic.component').then(m => m.DiagnosticComponent),
+        title: 'Diagnósticos'
+      },
 
       { path: "", redirectTo: "home", pathMatch: "full" }, // Rota padrão dentro de /app
     ],
