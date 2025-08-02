@@ -253,6 +253,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   }
 
   loadServiceOrders(event?: TableLazyLoadEvent): void {
+    console.log("url", this.router.url);
     this.isLoading = true;
     if (event) {
       this.first = event.first ?? 0;
@@ -269,6 +270,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       .findAll(this.filterForm.value, page, this.rows)
       .subscribe({
         next: (dataPage) => {
+          console.log("Dados recebidos:", dataPage);
           this.os = dataPage.content;
           this.totalRecords = dataPage.page.totalElements;
           this.populateOrdersArray();

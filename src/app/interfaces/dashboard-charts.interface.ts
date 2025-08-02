@@ -60,3 +60,20 @@ export interface ServiceOrderTypeData {
   differencePercentage: string;
   trendDirection: "up" | "down" | "neutral";
 }
+
+export interface CategoryItem {
+  category: string;
+  count: number;
+}
+
+export interface CategoryData {
+  items: CategoryItem[];
+  total: number;
+}
+
+export interface DashboardSummary {
+  osTypes: CategoryData;
+  demandingAreas: CategoryData;
+  cities: CategoryData;
+  technologies: CategoryData;
+}

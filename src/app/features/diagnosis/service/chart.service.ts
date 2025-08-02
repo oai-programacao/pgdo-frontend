@@ -30,16 +30,16 @@ export class ChartService {
     );
   }
 
+getTechnology(startDate: string, endDate: string, status?: string[]): Observable<DashboardSummary> {
+  const params: any = { startDate, endDate };
+  if (status && status.length > 0) {
+    params.status = status;
+  }
+  return this.http.get<DashboardSummary>(`${this.apiUrl}/dashboard/tecnology`, {
+    params
+  });
+}
 
-  // getTechnicianServiceCount(
-  //   startDate: string,
-  //   endDate: string
-  // ): Observable<TechnicianServiceCount> {
-  //   return this.http.get<TechnicianServiceCount>(
-  //     `${this.apiUrl}/dashboard/technician-service-count`,
-  //     { params: { startDate, endDate } }
-  //   );
-  // }
  // Método para obter a contagem de serviços por técnico
   getTechnicianCount(
     startDate: string,
