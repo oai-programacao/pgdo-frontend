@@ -10,7 +10,7 @@ import { environment } from '../../../../environments/environment';
 export class BlockOffersRequestService {
 
   private http = inject(HttpClient);
-  private readonly apiUrl = environment.apiUrl + '/block-offers';
+  private readonly apiUrl = environment.apiUrl + '/blocking-offers';
 
   createBlockOffer(body: CreateBlockOffersDto): Observable<ViewBlockOffersDto> {
     return this.http.post<ViewBlockOffersDto>(`${this.apiUrl}`, body);

@@ -78,7 +78,18 @@ export class CreateServiceOrderComponent implements OnInit, OnDestroy {
   clientTypeOptions: any[];
   technologyOptions: any[];
   //dropdowns dinâmicos
-  typeOfOsOptions: any[];
+  typeOfOsOptions!: any[];
+  // typeOfOsOptions: { label: string; value: TypeOfOs }[] = [
+  //   {label: 'Instalação' , value: TypeOfOs.INSTALLATION},
+  //   {label: 'Manutenção', value: TypeOfOs.MAINTENANCE},
+  //   {label: 'Mudança de Endereço', value: TypeOfOs. CHANGE_OF_ADDRESS},
+  //   {label: 'Mudança de Tecnologia', value: TypeOfOs.CHANGE_OF_TECHNOLOGY},
+  //   {label: 'Projetos', value: TypeOfOs.PROJECTS},
+  //   {label: 'Remoção de Equipamentos', value: TypeOfOs.KIT_REMOVAL},
+  //   {label: 'Viabilidade Técnica', value: TypeOfOs. TECHNICAL_VIABILITY},
+  //   {label: 'Visita Técnica', value: TypeOfOs.TECHNICAL_VISIT},
+  //   {label: 'Rede Interna', value: TypeOfOs.INTERNAL}
+  // ];
   scheduleDateOptions: any[];
   periodOptions: any[];
 
@@ -86,7 +97,7 @@ export class CreateServiceOrderComponent implements OnInit, OnDestroy {
     this.commandAreaOptions = Object.entries(CommandAreaLabels).map(([key, value]) => ({ label: value, value: key }));
     this.clientTypeOptions = Object.entries(ClientTypeLabels).map(([key, value]) => ({ label: value, value: key }));
     this.technologyOptions = Object.entries(TechnologyLabels).map(([key, value]) => ({ label: value, value: key }));
-    this.typeOfOsOptions = [];
+    // this.typeOfOsOptions = [];
     this.scheduleDateOptions = [];
     this.periodOptions = [];
   }

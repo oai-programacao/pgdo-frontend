@@ -50,70 +50,176 @@
       </div>
     </div>
   </form>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start mb-8">
+    <!-- Visitas Improdutivas -->
+    <div
+      class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-4 border border-slate-200/50 dark:border-blue-700/50 flex flex-col h-full"
+    >
+      @if (unproductiveVisitsTotal) {
+      <div class="text-center mb-1">
+        <div
+          class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 px-2 py-1 rounded-lg border border-blue-200 dark:border-blue-700/50"
+        >
+          <i class="pi pi-chart-pie text-blue-500"></i>
+          <span class="font-bold text-blue-700 dark:text-blue-300 text-base">
+            Total: {{ unproductiveVisitsTotal }}
+          </span>
+        </div>
+      </div>
+      }
       <app-dashboard-chart
-        [title]="'Visitar Improdutivas'"
+        [title]="'Visitas Improdutivas'"
         [chartType]="'pie'"
         [chartData]="unproductiveVisitsCount"
         [chartOptions]="{ responsive: true, maintainAspectRatio: false }"
         [isLoading]="false"
-        [height]="'300px'"
+        [height]="'240px'"
         [showGrid]="false"
       ></app-dashboard-chart>
     </div>
-    <div>
+
+    <!-- Tecnologias -->
+    <div
+      class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-4 border border-slate-200/50 dark:border-orange-700/50 flex flex-col h-full"
+    >
+      @if (technologyTotal) {
+      <div class="text-center mb-1">
+        <div
+          class="inline-flex items-center gap-2 bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 px-2 py-1 rounded-lg border border-orange-200 dark:border-orange-700/50"
+        >
+          <i class="pi pi-cog text-orange-500"></i>
+          <span
+            class="font-bold text-orange-700 dark:text-orange-300 text-base"
+          >
+            Total: {{ technologyTotal }}
+          </span>
+        </div>
+      </div>
+      }
       <app-dashboard-chart
-        [title]="'Serviços por Técnico'"
-        [chartType]="'bar'"
-        [chartData]="technicianServiceCount"
-        [chartOptions]="technicianServiceCountOptions"
-        [height]="'350px'"
-        [showGrid]="true"
-      >
-      </app-dashboard-chart>
-    </div>
-    <div>
-<app-dashboard-chart
-  [title]="'Ordens de Serviço'"
-  [chartType]="'bar'"
-  [chartData]="serviceOrderCount"
-  [chartOptions]="serviceOrderCountOptions"
-  [isLoading]="false"
-  [height]="'300px'"
-  [showGrid]="false"
-></app-dashboard-chart>
+        [title]="'Tecnologias'"
+        [chartType]="'pie'"
+        [chartData]="technologyChartData"
+        [isLoading]="false"
+        [height]="'240px'"
+        [showGrid]="false"
+      ></app-dashboard-chart>
     </div>
   </div>
-  <div class="mt-6">
-    <div *ngIf="mainSummaryData">
-      <div class="flex flex-wrap gap-4 mb-2">
-        <span
-          *ngIf="mainSummaryData.osTypes"
-          class="font-semibold text-slate-700 dark:text-slate-200"
+
+<div class="mt-8">
+  @if (mainSummaryData) {
+    <div
+      class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl shadow-lg p-5 mb-6 border border-slate-200/50 dark:border-slate-700/50"
+    >
+      <h3
+        class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2"
+      >
+        <i class="pi pi-info-circle text-blue-500"></i>
+        Estatísticas Gerais
+      </h3>
+      <div class="flex flex-col md:flex-row justify-between gap-4">
+        @if (mainSummaryData.osTypes) {
+        <div
+          class="flex-1 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-3 rounded-xl border border-blue-200 dark:border-blue-700/50 mb-2 md:mb-0"
         >
-          Total Ordens de Serviço: {{ mainSummaryData.osTypes.total }}
-        </span>
-        <span
-          *ngIf="mainSummaryData.cities"
-          class="font-semibold text-slate-700 dark:text-slate-200"
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center"
+            >
+              <i class="pi pi-file text-white text-sm"></i>
+            </div>
+            <div>
+              <p class="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                Ordens de Serviço
+              </p>
+              <p class="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                {{ mainSummaryData.osTypes.total }}
+              </p>
+            </div>
+          </div>
+        </div>
+        }
+        @if (mainSummaryData.cities) {
+        <div
+          class="flex-1 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-3 rounded-xl border border-green-200 dark:border-green-700/50 mb-2 md:mb-0"
         >
-          Total Cidades: {{ mainSummaryData.cities.total }}
-        </span>
-        <span
-          *ngIf="mainSummaryData.demandingAreas"
-          class="font-semibold text-slate-700 dark:text-slate-200"
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center"
+            >
+              <i class="pi pi-map-marker text-white text-sm"></i>
+            </div>
+            <div>
+              <p class="text-sm text-green-600 dark:text-green-400 font-medium">
+                Cidades
+              </p>
+              <p class="text-2xl font-bold text-green-700 dark:text-green-300">
+                {{ mainSummaryData.cities.total }}
+              </p>
+            </div>
+          </div>
+        </div>
+        }
+        @if (mainSummaryData.demandingAreas) {
+        <div
+          class="flex-1 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-3 rounded-xl border border-purple-200 dark:border-purple-700/50 mb-2 md:mb-0"
         >
-          Total Áreas Demandantes: {{ mainSummaryData.demandingAreas.total }}
-        </span>
-        <span
-          *ngIf="mainSummaryData.technologies"
-          class="font-semibold text-slate-700 dark:text-slate-200"
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center"
+            >
+              <i class="pi pi-building text-white text-sm"></i>
+            </div>
+            <div>
+              <p
+                class="text-sm text-purple-600 dark:text-purple-400 font-medium"
+              >
+                Áreas Demandantes
+              </p>
+              <p
+                class="text-2xl font-bold text-purple-700 dark:text-purple-300"
+              >
+                {{ mainSummaryData.demandingAreas.total }}
+              </p>
+            </div>
+          </div>
+        </div>
+        }
+        @if (mainSummaryData.technologies) {
+        <div
+          class="flex-1 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 p-3 rounded-xl border border-orange-200 dark:border-orange-700/50"
         >
-          Total Tecnologias: {{ mainSummaryData.technologies.total }}
-        </span>
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center"
+            >
+              <i class="pi pi-cog text-white text-sm"></i>
+            </div>
+            <div>
+              <p
+                class="text-sm text-orange-600 dark:text-orange-400 font-medium"
+              >
+                Tecnologias
+              </p>
+              <p
+                class="text-2xl font-bold text-orange-700 dark:text-orange-300"
+              >
+                {{ mainSummaryData.technologies.total }}
+              </p>
+            </div>
+          </div>
+        </div>
+        }
       </div>
     </div>
+  }
+</div>
+
+  <div
+    class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-5 border border-slate-200/50 dark:border-slate-700/50 mb-6"
+  >
     <app-dashboard-chart
       [title]="'Resumo Principal'"
       [chartType]="'bar'"
@@ -121,7 +227,83 @@
       [chartOptions]="mainSummaryCountOptions"
       [height]="'400px'"
       [showGrid]="true"
-    >
-    </app-dashboard-chart>
+    ></app-dashboard-chart>
   </div>
+
+<div
+  class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-5 border border-slate-200/50 dark:border-slate-700/50 mb-6"
+>
+
+  @if (serviceOrderList?.length) {
+    <div class="mb-2">
+      <ul class="flex flex-wrap gap-2 justify-center">
+        <li *ngFor="let os of serviceOrderList" class="bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded text-blue-700 dark:text-blue-300 text-sm border border-blue-200 dark:border-blue-700/50">
+          <i class="pi pi-file"></i> {{ os.name }}:
+          <b>{{ os.atual }}</b> (atual) /
+          <b>{{ os.anterior }}</b> (anterior)
+        </li>
+      </ul>
+    </div>
+  }
+    @if (serviceOrderTotal) {
+    <div class="mb-2 text-start">
+      <div
+        class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 px-3 py-1 rounded-lg border border-purple-200 dark:border-purple-700/50"
+      >
+        <i class="pi pi-file-check text-purple-500"></i>
+        <span class="font-bold text-purple-700 dark:text-purple-300 text-base">
+          Total: {{ serviceOrderTotal }}
+        </span>
+      </div>
+    </div>
+  }
+  <app-dashboard-chart
+    [title]="'Ordens de Serviço'"
+    [chartType]="'bar'"
+    [chartData]="serviceOrderCount"
+    [chartOptions]="serviceOrderCountOptions"
+    [isLoading]="false"
+    [height]="'300px'"
+    [showGrid]="false"
+  ></app-dashboard-chart>
+</div>
+
+  <div
+    class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-5 border border-slate-200/50 dark:border-slate-700/50"
+  >
+   
+
+
+  <div
+  class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-5 border border-slate-200/50 dark:border-slate-700/50"
+>
+  @if (technicianList?.length) {
+    <div class="mb-2">
+      <ul class="flex flex-wrap gap-2 justify-center">
+        <li *ngFor="let tech of technicianList" class="bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded text-green-700 dark:text-green-300 text-sm border border-green-200 dark:border-green-700/50">
+          <i class="pi pi-user"></i> {{ tech.name }}: <b>{{ tech.count }}</b>
+        </li>
+      </ul>
+    </div>
+  }
+ @if (technicianGrandTotal) {
+    <div class="mb-2 text-start">
+      <div
+        class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 px-3 py-1 rounded-lg border border-purple-200 dark:border-purple-700/50"
+      >
+        <i class="pi pi-file-check text-purple-500"></i>
+        <span class="font-bold text-purple-700 dark:text-purple-300 text-base">
+          Total: {{ technicianGrandTotal }}
+        </span>
+      </div>
+    </div>
+  }
+  <app-dashboard-chart
+    [title]="'Serviços por Técnico'"
+    [chartType]="'bar'"
+    [chartData]="technicianServiceCount"
+    [chartOptions]="technicianServiceCountOptions"
+    [height]="'350px'"
+    [showGrid]="true"
+  ></app-dashboard-chart>
 </div>
