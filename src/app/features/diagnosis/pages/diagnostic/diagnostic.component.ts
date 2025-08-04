@@ -206,8 +206,7 @@ export class DiagnosticComponent {
           ],
         };
 
-
-        const maxValue = Math.max(...dataCounts, 1); 
+        const maxValue = Math.max(...dataCounts, 1);
         const suggestedMax = maxValue < 20 ? 20 : maxValue + 1;
 
         this.technicianServiceCountOptions = {
@@ -242,6 +241,7 @@ export class DiagnosticComponent {
       }
     );
   }
+
   showServiceOrder() {
     const [startDate, endDate] = this.form.value.rangeDates;
     const formattedStartDate = this.formatDateToBackend(startDate);
@@ -475,6 +475,26 @@ export class DiagnosticComponent {
         },
       });
   }
+
+  // downloadDashboardPdf() {
+  //   const [startDate, endDate] = this.form.value.rangeDates;
+
+  //   this.chartService.getDashboardPdf(startDate, endDate).subscribe({
+  //     next: (response: Blob) => {
+  //       const url = window.URL.createObjectURL(response);
+  //       const a = document.createElement('a');
+  //       a.href = url;
+  //       a.download = 'dashboard.pdf';
+  //       document.body.appendChild(a);
+  //       a.click();
+  //       document.body.removeChild(a);
+  //       window.URL.revokeObjectURL(url);
+  //     },
+  //     error: (e) => {
+  //       console.error("Erro ao baixar o PDF do dashboard:", e);
+  //     }
+  //   });
+  // }
 
   private formatDateToBackend(date: string | Date): string {
     if (!date) return "";
