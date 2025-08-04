@@ -92,14 +92,12 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
   public showSuccessDialog = false;
   public addressForMapSearch: any = null;
 
-  
-
   constructor() {
     this.fb = inject(FormBuilder);
     this.form = this.fb.group({
       clientType: [null, Validators.required],
       photoRg: [null],
-      photoRgVerse: [null],
+      photoRgVerses: this.fb.array([]),
       cpf: [null],
       rg: [null],
       cnpj: [null],
@@ -317,8 +315,6 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
   }
 
   submitRegistration(): void {
-    
-
     const clientData = this.form.value;
     const addresses = clientData.addresses;
 
@@ -540,12 +536,42 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
     }
     this.showSuccessDialog = false;
 
-    this.router.navigate(['/app/clientes/pesquisar-cliente'], {
+    this.router.navigate(["/app/clientes/pesquisar-cliente"], {
       queryParams: {
         type,
         document,
-        timestamp: new Date().getTime()
-      }
-    })
+        timestamp: new Date().getTime(),
+      },
+    });
+  }
+
+  get photoRgVerses(): FormArray {
+    return this.form.get("photoRgVerses") as FormArray;
+  }
+
+addPhotoRgVerse(): void {
+  if (this.photoRgVerses.length < 5) {
+    this.photoRgVerses.push(this.fb.control(null));
+  } else {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Limite atingido',
+      detail: 'Você pode adicionar no máximo 5 fotos do verso do documento.'
+    });
+  }
+}
+
+  removePhotoRgVerse(index: number): void {
+    this.photoRgVerses.removeAt(index);
+  }
+
+  onUploadVerse(event: any, index: number): void {
+    const file = event.files[0];
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.photoRgVerses.at(index).setValue(e.target.result);
+      this.photoRgVerses.at(index).markAsDirty();
+    };
+    reader.readAsDataURL(file);
   }
 }

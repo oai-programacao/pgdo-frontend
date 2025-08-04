@@ -43,29 +43,29 @@ export class DiagnosticComponent {
   private readonly chartService = inject(ChartService);
 
   // Variaveis para armazenar os dados dos gráficos
-unproductiveVisitData?: DashboardCharts;
-unproductiveVisitsCount?: ChartData<"pie">;
-unproductiveVisitsTotal?: number;
+  unproductiveVisitData?: DashboardCharts;
+  unproductiveVisitsCount?: ChartData<"pie">;
+  unproductiveVisitsTotal?: number;
 
-technicianServiceCountData?: TechnicianServiceCount;
-technicianServiceCount?: ChartData<"bar">;
-technicianServiceCountOptions?: ChartOptions;
-technicianGrandTotal?: number;
-technicianList: { name: string; count: number }[] = [];
+  technicianServiceCountData?: TechnicianServiceCount;
+  technicianServiceCount?: ChartData<"bar">;
+  technicianServiceCountOptions?: ChartOptions;
+  technicianGrandTotal?: number;
+  technicianList: { name: string; count: number }[] = [];
 
-serviceOrderData?: ServiceOrderTypeData[];
-serviceOrderCount?: ChartData<"bar">;
-serviceOrderCountOptions?: ChartOptions;
-serviceOrderTotal?: number;
-serviceOrderList: { name: string; atual: number; anterior: number }[] = [];
+  serviceOrderData?: ServiceOrderTypeData[];
+  serviceOrderCount?: ChartData<"bar">;
+  serviceOrderCountOptions?: ChartOptions;
+  serviceOrderTotal?: number;
+  serviceOrderList: { name: string; atual: number; anterior: number }[] = [];
 
-mainSummaryData?: DashboardSummary;
-mainSummaryCount?: ChartData<"bar">;
-mainSummaryCountOptions?: ChartOptions;
+  mainSummaryData?: DashboardSummary;
+  mainSummaryCount?: ChartData<"bar">;
+  mainSummaryCountOptions?: ChartOptions;
 
-technologySummaryData?: DashboardSummary;
-technologyChartData?: ChartData<"pie">;
-technologyTotal?: number;
+  technologySummaryData?: DashboardSummary;
+  technologyChartData?: ChartData<"pie">;
+  technologyTotal?: number;
 
   // Mapeamentos para os tipos de OS e áreas demandantes
   private readonly osTypesMap: Record<string, string> = {
@@ -95,31 +95,31 @@ technologyTotal?: number;
     });
   }
 
-clearFilter() {
-  this.form.reset();
-  this.unproductiveVisitsCount = undefined;
-  this.unproductiveVisitsTotal = undefined;
-  this.unproductiveVisitData = undefined;
+  clearFilter() {
+    this.form.reset();
+    this.unproductiveVisitsCount = undefined;
+    this.unproductiveVisitsTotal = undefined;
+    this.unproductiveVisitData = undefined;
 
-  this.technicianServiceCount = undefined;
-  this.technicianServiceCountOptions = undefined;
-  this.technicianGrandTotal = undefined;
-  this.technicianList = [];
-  this.technicianServiceCountData = undefined;
+    this.technicianServiceCount = undefined;
+    this.technicianServiceCountOptions = undefined;
+    this.technicianGrandTotal = undefined;
+    this.technicianList = [];
+    this.technicianServiceCountData = undefined;
 
-  this.serviceOrderCount = undefined;
-  this.serviceOrderCountOptions = undefined;
-  this.serviceOrderTotal = undefined;
-  this.serviceOrderData = undefined;
+    this.serviceOrderCount = undefined;
+    this.serviceOrderCountOptions = undefined;
+    this.serviceOrderTotal = undefined;
+    this.serviceOrderData = undefined;
 
-  this.mainSummaryCount = undefined;
-  this.mainSummaryCountOptions = undefined;
-  this.mainSummaryData = undefined;
+    this.mainSummaryCount = undefined;
+    this.mainSummaryCountOptions = undefined;
+    this.mainSummaryData = undefined;
 
-  this.technologyChartData = undefined;
-  this.technologyTotal = undefined;
-  this.technologySummaryData = undefined;
-}
+    this.technologyChartData = undefined;
+    this.technologyTotal = undefined;
+    this.technologySummaryData = undefined;
+  }
   onSubmit() {
     this.showUnproductiveVisitsCount();
     this.showTechnicianCount();
@@ -153,166 +153,197 @@ clearFilter() {
     });
   }
 
-showTechnicianCount() {
-  const [startDate, endDate] = this.form.value.rangeDates;
+  showTechnicianCount() {
+    const [startDate, endDate] = this.form.value.rangeDates;
 
-  this.chartService.getTechnicianCount(startDate, endDate).subscribe(
-    (response: TechnicianServiceCount) => {
-      const labels = response.technicianCounts.map((item) => item.technicianName);
-      const dataCounts = response.technicianCounts.map((item) => item.serviceOrderCount);
-
-      // Lista de técnicos com quantidade
-      this.technicianList = response.technicianCounts.map(item => ({
-        name: item.technicianName,
-        count: item.serviceOrderCount
-      }));
-
-      this.technicianServiceCount = {
-        labels: labels,
-        datasets: [
-          {
-            label: "Contagem de OS",
-            data: dataCounts,
-            backgroundColor: [
-              "rgba(255, 99, 132, 0.6)",
-              "rgba(54, 162, 235, 0.6)",
-              "rgba(255, 206, 86, 0.6)",
-              "rgba(75, 192, 192, 0.6)",
-              "rgba(153, 102, 255, 0.6)",
-              "rgba(255, 159, 64, 0.6)",
-              "rgba(100, 181, 246, 0.6)",
-              "rgba(255, 138, 101, 0.6)",
-              "rgba(174, 213, 129, 0.6)",
-              "rgba(244, 143, 177, 0.6)",
-            ],
-            borderColor: [
-              "rgba(255, 99, 132, 1)",
-              "rgba(54, 162, 235, 1)",
-              "rgba(255, 206, 86, 1)",
-              "rgba(75, 192, 192, 1)",
-              "rgba(153, 102, 255, 1)",
-              "rgba(255, 159, 64, 1)",
-              "rgba(100, 181, 246, 1)",
-              "rgba(255, 138, 101, 1)",
-              "rgba(174, 213, 129, 1)",
-              "rgba(244, 143, 177, 1)",
-            ],
-            borderWidth: 1,
-          },
-        ],
-      };
-
-      // ...restante do código...
-      this.technicianServiceCountOptions = { /* ... */ };
-      this.technicianGrandTotal = response.grandTotal;
-    },
-    (e) => {
-      console.log(e);
-    }
-  );
-}
-
-  showServiceOrder() {
-  const [startDate, endDate] = this.form.value.rangeDates;
-  const formattedStartDate = this.formatDateToBackend(startDate);
-  const formattedEndDate = this.formatDateToBackend(endDate);
-
-  this.chartService
-    .getServiceOrder(formattedStartDate, formattedEndDate)
-    .subscribe(
-      (response: ServiceOrderTypeData[]) => {
-        this.serviceOrderData = response;
-
-        // Calcular o total das ordens de serviço
-        this.serviceOrderTotal = response.reduce(
-          (total, item) =>
-            total + item.actualMonthValue + item.previousMonthValue,
-          0
+    this.chartService.getTechnicianCount(startDate, endDate).subscribe(
+      (response: TechnicianServiceCount) => {
+        const labels = response.technicianCounts.map(
+          (item) => item.technicianName
+        );
+        const dataCounts = response.technicianCounts.map(
+          (item) => item.serviceOrderCount
         );
 
-        const labels = response.map(
-          (item) =>
-            this.osTypesMap[item.serviceOrderType] || item.serviceOrderType
-        );
-        const actualMonthData = response.map((item) => item.actualMonthValue);
-        const previousMonthData = response.map(
-          (item) => item.previousMonthValue
-        );
-
-        // Lista para exibir no HTML
-        this.serviceOrderList = response.map(item => ({
-          name: this.osTypesMap[item.serviceOrderType] || item.serviceOrderType,
-          atual: item.actualMonthValue,
-          anterior: item.previousMonthValue
+        // Lista de técnicos com quantidade
+        this.technicianList = response.technicianCounts.map((item) => ({
+          name: item.technicianName,
+          count: item.serviceOrderCount,
         }));
 
-        // Apenas dados
-        this.serviceOrderCount = {
+        this.technicianServiceCount = {
           labels: labels,
           datasets: [
             {
-              label: "Mês Atual",
-              data: actualMonthData,
-              backgroundColor: "#42A5F5",
-            },
-            {
-              label: "Mês Anterior",
-              data: previousMonthData,
-              backgroundColor: "#FFA726",
+              label: "Contagem de OS",
+              data: dataCounts,
+              backgroundColor: [
+                "rgba(255, 99, 132, 0.6)",
+                "rgba(54, 162, 235, 0.6)",
+                "rgba(255, 206, 86, 0.6)",
+                "rgba(75, 192, 192, 0.6)",
+                "rgba(153, 102, 255, 0.6)",
+                "rgba(255, 159, 64, 0.6)",
+                "rgba(100, 181, 246, 0.6)",
+                "rgba(255, 138, 101, 0.6)",
+                "rgba(174, 213, 129, 0.6)",
+                "rgba(244, 143, 177, 0.6)",
+              ],
+              borderColor: [
+                "rgba(255, 99, 132, 1)",
+                "rgba(54, 162, 235, 1)",
+                "rgba(255, 206, 86, 1)",
+                "rgba(75, 192, 192, 1)",
+                "rgba(153, 102, 255, 1)",
+                "rgba(255, 159, 64, 1)",
+                "rgba(100, 181, 246, 1)",
+                "rgba(255, 138, 101, 1)",
+                "rgba(174, 213, 129, 1)",
+                "rgba(244, 143, 177, 1)",
+              ],
+              borderWidth: 1,
             },
           ],
         };
 
-        // Opções separadas
-        const isDarkMode =
-          document.documentElement.classList.contains("dark");
-        const axisTicksColor = isDarkMode ? "#94a3b8" : "#64748b";
-        const gridColor = isDarkMode
-          ? "rgba(255,255,255,0.1)"
-          : "rgba(0,0,0,0.1)";
 
-        this.serviceOrderCountOptions = {
-          plugins: {
-            legend: {
-              position: "top",
-              labels: {
-                color: isDarkMode ? "#cbd5e1" : "#4b5563",
-              },
-            },
-          },
+        const maxValue = Math.max(...dataCounts, 1); 
+        const suggestedMax = maxValue < 20 ? 20 : maxValue + 1;
+
+        this.technicianServiceCountOptions = {
           scales: {
             y: {
               beginAtZero: true,
-              title: {
-                display: true,
-                text: "Quantidade de Ordens de Serviço",
-                color: axisTicksColor,
-              },
-              ticks: { color: axisTicksColor },
-              grid: { color: gridColor },
-            },
-            x: {
-              title: {
-                display: true,
-                text: "Tipo de OS",
-                color: axisTicksColor,
-              },
+              max: suggestedMax,
               ticks: {
-                color: axisTicksColor,
-                maxRotation: 45,
-                minRotation: 0,
-                autoSkip: false,
+                stepSize: 1,
+                callback: function (
+                  tickValue: string | number,
+                  index: number,
+                  ticks: any[]
+                ) {
+                  if (
+                    typeof tickValue === "number" &&
+                    Number.isInteger(tickValue)
+                  ) {
+                    return tickValue;
+                  }
+                  return "";
+                },
               },
-              grid: { color: gridColor },
             },
           },
         };
+
+        this.technicianGrandTotal = response.grandTotal;
       },
       (e) => {
         console.log(e);
       }
     );
-}
+  }
+  showServiceOrder() {
+    const [startDate, endDate] = this.form.value.rangeDates;
+    const formattedStartDate = this.formatDateToBackend(startDate);
+    const formattedEndDate = this.formatDateToBackend(endDate);
+
+    this.chartService
+      .getServiceOrder(formattedStartDate, formattedEndDate)
+      .subscribe(
+        (response: ServiceOrderTypeData[]) => {
+          this.serviceOrderData = response;
+
+          // Calcular o total das ordens de serviço
+          this.serviceOrderTotal = response.reduce(
+            (total, item) =>
+              total + item.actualMonthValue + item.previousMonthValue,
+            0
+          );
+
+          const labels = response.map(
+            (item) =>
+              this.osTypesMap[item.serviceOrderType] || item.serviceOrderType
+          );
+          const actualMonthData = response.map((item) => item.actualMonthValue);
+          const previousMonthData = response.map(
+            (item) => item.previousMonthValue
+          );
+
+          // Lista para exibir no HTML
+          this.serviceOrderList = response.map((item) => ({
+            name:
+              this.osTypesMap[item.serviceOrderType] || item.serviceOrderType,
+            atual: item.actualMonthValue,
+            anterior: item.previousMonthValue,
+          }));
+
+          // Apenas dados
+          this.serviceOrderCount = {
+            labels: labels,
+            datasets: [
+              {
+                label: "Mês Atual",
+                data: actualMonthData,
+                backgroundColor: "#42A5F5",
+              },
+              {
+                label: "Mês Anterior",
+                data: previousMonthData,
+                backgroundColor: "#FFA726",
+              },
+            ],
+          };
+
+          // Opções separadas
+          const isDarkMode =
+            document.documentElement.classList.contains("dark");
+          const axisTicksColor = isDarkMode ? "#94a3b8" : "#64748b";
+          const gridColor = isDarkMode
+            ? "rgba(255,255,255,0.1)"
+            : "rgba(0,0,0,0.1)";
+
+          this.serviceOrderCountOptions = {
+            plugins: {
+              legend: {
+                position: "top",
+                labels: {
+                  color: isDarkMode ? "#cbd5e1" : "#4b5563",
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "Quantidade de Ordens de Serviço",
+                  color: axisTicksColor,
+                },
+                ticks: { color: axisTicksColor },
+                grid: { color: gridColor },
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: "Tipo de OS",
+                  color: axisTicksColor,
+                },
+                ticks: {
+                  color: axisTicksColor,
+                  maxRotation: 45,
+                  minRotation: 0,
+                  autoSkip: false,
+                },
+                grid: { color: gridColor },
+              },
+            },
+          };
+        },
+        (e) => {
+          console.log(e);
+        }
+      );
+  }
 
   showMainSummary() {
     const [startDate, endDate] = this.form.value.rangeDates;

@@ -1,18 +1,18 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
-import { CommonModule } from '@angular/common';
-import { AuthService } from '../../core/auth/auth.service';
-import { MenuItem } from '../../interfaces/menu-item.model';
-import { SseService } from '../../core/sse/sse.service';
-import { distinctUntilChanged, Subscription, tap } from 'rxjs';
+import { Component, inject, OnDestroy, OnInit } from "@angular/core";
+import { RouterOutlet } from "@angular/router";
+import { SidebarComponent } from "../../shared/components/sidebar/sidebar.component";
+import { CommonModule } from "@angular/common";
+import { AuthService } from "../../core/auth/auth.service";
+import { MenuItem } from "../../interfaces/menu-item.model";
+import { SseService } from "../../core/sse/sse.service";
+import { distinctUntilChanged, Subscription, tap } from "rxjs";
 
 @Component({
   selector: "app-main-layout",
   standalone: true,
   imports: [RouterOutlet, SidebarComponent, CommonModule],
   templateUrl: "./main-layout.component.html",
-  styleUrls: ['./main-layout.component.scss']
+  styleUrls: ["./main-layout.component.scss"],
 })
 export class MainLayoutComponent implements OnInit, OnDestroy {
   isSidebarCollapsed = false;
@@ -26,10 +26,15 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     { id: "home", label: "Home", icon: "pi pi-home", route: "/app/home" },
     // Clientes
     {
-      id: 'clients',
-      label: 'Clientes',
-      icon: 'pi pi-users',
-      allowedRoles: ['ROLE_ADMIN', 'ROLE_STORE_MANAGER', 'ROLE_STORE_EMPLOYEE', 'ROLE_CDS'],
+      id: "clients",
+      label: "Clientes",
+      icon: "pi pi-users",
+      allowedRoles: [
+        "ROLE_ADMIN",
+        "ROLE_STORE_MANAGER",
+        "ROLE_STORE_EMPLOYEE",
+        "ROLE_CDS",
+      ],
       expanded: false, // Estado inicial do submenu (opcional)
       children: [
         // {
@@ -40,44 +45,49 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         //   exactMatch: true,
         // },
         {
-          id: 'pesquisar-cliente',
-          label: 'Pesquisar Cliente',
-          icon: 'pi pi-search',
-          route: '/app/clientes/pesquisar-cliente',
+          id: "pesquisar-cliente",
+          label: "Pesquisar Cliente",
+          icon: "pi pi-search",
+          route: "/app/clientes/pesquisar-cliente",
           exactMatch: true,
         },
         {
-          id: 'register-client',
-          label: 'Cadastrar Novo Cliente',
-          icon: 'pi pi-user-plus',
-          route: '/app/clientes/cliente-cadastrar',
-          exactMatch: true
+          id: "register-client",
+          label: "Cadastrar Novo Cliente",
+          icon: "pi pi-user-plus",
+          route: "/app/clientes/cliente-cadastrar",
+          exactMatch: true,
         },
         {
-          id: 'client-list',
-          label: 'Listar Clientes',
-          icon: 'pi pi-users',
-          route: '/app/clientes/cliente-cadastrados',
-          exactMatch: true
+          id: "client-list",
+          label: "Listar Clientes",
+          icon: "pi pi-users",
+          route: "/app/clientes/cliente-cadastrados",
+          exactMatch: true,
         },
         {
-          id: 'confirm-installation',
-          label: 'Confirmar Instalação',
-          icon: 'pi pi-check',
-          route: '/app/clientes/confirmar-instalacao',
-          exactMatch: true
-        }
-      ]
+          id: "confirm-installation",
+          label: "Confirmar Instalação",
+          icon: "pi pi-check",
+          route: "/app/clientes/confirmar-instalacao",
+          exactMatch: true,
+        },
+      ],
     },
     // Companhia
     {
       id: "company",
       label: "Empresa",
       icon: "pi pi-building",
-      allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_STORE_EMPLOYEE", "ROLE_CDS"],
+      allowedRoles: [
+        "ROLE_ADMIN",
+        "ROLE_STORE_MANAGER",
+        "ROLE_STORE_EMPLOYEE",
+        "ROLE_CDS",
+      ],
       expanded: false,
       children: [
-         {
+        {
           id: "colaboradores",
           label: "Colaboradores",
           icon: "pi pi-users",
@@ -90,7 +100,12 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           label: "Técnicos",
           icon: "pi pi-wrench",
           route: "/app/tecnicos",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_ANALYST", "ROLE_CDS"],
+          allowedRoles: [
+            "ROLE_ADMIN",
+            "ROLE_STORE_MANAGER",
+            "ROLE_ANALYST",
+            "ROLE_CDS",
+          ],
           exactMatch: true,
         },
         {
@@ -98,16 +113,26 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           label: "Anotações",
           icon: "pi pi-pen-to-square",
           route: "/app/anotacoes",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_ANALYST", "ROLE_CDS"],
-        }
-      ]
+          allowedRoles: [
+            "ROLE_ADMIN",
+            "ROLE_STORE_MANAGER",
+            "ROLE_ANALYST",
+            "ROLE_CDS",
+          ],
+        },
+      ],
     },
     // Ordens de Serviço
     {
       id: "service-orders",
       label: "Ordens de Serviço",
       icon: "pi pi-briefcase",
-      allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_STORE_EMPLOYEE", "ROLE_CDS"], // Papéis para ver o item "Ordens de Serviço"
+      allowedRoles: [
+        "ROLE_ADMIN",
+        "ROLE_STORE_MANAGER",
+        "ROLE_STORE_EMPLOYEE",
+        "ROLE_CDS",
+      ], // Papéis para ver o item "Ordens de Serviço"
       expanded: false, // Estado inicial do submenu (opcional)
       children: [
         {
@@ -161,8 +186,13 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           label: "Endereços Cabeados",
           icon: "pi pi-map-marker",
           route: "/app/ordens-de-servico/endereco-cabeado",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_ANALYST", "ROLE_CDS"],
-        }
+          allowedRoles: [
+            "ROLE_ADMIN",
+            "ROLE_STORE_MANAGER",
+            "ROLE_ANALYST",
+            "ROLE_CDS",
+          ],
+        },
       ],
     },
     // Vendas
@@ -188,24 +218,36 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           route: "/app/vendas",
           allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST"],
           exactMatch: true,
-        }
-      ]
+        },
+      ],
     },
     // Pós Vendas
     {
-      id: 'after-sales',
-      label: 'Pós-Vendas',
-      icon: 'pi pi-check-circle',
-      route: '/app/pos-vendas',
-      allowedRoles: ['ROLE_ADMIN', 'ROLE_STORE_MANAGER', 'ROLE_ANALYST', 'ROLE_STORE_EMPLOYEE'],
+      id: "after-sales",
+      label: "Pós-Vendas",
+      icon: "pi pi-check-circle",
+      route: "/app/pos-vendas",
+      allowedRoles: [
+        "ROLE_ADMIN",
+        "ROLE_STORE_MANAGER",
+        "ROLE_ANALYST",
+        "ROLE_STORE_EMPLOYEE",
+      ],
     },
     // ONUs
     {
       id: "olt",
       label: "Olt",
       icon: "pi pi-server",
-      allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_ANALYST", "ROLE_MAINTENANCE", "ROLE_CDS", "ROLE_CALL_CENTER"],
-      expanded: false, 
+      allowedRoles: [
+        "ROLE_ADMIN",
+        "ROLE_STORE_MANAGER",
+        "ROLE_ANALYST",
+        "ROLE_MAINTENANCE",
+        "ROLE_CDS",
+        "ROLE_CALL_CENTER",
+      ],
+      expanded: false,
       children: [
         {
           id: "olt-sn",
@@ -228,7 +270,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           route: "/app/olt/usuarios",
           allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST"],
           exactMatch: true,
-        }
+        },
       ],
     },
     {
@@ -236,7 +278,12 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       label: "Onus",
       icon: "pi pi-warehouse",
       route: "/app/onus",
-      allowedRoles: ["ROLE_ADMIN", "ROLE_MAINTENANCE", "ROLE_ANALYST", "ROLE_CDS"],
+      allowedRoles: [
+        "ROLE_ADMIN",
+        "ROLE_MAINTENANCE",
+        "ROLE_ANALYST",
+        "ROLE_CDS",
+      ],
     },
     {
       id: "tickets",
@@ -258,7 +305,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           route: "/app/chamados/gerenciar",
           allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST", "ROLE_MAINTENANCE"],
           exactMatch: true,
-        }
+        },
       ],
     },
     {
@@ -284,10 +331,11 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     },
     // Diagnósticos
     {
-      id: 'diagnostics',
-      label: 'Diagnósticos',
-      icon: 'pi pi-chart-bar',
-      route: '/app/diagnosticos',
+      id: "diagnostics",
+      label: "Diagnósticos",
+      icon: "pi pi-chart-bar",
+      route: "/app/diagnosticos",
+      allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_ANALYST"],
     },
     {
       id: "settings",
@@ -300,21 +348,21 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Ouve as mudanças no estado do usuário
     this.authStateSubscription = this.authService.currentUser$
-    .pipe(
-      tap((user: any) => console.log('Current user:', user)),
-      distinctUntilChanged()
-    )
-    .subscribe(user => {
-      if (user) {
-        // Se há um usuário, conecta o SSE
-        console.log('User logged in, connecting to SSE...');
-        this.sseService.connect();
-      } else {
-        // Se não há usuário (logout), desconecta o SSE
-        console.log('User logged out, disconnecting from SSE...');
-        this.sseService.disconnect();
-      }
-    });
+      .pipe(
+        tap((user: any) => console.log("Current user:", user)),
+        distinctUntilChanged()
+      )
+      .subscribe((user) => {
+        if (user) {
+          // Se há um usuário, conecta o SSE
+          console.log("User logged in, connecting to SSE...");
+          this.sseService.connect();
+        } else {
+          // Se não há usuário (logout), desconecta o SSE
+          console.log("User logged out, disconnecting from SSE...");
+          this.sseService.disconnect();
+        }
+      });
   }
 
   ngOnDestroy(): void {

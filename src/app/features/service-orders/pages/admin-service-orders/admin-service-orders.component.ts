@@ -253,7 +253,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   }
 
   loadServiceOrders(event?: TableLazyLoadEvent): void {
-    console.log("url", this.router.url);
     this.isLoading = true;
     if (event) {
       this.first = event.first ?? 0;
