@@ -9,6 +9,9 @@ import { environment } from '../../../../environments/environment';
   providedIn: 'root'
 })
 export class OnuService {
+  findMaintenancesByOnuId(id: string) {
+    throw new Error("Method not implemented.");
+  }
 
   private http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/onus`;
@@ -45,4 +48,6 @@ export class OnuService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
   
+
+
 }

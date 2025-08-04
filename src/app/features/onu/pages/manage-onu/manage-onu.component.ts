@@ -1,27 +1,44 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
-import { ViewOnuDto, OnuSignalLabels, OnuColorLabels, OnuCertificateLabels, OnuMaintenanceStatusLabels, CreateOnuMaintenanceDto, OnuSignal, OnuCertificate, OnuColor } from '../../../../interfaces/onu.model';
-import { OnuMaintenanceService } from '../../services/onu-maintenance.service';
-import { OnuService } from '../../services/onu.service';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { FieldsetModule } from 'primeng/fieldset';
-import { SelectModule } from 'primeng/select';
-import { ButtonModule } from 'primeng/button';
-import { ToolbarModule } from 'primeng/toolbar';
-import { TagModule } from 'primeng/tag';
-import { DialogModule } from 'primeng/dialog';
-import { CustomPageResponse } from '../../../../interfaces/service-order.model';
-import { CommonModule } from '@angular/common';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
+import { Component, inject, OnDestroy, OnInit } from "@angular/core";
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from "@angular/forms";
+import { Router, ActivatedRoute } from "@angular/router";
+import { MessageService, ConfirmationService } from "primeng/api";
+import { TableLazyLoadEvent, TableModule } from "primeng/table";
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from "rxjs";
+import {
+  ViewOnuDto,
+  OnuSignalLabels,
+  OnuColorLabels,
+  OnuCertificateLabels,
+  OnuMaintenanceStatusLabels,
+  CreateOnuMaintenanceDto,
+  OnuSignal,
+  OnuCertificate,
+  OnuColor,
+  ViewOnuMaintenanceDto,
+} from "../../../../interfaces/onu.model";
+import { OnuMaintenanceService } from "../../services/onu-maintenance.service";
+import { OnuService } from "../../services/onu.service";
+import { ToastModule } from "primeng/toast";
+import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { FieldsetModule } from "primeng/fieldset";
+import { SelectModule } from "primeng/select";
+import { ButtonModule } from "primeng/button";
+import { ToolbarModule } from "primeng/toolbar";
+import { TagModule } from "primeng/tag";
+import { DialogModule } from "primeng/dialog";
+import { CustomPageResponse } from "../../../../interfaces/service-order.model";
+import { CommonModule } from "@angular/common";
+import { InputTextModule } from "primeng/inputtext";
+import { TextareaModule } from "primeng/textarea";
 
 @Component({
-  selector: 'app-manage-onu',
+  selector: "app-manage-onu",
   imports: [
     ToastModule,
     ConfirmDialogModule,
@@ -36,13 +53,13 @@ import { TextareaModule } from 'primeng/textarea';
     DialogModule,
     CommonModule,
     InputTextModule,
-    TextareaModule
+    TextareaModule,
   ],
-  templateUrl: './manage-onu.component.html',
-  styleUrl: './manage-onu.component.scss',
-  providers: [MessageService, ConfirmationService]
+  templateUrl: "./manage-onu.component.html",
+  styleUrl: "./manage-onu.component.scss",
+  providers: [MessageService, ConfirmationService],
 })
-export class ManageOnuComponent implements OnInit, OnDestroy{
+export class ManageOnuComponent implements OnInit, OnDestroy {
   // --- Injeções ---
   private fb = inject(FormBuilder);
   private onuService = inject(OnuService);
@@ -73,20 +90,20 @@ export class ManageOnuComponent implements OnInit, OnDestroy{
   public readonly OnuCertificateLabels = OnuCertificateLabels;
 
   modelsOptions = [
-    'HG8010H',
-    'EG8145v5',
-    'HS8546v5',
-    'EGB145X6',
-    'HG8145V5',
-    'HS8546V',
-    'HG8546M',
-    'EGB145v5',
-    'EG8010',
-    'HG8310M',
-    'EG8120L',
-    'EGB145X6-10',
-    'EG8145B7-50'
-  ]
+    "HG8010H",
+    "EG8145v5",
+    "HS8546v5",
+    "EGB145X6",
+    "HG8145V5",
+    "HS8546V",
+    "HG8546M",
+    "EGB145v5",
+    "EG8010",
+    "HG8310M",
+    "EG8120L",
+    "EGB145X6-10",
+    "EG8145B7-50",
+  ];
 
   // --- Dialogs e Forms ---
   selectedOnu: ViewOnuDto | null = null;
@@ -102,11 +119,17 @@ export class ManageOnuComponent implements OnInit, OnDestroy{
   maintenanceForm!: FormGroup;
   isSubmittingMaintenance = false;
 
+  maintenanceByIdDialog = false;
+  maintenanceHistory: ViewOnuMaintenanceDto[] = [];
+  isLoadingMaintenances = false;
+
   constructor() {
     this.signalOptions = this.mapLabelsToOptions(OnuSignalLabels);
     this.colorOptions = this.mapLabelsToOptions(OnuColorLabels);
     this.certificateOptions = this.mapLabelsToOptions(OnuCertificateLabels);
-    this.maintenanceStatusOptions = this.mapLabelsToOptions(OnuMaintenanceStatusLabels);
+    this.maintenanceStatusOptions = this.mapLabelsToOptions(
+      OnuMaintenanceStatusLabels
+    );
   }
 
   ngOnInit(): void {
@@ -124,55 +147,60 @@ export class ManageOnuComponent implements OnInit, OnDestroy{
       onuCertificate: [null],
       onuColor: [null],
       onuSignal: [null],
-      serialNumber: ['', Validators.pattern('^[a-zA-Z0-9-]+$')] // Regex para permitir apenas letras, números e hífens
+      serialNumber: ["", Validators.pattern("^[a-zA-Z0-9-]+$")], // Regex para permitir apenas letras, números e hífens
     });
     this.createForm = this.fb.group({
-      serialNumber: ['', Validators.required],
-      model: ['', Validators.required],
+      serialNumber: ["", Validators.required],
+      model: ["", Validators.required],
       onuCertificate: [null, Validators.required],
       onuColor: [null, Validators.required],
       onuSignal: [null, Validators.required],
-      observation: [''],
+      observation: [""],
     });
     this.updateForm = this.fb.group({
-      serialNumber: ['', Validators.required],
-      model: ['', Validators.required],
+      serialNumber: ["", Validators.required],
+      model: ["", Validators.required],
       onuCertificate: [null, Validators.required],
       onuColor: [null, Validators.required],
       onuSignal: [null, Validators.required],
     });
     this.maintenanceForm = this.fb.group({
-      detectedProblem: ['', Validators.required],
+      detectedProblem: ["", Validators.required],
       status: [null, Validators.required],
       signal: [null, Validators.required],
-      observation: [''],
+      observation: [""],
     });
   }
 
   private syncFiltersWithUrl(): void {
-    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      const page = params.get('page') ? parseInt(params.get('page')!, 10) : 0;
-      this.rows = params.get('size') ? parseInt(params.get('size')!, 10) : 10;
-      this.first = page * this.rows;
+    this.route.queryParamMap
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        const page = params.get("page") ? parseInt(params.get("page")!, 10) : 0;
+        this.rows = params.get("size") ? parseInt(params.get("size")!, 10) : 10;
+        this.first = page * this.rows;
 
-      const filters = {
-        onuCertificate: params.get('onuCertificate') as OnuCertificate || null,
-        onuColor: params.get('onuColor') as OnuColor || null,
-        onuSignal: params.get('onuSignal') as OnuSignal || null,
-        serialNumber: params.get('serialNumber') || ''
-      };
-      this.filterForm.patchValue(filters, { emitEvent: false });
-      this.loadOnus();
-    });
+        const filters = {
+          onuCertificate:
+            (params.get("onuCertificate") as OnuCertificate) || null,
+          onuColor: (params.get("onuColor") as OnuColor) || null,
+          onuSignal: (params.get("onuSignal") as OnuSignal) || null,
+          serialNumber: params.get("serialNumber") || "",
+        };
+        this.filterForm.patchValue(filters, { emitEvent: false });
+        this.loadOnus();
+      });
 
-    this.filterForm.valueChanges.pipe(
-      debounceTime(500),
-      distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-      takeUntil(this.destroy$)
-    ).subscribe(() => {
-      this.first = 0;
-      this.updateUrl();
-    });
+    this.filterForm.valueChanges
+      .pipe(
+        debounceTime(500),
+        distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        this.first = 0;
+        this.updateUrl();
+      });
   }
 
   loadOnus(event?: TableLazyLoadEvent): void {
@@ -184,17 +212,30 @@ export class ManageOnuComponent implements OnInit, OnDestroy{
     const page = Math.floor(this.first / this.rows);
     const filters = this.filterForm.value;
 
-    this.onuService.findAllOnus(page, this.rows, filters.onuCertificate, filters.onuColor, filters.onuSignal, filters.serialNumber).subscribe({
-      next: (dataPage: CustomPageResponse<ViewOnuDto>) => {
-        this.onus = dataPage.content;
-        this.totalRecords = dataPage.page.totalElements;
-        this.isLoading = false;
-      },
-      error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar ONUs.' });
-        this.isLoading = false;
-      }
-    });
+    this.onuService
+      .findAllOnus(
+        page,
+        this.rows,
+        filters.onuCertificate,
+        filters.onuColor,
+        filters.onuSignal,
+        filters.serialNumber
+      )
+      .subscribe({
+        next: (dataPage: CustomPageResponse<ViewOnuDto>) => {
+          this.onus = dataPage.content;
+          this.totalRecords = dataPage.page.totalElements;
+          this.isLoading = false;
+        },
+        error: () => {
+          this.messageService.add({
+            severity: "error",
+            summary: "Erro",
+            detail: "Falha ao carregar ONUs.",
+          });
+          this.isLoading = false;
+        },
+      });
   }
 
   updateUrl(): void {
@@ -219,6 +260,29 @@ export class ManageOnuComponent implements OnInit, OnDestroy{
     this.displayCreateDialog = true;
   }
 
+openMaintenanceByIdDialog(onu: ViewOnuDto): void {
+  console.log(onu.id)
+  this.selectedOnu = onu;
+  this.maintenanceByIdDialog = true;
+  this.isLoadingMaintenances = true;
+  this.maintenanceHistory = [];
+  this.maintenanceService.findMaintenancesByOnuId(onu.id).subscribe({
+    next: (response) => {
+      this.maintenanceHistory = response;
+      this.isLoadingMaintenances = false;
+
+    },
+    error: (e) => {
+      this.messageService.add({
+        severity: "error",
+        summary: "Erro",
+        detail: e.error?.message || "Falha ao carregar histórico de manutenções.",
+      });
+      this.isLoadingMaintenances = false;
+    }
+  });
+}
+
   submitCreateForm(): void {
     if (this.createForm.invalid) {
       this.createForm.markAllAsTouched();
@@ -227,12 +291,21 @@ export class ManageOnuComponent implements OnInit, OnDestroy{
     this.isSubmittingCreate = true;
     this.onuService.createOnu(this.createForm.value).subscribe({
       next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'ONU criada!' });
+        this.messageService.add({
+          severity: "success",
+          summary: "Sucesso",
+          detail: "ONU criada!",
+        });
         this.displayCreateDialog = false;
         this.loadOnus();
       },
-      error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message || 'Falha ao criar ONU.' }),
-      complete: () => this.isSubmittingCreate = false,
+      error: (err) =>
+        this.messageService.add({
+          severity: "error",
+          summary: "Erro",
+          detail: err.error?.message || "Falha ao criar ONU.",
+        }),
+      complete: () => (this.isSubmittingCreate = false),
     });
   }
 
@@ -245,15 +318,26 @@ export class ManageOnuComponent implements OnInit, OnDestroy{
   submitUpdateForm(): void {
     if (!this.selectedOnu || this.updateForm.invalid) return;
     this.isSubmittingUpdate = true;
-    this.onuService.updateOnu(this.selectedOnu.id, this.updateForm.value).subscribe({
-      next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'ONU atualizada.' });
-        this.displayUpdateDialog = false;
-        this.loadOnus();
-      },
-      error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message || 'Falha ao atualizar ONU.' }),
-      complete: () => this.isSubmittingUpdate = false
-    });
+    this.onuService
+      .updateOnu(this.selectedOnu.id, this.updateForm.value)
+      .subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: "success",
+            summary: "Sucesso",
+            detail: "ONU atualizada.",
+          });
+          this.displayUpdateDialog = false;
+          this.loadOnus();
+        },
+        error: (err) =>
+          this.messageService.add({
+            severity: "error",
+            summary: "Erro",
+            detail: err.error?.message || "Falha ao atualizar ONU.",
+          }),
+        complete: () => (this.isSubmittingUpdate = false),
+      });
   }
 
   openMaintenanceDialog(onu: ViewOnuDto): void {
@@ -266,38 +350,57 @@ export class ManageOnuComponent implements OnInit, OnDestroy{
     if (!this.selectedOnu || this.maintenanceForm.invalid) return;
     this.isSubmittingMaintenance = true;
     const dto: CreateOnuMaintenanceDto = this.maintenanceForm.value;
-    this.maintenanceService.createMaintenance(this.selectedOnu.id, dto).subscribe({
-      next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Manutenção registrada.' });
-        this.displayMaintenanceDialog = false;
-        this.loadOnus();
-      },
-      error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message || 'Falha ao registrar manutenção.' }),
-      complete: () => this.isSubmittingMaintenance = false
-    });
+    this.maintenanceService
+      .createMaintenance(this.selectedOnu.id, dto)
+      .subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: "success",
+            summary: "Sucesso",
+            detail: "Manutenção registrada.",
+          });
+          this.displayMaintenanceDialog = false;
+          this.loadOnus();
+        },
+        error: (err) =>
+          this.messageService.add({
+            severity: "error",
+            summary: "Erro",
+            detail: err.error?.message || "Falha ao registrar manutenção.",
+          }),
+        complete: () => (this.isSubmittingMaintenance = false),
+      });
   }
 
   confirmDelete(onu: ViewOnuDto): void {
     this.confirmationService.confirm({
       message: `Tem certeza que deseja excluir a ONU com SN: ${onu.serialNumber}? Esta ação não pode ser desfeita.`,
-      header: 'Confirmar Exclusão',
-      icon: 'pi pi-trash',
-      acceptLabel: 'Sim, Excluir',
-      rejectLabel: 'Não',
-      acceptButtonStyleClass: 'p-button-danger',
+      header: "Confirmar Exclusão",
+      icon: "pi pi-trash",
+      acceptLabel: "Sim, Excluir",
+      rejectLabel: "Não",
+      acceptButtonStyleClass: "p-button-danger",
       accept: () => {
         this.onuService.deleteOnu(onu.id).subscribe({
-            next: () => {
-                this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'ONU excluída.' });
-                this.loadOnus();
-            },
-            error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message || 'Falha ao excluir ONU.' })
+          next: () => {
+            this.messageService.add({
+              severity: "success",
+              summary: "Sucesso",
+              detail: "ONU excluída.",
+            });
+            this.loadOnus();
+          },
+          error: (err) =>
+            this.messageService.add({
+              severity: "error",
+              summary: "Erro",
+              detail: err.error?.message || "Falha ao excluir ONU.",
+            }),
         });
-      }
+      },
     });
   }
 
-  
   getSignalLabel(signal: OnuSignal): string {
     return OnuSignalLabels[signal] || signal;
   }
@@ -309,13 +412,49 @@ export class ManageOnuComponent implements OnInit, OnDestroy{
   getCertificateLabel(certificate: OnuCertificate): string {
     return OnuCertificateLabels[certificate] || certificate;
   }
-  
+
   // Helper para a severidade da tag (já existente e correto)
-  getSignalSeverity(signal: OnuSignal): any {
-    const map: Record<string, string> = { 'NORMAL': 'success', 'WITH_PROBLEM': 'warning', 'LOS': 'danger' };
-    return map[signal] || 'info';
+ getSignalSeverity(signal: string): 'success' | 'secondary' | 'info' | 'warn' | 'danger' | 'contrast' | undefined {
+  switch (signal) {
+    case 'NORMAL':
+      return 'success';    
+    case 'WITH_PROBLEM':
+      return 'warn';      
+    case 'LOS':
+      return 'danger';     
+    default:
+      return 'secondary'; 
   }
-  
-  // Helper para popular dropdowns (já existente e correto)
-  private mapLabelsToOptions = (labels: Record<string, string>): any[] => Object.entries(labels).map(([value, label]) => ({ label, value }));
 }
+
+  // Helper para popular dropdowns (já existente e correto)
+  private mapLabelsToOptions = (labels: Record<string, string>): any[] =>
+    Object.entries(labels).map(([value, label]) => ({ label, value }));
+
+getMaintenanceStatusSeverity(status: string): 'success' | 'secondary' | 'info' | 'warn' | 'danger' | 'contrast' | undefined {
+  switch (status) {
+    case 'FIXED':
+      return 'success';
+    case 'PENDING':
+      return 'warn';
+    case 'CANCELLED':
+      return 'danger';
+    default:
+      return 'secondary';
+  }
+}
+
+getMaintenanceStatusLabel(status: string): string {
+  switch (status) {
+    case 'FIXED':
+      return 'Concluída';
+    case 'PENDING':
+      return 'Pendente';
+    case 'CANCELLED':
+      return 'Cancelada';
+    default:
+      return status;
+  }
+}
+}
+

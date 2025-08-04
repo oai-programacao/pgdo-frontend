@@ -1,4 +1,6 @@
-<div class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
+<div
+  class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md"
+>
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
@@ -7,45 +9,106 @@
       <h1 class="text-2xl font-semibold">Gerenciamento de ONUs</h1>
     </ng-template>
     <ng-template pTemplate="right">
-      <button pButton label="Nova ONU" icon="pi pi-plus" class="p-button-success" (click)="openCreateDialog()"></button>
+      <button
+        pButton
+        label="Nova ONU"
+        icon="pi pi-plus"
+        class="p-button-success"
+        (click)="openCreateDialog()"
+      ></button>
     </ng-template>
   </p-toolbar>
 
-  <p-fieldset legend="Filtros" [toggleable]="true" [collapsed]="true" styleClass="mb-6">
-    <form [formGroup]="filterForm" class="p-fluid grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5 pt-4">
+  <p-fieldset
+    legend="Filtros"
+    [toggleable]="true"
+    [collapsed]="true"
+    styleClass="mb-6"
+  >
+    <form
+      [formGroup]="filterForm"
+      class="p-fluid grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5 pt-4"
+    >
       <div>
-        <label for="filter-sn" class="block text-sm font-medium mb-1.5">Serial Number</label>
-        <input id="filter-sn" type="search" pInputText formControlName="serialNumber" fluid showClear/>
+        <label for="filter-sn" class="block text-sm font-medium mb-1.5"
+          >Serial Number</label
+        >
+        <input
+          id="filter-sn"
+          type="search"
+          pInputText
+          formControlName="serialNumber"
+          fluid
+          showClear
+        />
       </div>
       <div>
-        <label for="filter-cert" class="block text-sm font-medium mb-1.5">Certificado</label>
-        <p-select inputId="filter-cert" [options]="certificateOptions" appendTo="body" styleClass="w-full" formControlName="onuCertificate" placeholder="Todos" [showClear]="true"></p-select>
+        <label for="filter-cert" class="block text-sm font-medium mb-1.5"
+          >Certificado</label
+        >
+        <p-select
+          inputId="filter-cert"
+          [options]="certificateOptions"
+          appendTo="body"
+          styleClass="w-full"
+          formControlName="onuCertificate"
+          placeholder="Todos"
+          [showClear]="true"
+        ></p-select>
       </div>
       <div>
-        <label for="filter-color" class="block text-sm font-medium mb-1.5">Cor</label>
-        <p-select inputId="filter-color" [options]="colorOptions" appendTo="body" styleClass="w-full" formControlName="onuColor" placeholder="Todas" [showClear]="true"></p-select>
+        <label for="filter-color" class="block text-sm font-medium mb-1.5"
+          >Cor</label
+        >
+        <p-select
+          inputId="filter-color"
+          [options]="colorOptions"
+          appendTo="body"
+          styleClass="w-full"
+          formControlName="onuColor"
+          placeholder="Todas"
+          [showClear]="true"
+        ></p-select>
       </div>
       <div>
-        <label for="filter-signal" class="block text-sm font-medium mb-1.5">Sinal</label>
-        <p-select inputId="filter-signal" [options]="signalOptions" appendTo="body" styleClass="w-full" formControlName="onuSignal" placeholder="Todos" [showClear]="true"></p-select>
+        <label for="filter-signal" class="block text-sm font-medium mb-1.5"
+          >Sinal</label
+        >
+        <p-select
+          inputId="filter-signal"
+          [options]="signalOptions"
+          appendTo="body"
+          styleClass="w-full"
+          formControlName="onuSignal"
+          placeholder="Todos"
+          [showClear]="true"
+        ></p-select>
       </div>
       <div class="md:col-span-3 flex justify-end">
-        <button pButton type="button" label="Limpar Filtros" icon="pi pi-filter-slash" class="p-button-outlined p-button-secondary" (click)="clearFilters()"></button>
+        <button
+          pButton
+          type="button"
+          label="Limpar Filtros"
+          icon="pi pi-filter-slash"
+          class="p-button-outlined p-button-secondary"
+          (click)="clearFilters()"
+        ></button>
       </div>
     </form>
   </p-fieldset>
 
-  <p-table 
-    [value]="onus" 
-    [loading]="isLoading" 
-    #dt 
+  <p-table
+    [value]="onus"
+    [loading]="isLoading"
+    #dt
     styleClass="p-datatable-striped p-datatable-sm"
-    [paginator]="true" 
-    [rows]="rows" 
-    [totalRecords]="totalRecords" 
-    (onPage)="loadOnus($event)" 
+    [paginator]="true"
+    [rows]="rows"
+    [totalRecords]="totalRecords"
+    (onPage)="loadOnus($event)"
     [lazy]="true"
-    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ONUs">
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ONUs"
+  >
     <ng-template pTemplate="header">
       <tr>
         <th>Serial Number</th>
@@ -61,87 +124,476 @@
         <td class="font-mono">{{ onu.serialNumber }}</td>
         <td>{{ onu.model }}</td>
         <td class="text-center">
-            <p-tag [value]="getSignalLabel(onu.signal)" [severity]="getSignalSeverity(onu.signal)" />
+          <p-tag
+            [value]="getSignalLabel(onu.signal)"
+            [severity]="getSignalSeverity(onu.signal)"
+          />
         </td>
         <td class="text-center">{{ getColorLabel(onu.onuColor) }}</td>
-        <td class="text-center">{{ getCertificateLabel(onu.onuCertificate) }}</td>
+        <td class="text-center">
+          {{ getCertificateLabel(onu.onuCertificate) }}
+        </td>
         <td class="text-center space-x-2">
-          <button pButton type="button" icon="pi pi-wrench" class="p-button-rounded p-button-info p-button-outlined" pTooltip="Registrar Manutenção" (click)="openMaintenanceDialog(onu)"></button>
-          <button pButton type="button" icon="pi pi-pencil" class="p-button-rounded p-button-warning p-button-outlined" pTooltip="Editar ONU" (click)="openUpdateDialog(onu)"></button>
-          <button pButton type="button" icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-outlined" pTooltip="Excluir ONU" (click)="confirmDelete(onu)"></button>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-wrench"
+            class="p-button-rounded p-button-info p-button-outlined"
+            pTooltip="Registrar Manutenção"
+            (click)="openMaintenanceDialog(onu)"
+          ></button>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-warning p-button-outlined"
+            pTooltip="Editar ONU"
+            (click)="openUpdateDialog(onu)"
+          ></button>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-danger p-button-outlined"
+            pTooltip="Excluir ONU"
+            (click)="confirmDelete(onu)"
+          ></button>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-eye"
+            class="p-button-rounded p-button-secondary p-button-outlined"
+            pTooltip="Ver Detalhes"
+            (click)="openMaintenanceByIdDialog(onu)"
+          ></button>
         </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
-      <tr><td colspan="6" class="text-center p-6">Nenhuma ONU encontrada.</td></tr>
+      <tr>
+        <td colspan="6" class="text-center p-6">Nenhuma ONU encontrada.</td>
+      </tr>
     </ng-template>
   </p-table>
 </div>
 
-<p-dialog header="Criar Nova ONU" [(visible)]="displayCreateDialog" [modal]="true" [style]="{width: '50vw', minWidth: '500px'}" [draggable]="false">
-    <form [formGroup]="createForm" (ngSubmit)="submitCreateForm()" class="p-fluid space-y-6 pt-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
-        <div>
-          <label for="create-sn" class="block text-sm font-medium mb-1.5">Serial Number <span class="text-red-500">*</span></label>
-          <input id="create-sn" type="text" pInputText formControlName="serialNumber" fluid/>
-          <div class="h-5 mt-1.5"><small *ngIf="createForm.get('serialNumber')?.invalid && createForm.get('serialNumber')?.touched" class="p-error block text-xs">Serial Number é obrigatório.</small></div>
-        </div>
-        <div>
-          <label for="create-model" class="block text-sm font-medium mb-1.5">Modelo <span class="text-red-500">*</span></label>
-            <p-select inputId="create-model" [options]="modelsOptions" formControlName="model" appendTo="body" styleClass="w-full"></p-select>
-          <div class="h-5 mt-1.5"><small *ngIf="createForm.get('model')?.invalid && createForm.get('model')?.touched" class="p-error block text-xs">Modelo é obrigatório.</small></div>
-        </div>
-        <div>
-          <label for="create-cert" class="block text-sm font-medium mb-1.5">Certificado <span class="text-red-500">*</span></label>
-          <p-select inputId="create-cert" [options]="certificateOptions" formControlName="onuCertificate" appendTo="body" styleClass="w-full"></p-select>
-          <div class="h-5 mt-1.5"><small *ngIf="createForm.get('onuCertificate')?.invalid && createForm.get('onuCertificate')?.touched" class="p-error block text-xs">Certificado é obrigatório.</small></div>
-        </div>
-        <div>
-          <label for="create-color" class="block text-sm font-medium mb-1.5">Cor <span class="text-red-500">*</span></label>
-          <p-select inputId="create-color" [options]="colorOptions" formControlName="onuColor" appendTo="body" styleClass="w-full"></p-select>
-          <div class="h-5 mt-1.5"><small *ngIf="createForm.get('onuColor')?.invalid && createForm.get('onuColor')?.touched" class="p-error block text-xs">Cor é obrigatória.</small></div>
-        </div>
-        <div class="md:col-span-2">
-          <label for="create-signal" class="block text-sm font-medium mb-1.5">Sinal <span class="text-red-500">*</span></label>
-          <p-select inputId="create-signal" [options]="signalOptions" formControlName="onuSignal" appendTo="body" styleClass="w-full"></p-select>
-          <div class="h-5 mt-1.5"><small *ngIf="createForm.get('onuSignal')?.invalid && createForm.get('onuSignal')?.touched" class="p-error block text-xs">Sinal é obrigatório.</small></div>
-        </div>
-        <div class="md:col-span-2">
-          <label for="create-obs" class="block text-sm font-medium mb-1.5">Observação</label>
-          <textarea id="create-obs" pTextarea [rows]="3" formControlName="observation" fluid></textarea>
+<p-dialog
+  header="Criar Nova ONU"
+  [(visible)]="displayCreateDialog"
+  [modal]="true"
+  [style]="{ width: '50vw', minWidth: '500px' }"
+  [draggable]="false"
+>
+  <form
+    [formGroup]="createForm"
+    (ngSubmit)="submitCreateForm()"
+    class="p-fluid space-y-6 pt-4"
+  >
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+      <div>
+        <label for="create-sn" class="block text-sm font-medium mb-1.5"
+          >Serial Number <span class="text-red-500">*</span></label
+        >
+        <input
+          id="create-sn"
+          type="text"
+          pInputText
+          formControlName="serialNumber"
+          fluid
+        />
+        <div class="h-5 mt-1.5">
+          <small
+            *ngIf="
+              createForm.get('serialNumber')?.invalid &&
+              createForm.get('serialNumber')?.touched
+            "
+            class="p-error block text-xs"
+            >Serial Number é obrigatório.</small
+          >
         </div>
       </div>
-    </form>
-    <ng-template pTemplate="footer">
-      <div class="flex justify-end gap-3">
-        <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="displayCreateDialog=false"></button>
-        <button pButton type="submit" label="Salvar ONU" icon="pi pi-check" [loading]="isSubmittingCreate" (click)="submitCreateForm()"></button>
+      <div>
+        <label for="create-model" class="block text-sm font-medium mb-1.5"
+          >Modelo <span class="text-red-500">*</span></label
+        >
+        <p-select
+          inputId="create-model"
+          [options]="modelsOptions"
+          formControlName="model"
+          appendTo="body"
+          styleClass="w-full"
+        ></p-select>
+        <div class="h-5 mt-1.5">
+          <small
+            *ngIf="
+              createForm.get('model')?.invalid &&
+              createForm.get('model')?.touched
+            "
+            class="p-error block text-xs"
+            >Modelo é obrigatório.</small
+          >
+        </div>
       </div>
-    </ng-template>
-</p-dialog>
-
-<!-- Exemplo Dialog para Adicionar Manutenção -->
-<p-dialog header="Registrar Manutenção para ONU: {{ selectedOnu?.serialNumber }}" [(visible)]="displayMaintenanceDialog" [modal]="true" [style]="{width: '50vw'}">
-  <form [formGroup]="maintenanceForm" (ngSubmit)="submitMaintenanceForm()" class="p-fluid space-y-6 pt-4">
-    <div>
-      <label for="main-problem" class="block">Problema Detectado</label>
-      <input id="main-problem" type="text" fluid pInputText formControlName="detectedProblem" />
-    </div>
-    <div>
-      <label for="main-status">Status da Manutenção</label>
-      <p-select inputId="main-status" [options]="maintenanceStatusOptions" formControlName="status" placeholder="Selecione" appendTo="body" styleClass="w-full"></p-select>
-    </div>
-    <div>
-      <label for="main-signal">Sinal Após Manutenção</label>
-      <p-select inputId="main-signal" [options]="signalOptions" formControlName="signal" placeholder="Selecione" appendTo="body" styleClass="w-full"></p-select>
-    </div>
-    <div>
-      <label for="main-obs">Observações Adicionais</label>
-      <textarea id="main-obs" pTextarea [rows]="4" formControlName="observation" fluid></textarea>
+      <div>
+        <label for="create-cert" class="block text-sm font-medium mb-1.5"
+          >Certificado <span class="text-red-500">*</span></label
+        >
+        <p-select
+          inputId="create-cert"
+          [options]="certificateOptions"
+          formControlName="onuCertificate"
+          appendTo="body"
+          styleClass="w-full"
+        ></p-select>
+        <div class="h-5 mt-1.5">
+          <small
+            *ngIf="
+              createForm.get('onuCertificate')?.invalid &&
+              createForm.get('onuCertificate')?.touched
+            "
+            class="p-error block text-xs"
+            >Certificado é obrigatório.</small
+          >
+        </div>
+      </div>
+      <div>
+        <label for="create-color" class="block text-sm font-medium mb-1.5"
+          >Cor <span class="text-red-500">*</span></label
+        >
+        <p-select
+          inputId="create-color"
+          [options]="colorOptions"
+          formControlName="onuColor"
+          appendTo="body"
+          styleClass="w-full"
+        ></p-select>
+        <div class="h-5 mt-1.5">
+          <small
+            *ngIf="
+              createForm.get('onuColor')?.invalid &&
+              createForm.get('onuColor')?.touched
+            "
+            class="p-error block text-xs"
+            >Cor é obrigatória.</small
+          >
+        </div>
+      </div>
+      <div class="md:col-span-2">
+        <label for="create-signal" class="block text-sm font-medium mb-1.5"
+          >Sinal <span class="text-red-500">*</span></label
+        >
+        <p-select
+          inputId="create-signal"
+          [options]="signalOptions"
+          formControlName="onuSignal"
+          appendTo="body"
+          styleClass="w-full"
+        ></p-select>
+        <div class="h-5 mt-1.5">
+          <small
+            *ngIf="
+              createForm.get('onuSignal')?.invalid &&
+              createForm.get('onuSignal')?.touched
+            "
+            class="p-error block text-xs"
+            >Sinal é obrigatório.</small
+          >
+        </div>
+      </div>
+      <div class="md:col-span-2">
+        <label for="create-obs" class="block text-sm font-medium mb-1.5"
+          >Observação</label
+        >
+        <textarea
+          id="create-obs"
+          pTextarea
+          [rows]="3"
+          formControlName="observation"
+          fluid
+        ></textarea>
+      </div>
     </div>
   </form>
   <ng-template pTemplate="footer">
-    <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="displayMaintenanceDialog=false"></button>
-    <button pButton type="submit" label="Salvar Manutenção" icon="pi pi-save" [loading]="isSubmittingMaintenance" (click)="submitMaintenanceForm()"></button>
+    <div class="flex justify-end gap-3">
+      <button
+        pButton
+        type="button"
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="displayCreateDialog = false"
+      ></button>
+      <button
+        pButton
+        type="submit"
+        label="Salvar ONU"
+        icon="pi pi-check"
+        [loading]="isSubmittingCreate"
+        (click)="submitCreateForm()"
+      ></button>
+    </div>
   </ng-template>
+</p-dialog>
+
+<!-- Exemplo Dialog para Adicionar Manutenção -->
+<p-dialog
+  header="Registrar Manutenção para ONU: {{ selectedOnu?.serialNumber }}"
+  [(visible)]="displayMaintenanceDialog"
+  [modal]="true"
+  [style]="{ width: '50vw' }"
+>
+  <form
+    [formGroup]="maintenanceForm"
+    (ngSubmit)="submitMaintenanceForm()"
+    class="p-fluid space-y-6 pt-4"
+  >
+    <div>
+      <label for="main-problem" class="block">Problema Detectado</label>
+      <input
+        id="main-problem"
+        type="text"
+        fluid
+        pInputText
+        formControlName="detectedProblem"
+      />
+    </div>
+    <div>
+      <label for="main-status">Status da Manutenção</label>
+      <p-select
+        inputId="main-status"
+        [options]="maintenanceStatusOptions"
+        formControlName="status"
+        placeholder="Selecione"
+        appendTo="body"
+        styleClass="w-full"
+      ></p-select>
+    </div>
+    <div>
+      <label for="main-signal">Sinal Após Manutenção</label>
+      <p-select
+        inputId="main-signal"
+        [options]="signalOptions"
+        formControlName="signal"
+        placeholder="Selecione"
+        appendTo="body"
+        styleClass="w-full"
+      ></p-select>
+    </div>
+    <div>
+      <label for="main-obs">Observações Adicionais</label>
+      <textarea
+        id="main-obs"
+        pTextarea
+        [rows]="4"
+        formControlName="observation"
+        fluid
+      ></textarea>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="displayMaintenanceDialog = false"
+    ></button>
+    <button
+      pButton
+      type="submit"
+      label="Salvar Manutenção"
+      icon="pi pi-save"
+      [loading]="isSubmittingMaintenance"
+      (click)="submitMaintenanceForm()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Editar ONU: {{ selectedOnu?.serialNumber }}"
+  [(visible)]="displayUpdateDialog"
+  [modal]="true"
+  [style]="{ width: '50vw', minWidth: '500px' }"
+  [draggable]="false"
+>
+  <form
+    [formGroup]="updateForm"
+    (ngSubmit)="submitUpdateForm()"
+    class="p-fluid space-y-6 pt-4"
+  >
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+      <div>
+        <label for="update-sn" class="block text-sm font-medium mb-1.5"
+          >Serial Number</label
+        >
+        <input
+          id="update-sn"
+          type="text"
+          pInputText
+          formControlName="serialNumber"
+          fluid
+        />
+      </div>
+      <div>
+        <label for="update-model" class="block text-sm font-medium mb-1.5"
+          >Modelo</label
+        >
+        <p-select
+          inputId="update-model"
+          [options]="modelsOptions"
+          formControlName="model"
+          appendTo="body"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+      <div>
+        <label for="update-cert" class="block text-sm font-medium mb-1.5"
+          >Certificado</label
+        >
+        <p-select
+          inputId="update-cert"
+          [options]="certificateOptions"
+          formControlName="onuCertificate"
+          appendTo="body"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+      <div>
+        <label for="update-color" class="block text-sm font-medium mb-1.5"
+          >Cor</label
+        >
+        <p-select
+          inputId="update-color"
+          [options]="colorOptions"
+          formControlName="onuColor"
+          appendTo="body"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+      <div class="md:col-span-2">
+        <label for="update-signal" class="block text-sm font-medium mb-1.5"
+          >Sinal</label
+        >
+        <p-select
+          inputId="update-signal"
+          [options]="signalOptions"
+          formControlName="onuSignal"
+          appendTo="body"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+      <div class="md:col-span-2">
+        <label for="update-obs" class="block text-sm font-medium mb-1.5"
+          >Observação</label
+        >
+        <textarea
+          id="update-obs"
+          pTextarea
+          [rows]="3"
+          formControlName="observation"
+          fluid
+        ></textarea>
+      </div>
+    </div>
+    <div>
+      <p-button
+        label="Salvar"
+        icon="pi pi-save"
+        type="submit"
+        [loading]="isSubmittingUpdate"
+      ></p-button>
+    </div>
+  </form>
+</p-dialog>
+
+<p-dialog
+  header="Detalhes da ONU: {{ selectedOnu?.serialNumber }}"
+  [(visible)]="maintenanceByIdDialog"
+  [modal]="true"
+  [style]="{ width: '60vw', minWidth: '500px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <div *ngIf="selectedOnu" class="space-y-8">
+    <!-- Informações da ONU -->
+    <p-fieldset legend="Informações da ONU" [toggleable]="true" [collapsed]="false">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <span class="block text-sm text-slate-500">Serial Number</span>
+          <span class="font-medium text-slate-700 dark:text-slate-300">{{ selectedOnu.serialNumber }}</span>
+        </div>
+        <div>
+          <span class="block text-sm text-slate-500">Modelo</span>
+          <span class="font-medium text-slate-700 dark:text-slate-300">{{ selectedOnu.model }}</span>
+        </div>
+        <div>
+          <span class="block text-sm text-slate-500">Certificado</span>
+          <span class="font-medium text-slate-700 dark:text-slate-300">{{ getCertificateLabel(selectedOnu.onuCertificate) }}</span>
+        </div>
+        <div>
+          <span class="block text-sm text-slate-500">Cor</span>
+          <span class="font-medium text-slate-700 dark:text-slate-300">{{ getColorLabel(selectedOnu.onuColor) }}</span>
+        </div>
+        <div>
+          <span class="block text-sm text-slate-500">Sinal</span>
+          <p-tag
+            [value]="getSignalLabel(selectedOnu.onuSignal)"
+            [severity]="getSignalSeverity(selectedOnu.onuSignal)"
+          />
+        </div>
+        <div *ngIf="selectedOnu.observation">
+          <span class="block text-sm text-slate-500">Observação</span>
+          <span class="font-medium text-slate-700 dark:text-slate-300">{{ selectedOnu.observation }}</span>
+        </div>
+      </div>
+    </p-fieldset>
+
+    <!-- Histórico de Manutenções -->
+    <p-fieldset legend="Histórico de Manutenções" [toggleable]="true" [collapsed]="false">
+      <div *ngIf="isLoadingMaintenances" class="flex items-center gap-2 text-blue-600">
+        <i class="pi pi-spin pi-spinner"></i> Carregando manutenções...
+      </div>
+
+      <div *ngIf="!isLoadingMaintenances && maintenanceHistory.length === 0" class="text-slate-500 italic">
+        Nenhuma manutenção encontrada para esta ONU.
+      </div>
+
+      <ul *ngIf="!isLoadingMaintenances && maintenanceHistory.length > 0" class="space-y-4">
+        <li
+          *ngFor="let m of maintenanceHistory"
+          class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 border border-slate-200 dark:border-slate-700"
+        >
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-2">
+            <span class="text-sm text-blue-700 dark:text-blue-300 font-semibold">
+              <i class="pi pi-calendar mr-1"></i> {{ m.date }}
+            </span>
+            <p-tag
+              [value]="getMaintenanceStatusLabel(m.status)"
+              [severity]="getMaintenanceStatusSeverity(m.status)"
+            ></p-tag>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+            <div>
+              <span class="text-slate-500">Responsável:</span> {{ m.employee?.name || "-" }}
+            </div>
+            <div>
+              <span class="text-slate-500">Problema:</span> {{ m.detectedProblem }}
+            </div>
+            <div>
+              <span class="text-slate-500">Sinal:</span>
+              <p-tag
+                [value]="getSignalLabel(m.signal)"
+                [severity]="getSignalSeverity(m.signal)"
+              ></p-tag>
+            </div>
+            <div *ngIf="m.observation">
+              <span class="text-slate-500">Observação:</span> {{ m.observation }}
+            </div>
+          </div>
+        </li>
+      </ul>
+    </p-fieldset>
+  </div>
 </p-dialog>

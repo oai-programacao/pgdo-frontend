@@ -71,6 +71,10 @@ getTechnology(startDate: string, endDate: string, status?: string[]): Observable
     });
   }
 
-  
-
+getDashboardPdf(startDate: string, endDate: string) {
+  return this.http.get(`${this.apiUrl}/dashboard/dashboard/pdf`, {
+    params: { startDate, endDate },
+    responseType: 'blob'
+  });
+}
 }
