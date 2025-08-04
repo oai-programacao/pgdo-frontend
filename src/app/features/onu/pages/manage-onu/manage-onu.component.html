@@ -536,13 +536,7 @@
           <span class="block text-sm text-slate-500">Cor</span>
           <span class="font-medium text-slate-700 dark:text-slate-300">{{ getColorLabel(selectedOnu.onuColor) }}</span>
         </div>
-        <div>
-          <span class="block text-sm text-slate-500">Sinal</span>
-          <p-tag
-            [value]="getSignalLabel(selectedOnu.onuSignal)"
-            [severity]="getSignalSeverity(selectedOnu.onuSignal)"
-          />
-        </div>
+
         <div *ngIf="selectedOnu.observation">
           <span class="block text-sm text-slate-500">Observação</span>
           <span class="font-medium text-slate-700 dark:text-slate-300">{{ selectedOnu.observation }}</span>
