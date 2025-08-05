@@ -277,7 +277,7 @@
                         let i = index
                       "
                     >
-                      <div *ngIf="!photo.value">
+                      <div class="flex items-center gap-3" *ngIf="!photo.value">
                         <p-fileUpload
                           [name]="'photoRgVerse' + i"
                           accept="image/*"
@@ -288,6 +288,13 @@
                           (onSelect)="onUploadVerse($event, i)"
                           [auto]="true"
                         ></p-fileUpload>
+                        <p-button
+                          icon="pi pi-trash"
+                          styleClass="p-button-danger p-button-outlined"
+                          (onClick)="removePhotoRgVerse(i)"
+                          type="button"
+                          ariaLabel="Remover foto"
+                        ></p-button>
                       </div>
                       <div
                         *ngIf="photo.value"
@@ -298,12 +305,6 @@
                           alt="Preview Verso do Documento"
                           class="w-full border-round"
                         />
-                        <p-button
-                          rounded
-                          icon="pi pi-trash"
-                          styleClass="p-button-danger"
-                          (onClick)="removePhotoRgVerse(i)"
-                        ></p-button>
                       </div>
                     </ng-container>
                     <p-button

@@ -574,4 +574,5 @@ addPhotoRgVerse(): void {
     };
     reader.readAsDataURL(file);
   }
+
 }
