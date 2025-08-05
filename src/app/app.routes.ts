@@ -8,7 +8,7 @@ export const routes: Routes = [
     path: "login",
     loadComponent: () =>
       import("./pages/login/login.component").then((m) => m.LoginComponent),
-    canActivate: [loginGuard],
+    // canActivate: [loginGuard],
     title: "Login", // Título da página, pode ser usado para SEO ou breadcrumbs
   },
   {
