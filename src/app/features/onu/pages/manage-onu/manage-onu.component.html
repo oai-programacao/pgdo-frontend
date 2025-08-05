@@ -518,49 +518,80 @@
 >
   <div *ngIf="selectedOnu" class="space-y-8">
     <!-- Informações da ONU -->
-    <p-fieldset legend="Informações da ONU" [toggleable]="true" [collapsed]="false">
+    <p-fieldset
+      legend="Informações da ONU"
+      [toggleable]="true"
+      [collapsed]="false"
+    >
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <span class="block text-sm text-slate-500">Serial Number</span>
-          <span class="font-medium text-slate-700 dark:text-slate-300">{{ selectedOnu.serialNumber }}</span>
+          <span class="font-medium text-slate-700 dark:text-slate-300">{{
+            selectedOnu.serialNumber
+          }}</span>
         </div>
         <div>
           <span class="block text-sm text-slate-500">Modelo</span>
-          <span class="font-medium text-slate-700 dark:text-slate-300">{{ selectedOnu.model }}</span>
+          <span class="font-medium text-slate-700 dark:text-slate-300">{{
+            selectedOnu.model
+          }}</span>
         </div>
         <div>
           <span class="block text-sm text-slate-500">Certificado</span>
-          <span class="font-medium text-slate-700 dark:text-slate-300">{{ getCertificateLabel(selectedOnu.onuCertificate) }}</span>
+          <span class="font-medium text-slate-700 dark:text-slate-300">{{
+            getCertificateLabel(selectedOnu.onuCertificate)
+          }}</span>
         </div>
         <div>
           <span class="block text-sm text-slate-500">Cor</span>
-          <span class="font-medium text-slate-700 dark:text-slate-300">{{ getColorLabel(selectedOnu.onuColor) }}</span>
+          <span class="font-medium text-slate-700 dark:text-slate-300">{{
+            getColorLabel(selectedOnu.onuColor)
+          }}</span>
         </div>
 
         <div *ngIf="selectedOnu.observation">
           <span class="block text-sm text-slate-500">Observação</span>
-          <span class="font-medium text-slate-700 dark:text-slate-300">{{ selectedOnu.observation }}</span>
+          <span class="font-medium text-slate-700 dark:text-slate-300">{{
+            selectedOnu.observation
+          }}</span>
         </div>
       </div>
     </p-fieldset>
 
     <!-- Histórico de Manutenções -->
-    <p-fieldset legend="Histórico de Manutenções" [toggleable]="true" [collapsed]="false">
-      <div *ngIf="isLoadingMaintenances" class="flex items-center gap-2 text-blue-600">
+    <p-fieldset
+      legend="Histórico de Manutenções"
+      [toggleable]="true"
+      [collapsed]="false"
+    >
+      <div
+        *ngIf="isLoadingMaintenances"
+        class="flex items-center gap-2 text-blue-600"
+      >
         <i class="pi pi-spin pi-spinner"></i> Carregando manutenções...
       </div>
 
-      <div *ngIf="!isLoadingMaintenances && maintenanceHistory.length === 0" class="text-slate-500 italic">
+      <div
+        *ngIf="!isLoadingMaintenances && maintenanceHistory.length === 0"
+        class="text-slate-500 italic"
+      >
         Nenhuma manutenção encontrada para esta ONU.
       </div>
 
-      <ul *ngIf="!isLoadingMaintenances && maintenanceHistory.length > 0" class="space-y-4">
+      <ul
+        *ngIf="!isLoadingMaintenances && maintenanceHistory.length > 0"
+        class="space-y-4"
+      >
         <li
           *ngFor="let m of maintenanceHistory"
           class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 border border-slate-200 dark:border-slate-700"
         >
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-2">
-            <span class="text-sm text-blue-700 dark:text-blue-300 font-semibold">
+          <div
+            class="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-2"
+          >
+            <span
+              class="text-sm text-blue-700 dark:text-blue-300 font-semibold"
+            >
               <i class="pi pi-calendar mr-1"></i> {{ m.date }}
             </span>
             <p-tag
@@ -570,10 +601,12 @@
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
             <div>
-              <span class="text-slate-500">Responsável:</span> {{ m.employee?.name || "-" }}
+              <span class="text-slate-500">Responsável:</span>
+              {{ m.employee?.name || "-" }}
             </div>
             <div>
-              <span class="text-slate-500">Problema:</span> {{ m.detectedProblem }}
+              <span class="text-slate-500">Problema:</span>
+              {{ m.detectedProblem }}
             </div>
             <div>
               <span class="text-slate-500">Sinal:</span>
@@ -583,7 +616,8 @@
               ></p-tag>
             </div>
             <div *ngIf="m.observation">
-              <span class="text-slate-500">Observação:</span> {{ m.observation }}
+              <span class="text-slate-500">Observação:</span>
+              {{ m.observation }}
             </div>
           </div>
         </li>

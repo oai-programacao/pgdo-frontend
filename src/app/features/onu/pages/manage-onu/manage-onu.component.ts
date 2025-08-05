@@ -36,6 +36,7 @@ import { CustomPageResponse } from "../../../../interfaces/service-order.model";
 import { CommonModule } from "@angular/common";
 import { InputTextModule } from "primeng/inputtext";
 import { TextareaModule } from "primeng/textarea";
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: "app-manage-onu",
@@ -54,6 +55,7 @@ import { TextareaModule } from "primeng/textarea";
     CommonModule,
     InputTextModule,
     TextareaModule,
+    TooltipModule
   ],
   templateUrl: "./manage-onu.component.html",
   styleUrl: "./manage-onu.component.scss",
@@ -163,6 +165,7 @@ export class ManageOnuComponent implements OnInit, OnDestroy {
       onuCertificate: [null, Validators.required],
       onuColor: [null, Validators.required],
       onuSignal: [null, Validators.required],
+      observation: [""],
     });
     this.maintenanceForm = this.fb.group({
       detectedProblem: ["", Validators.required],
