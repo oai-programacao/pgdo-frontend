@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, ElementRef, inject, ViewChild } from "@angular/core";
 import { UIChart } from "primeng/chart";
 import { DashboardChartComponent } from "../../../../shared/chart/dashboard-chart/dashboard-chart.component";
 import { DatePickerModule } from "primeng/datepicker";
@@ -41,6 +41,7 @@ export class DiagnosticComponent {
   form!: FormGroup;
   private readonly fb = inject(FormBuilder);
   private readonly chartService = inject(ChartService);
+  @ViewChild("dashboardContent") dashboardContent!: ElementRef;
 
   // Variaveis para armazenar os dados dos gráficos
   unproductiveVisitData?: DashboardCharts;
@@ -476,26 +477,91 @@ export class DiagnosticComponent {
       });
   }
 
-  // downloadDashboardPdf() {
-  //   const [startDate, endDate] = this.form.value.rangeDates;
+  printDashboard() {
+    const dashboard = this.dashboardContent.nativeElement as HTMLElement;
+    const canvases = dashboard.querySelectorAll("canvas");
+    const canvasImages: { canvas: HTMLCanvasElement; img: HTMLImageElement }[] =
+      [];
 
-  //   this.chartService.getDashboardPdf(startDate, endDate).subscribe({
-  //     next: (response: Blob) => {
-  //       const url = window.URL.createObjectURL(response);
-  //       const a = document.createElement('a');
-  //       a.href = url;
-  //       a.download = 'dashboard.pdf';
-  //       document.body.appendChild(a);
-  //       a.click();
-  //       document.body.removeChild(a);
-  //       window.URL.revokeObjectURL(url);
-  //     },
-  //     error: (e) => {
-  //       console.error("Erro ao baixar o PDF do dashboard:", e);
-  //     }
-  //   });
-  // }
+    canvases.forEach((canvas) => {
+      const img = document.createElement("img");
+      img.src = canvas.toDataURL("image/png");
+      img.style.maxWidth = "100%";
+      img.style.display = "block";
+      img.width = canvas.width;
+      img.height = canvas.height;
+      canvas.parentNode?.replaceChild(img, canvas);
+      canvasImages.push({ canvas, img });
+    });
 
+    setTimeout(() => {
+      this.printElement(this.dashboardContent);
+
+      setTimeout(() => {
+        canvasImages.forEach(({ canvas, img }) => {
+          img.parentNode?.replaceChild(canvas, img);
+        });
+      }, 1000);
+    }, 300); 
+  }
+
+  printElement(elementRef: ElementRef | undefined): void {
+    if (!elementRef) {
+      console.error("Elemento inválido para impressão.");
+      return;
+    }
+
+    const elementHTML = elementRef.nativeElement.outerHTML;
+
+   
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "absolute";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "none";
+
+    document.body.appendChild(iframe);
+
+    const iframeDocument = iframe.contentWindow?.document;
+
+    if (iframeDocument) {
+      const styles = Array.from(document.styleSheets)
+        .map((styleSheet) => {
+          try {
+            return Array.from(styleSheet.cssRules)
+              .map((rule) => rule.cssText)
+              .join("");
+          } catch (error) {
+            return "";
+          }
+        })
+        .join("");
+
+      iframeDocument.open();
+      iframeDocument.write(`
+      <html>
+        <head>
+          <style>${styles}</style>
+        </head>
+        <body>${elementHTML}</body>
+      </html>
+    `);
+      iframeDocument.close();
+
+      // Acionar a impressão
+      iframe.contentWindow?.print();
+
+      // Remover o iframe após a impressão
+      if (iframe.contentWindow) {
+        iframe.contentWindow.onafterprint = () => {
+          document.body.removeChild(iframe);
+        };
+      }
+    } else {
+      console.error("Erro ao acessar o documento do iframe.");
+    }
+  }
+  
   private formatDateToBackend(date: string | Date): string {
     if (!date) return "";
     if (date instanceof Date) {
