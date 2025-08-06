@@ -1,0 +1,59 @@
+<div
+  class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md"
+>
+  <h2 class="text-lg font-semibold">Alterar Senha</h2>
+  <div
+    class="bg-white dark:bg-slate-900 p-6 rounded-lg shadow-md max-w-xl mx-auto"
+  >
+    <h2 class="text-2xl font-bold mb-6 text-slate-800 dark:text-slate-100">
+      Alterar Senha
+    </h2>
+    <div class="mb-8">
+      @if(userLogged){
+      <div
+        class="flex items-center gap-4 bg-slate-50 dark:bg-slate-800 rounded-lg p-4 shadow-sm"
+      >
+        <p-avatar
+          [label]="getUserInitials()"
+          styleClass="mr-2"
+          size="xlarge"
+          shape="circle"
+        />
+        <div>
+          <div class="text-slate-700 dark:text-slate-200 text-lg font-semibold">
+            {{ userLogged?.name }}
+          </div>
+          <div class="text-slate-500 dark:text-slate-400 text-sm mt-1">
+            <span class="font-semibold">E-mail:</span>
+            {{ userLogged?.email }}
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+
+    <form [formGroup]="form" class="space-y-4">
+      <div class="flex flex-col">
+        <label
+          for="password"
+          class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+          >Senha</label
+        >
+        <input
+          pInputText
+          id="password"
+          formControlName="password"
+          type="password"
+          class="p-inputtext w-full"
+        />
+      </div>
+      <div class="pt-4 flex justify-end">
+        <p-button
+          label="Atualizar"
+          icon="pi pi-save"
+          (onClick)="updatePassword()"
+        ></p-button>
+      </div>
+    </form>
+  </div>
+</div>

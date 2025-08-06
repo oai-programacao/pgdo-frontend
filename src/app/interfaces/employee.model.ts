@@ -32,4 +32,5 @@ export interface UpdateEmployeeDto {
   email?: string | null;
   rbxUsername?: string | null;
   role?: EmployeeRole | null;
+  password?: string | null;
 }
