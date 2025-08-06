@@ -196,44 +196,44 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       ],
     },
     // Vendas
-    {
-      id: "sales",
-      label: "Vendas",
-      icon: "pi pi-dollar",
-      allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_STORE_EMPLOYEE"],
-      expanded: false,
-      children: [
-        {
-          id: "sales-list",
-          label: "Minhas Vendas",
-          icon: "pi pi-list",
-          route: "/app/minhas-vendas",
-          exactMatch: true,
-          allowedRoles: ["ROLE_STORE_EMPLOYEE"],
-        },
-        {
-          id: "sales-manage",
-          label: "Gerenciar Todas Vendas",
-          icon: "pi pi-sliders-h",
-          route: "/app/vendas",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST"],
-          exactMatch: true,
-        },
-      ],
-    },
+    // {
+    //   id: "sales",
+    //   label: "Vendas",
+    //   icon: "pi pi-dollar",
+    //   allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_STORE_EMPLOYEE"],
+    //   expanded: false,
+    //   children: [
+    //     {
+    //       id: "sales-list",
+    //       label: "Minhas Vendas",
+    //       icon: "pi pi-list",
+    //       route: "/app/minhas-vendas",
+    //       exactMatch: true,
+    //       allowedRoles: ["ROLE_STORE_EMPLOYEE"],
+    //     },
+    //     {
+    //       id: "sales-manage",
+    //       label: "Gerenciar Todas Vendas",
+    //       icon: "pi pi-sliders-h",
+    //       route: "/app/vendas",
+    //       allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST"],
+    //       exactMatch: true,
+    //     },
+    //   ],
+    // },
     // Pós Vendas
-    {
-      id: "after-sales",
-      label: "Pós-Vendas",
-      icon: "pi pi-check-circle",
-      route: "/app/pos-vendas",
-      allowedRoles: [
-        "ROLE_ADMIN",
-        "ROLE_STORE_MANAGER",
-        "ROLE_ANALYST",
-        "ROLE_STORE_EMPLOYEE",
-      ],
-    },
+    // {
+    //   id: "after-sales",
+    //   label: "Pós-Vendas",
+    //   icon: "pi pi-check-circle",
+    //   route: "/app/pos-vendas",
+    //   allowedRoles: [
+    //     "ROLE_ADMIN",
+    //     "ROLE_STORE_MANAGER",
+    //     "ROLE_ANALYST",
+    //     "ROLE_STORE_EMPLOYEE",
+    //   ],
+    // },
     // ONUs
     {
       id: "olt",

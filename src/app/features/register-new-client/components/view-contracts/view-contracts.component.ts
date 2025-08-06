@@ -47,6 +47,8 @@ export class ViewContractsComponent implements OnInit, OnChanges {
   cdr = inject(ChangeDetectorRef);
   router = inject(Router);
 
+  registerPdf: string | null = null;
+  permanentContractPdf: string | null = null;
   ngOnInit() {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -125,5 +127,45 @@ export class ViewContractsComponent implements OnInit, OnChanges {
     navigator.clipboard.writeText(link).then(() => {
       window.open(link, "_blank");
     });
+  }
+
+  getRegisterPdf() {
+    const clientId = this.clientData[0]?.id;
+    const contractId = this.contractsList[0]?.id;
+
+    this.registerClientService
+      .getClientRegisterPdf(clientId, contractId)
+      .subscribe({
+        next: (response: Blob) => {
+          const fileURL = URL.createObjectURL(response);
+          this.registerPdf = fileURL;
+          window.open(fileURL, "_blank");
+        },
+        error: (err) => {
+          this.registerPdf = null;
+          console.error("Erro ao gerar PDF:", err);
+        },
+      });
+  }
+
+  getClientContractPermanantPdf() {
+    const clientId = this.clientData[0]?.id;
+    const contractId = this.contractsList[0]?.id;
+    console.log("clientId:", clientId, "contractId:", contractId);
+    console.log("contractId:", contractId);
+
+    this.registerClientService
+      .getClientContractPermanantPdf(clientId, contractId)
+      .subscribe({
+        next: (response: Blob) => {
+          const fileURL = URL.createObjectURL(response);
+          this.permanentContractPdf = fileURL;
+          window.open(fileURL, "_blank");
+        },
+        error: (e) => {
+          this.permanentContractPdf = null;
+          console.log(e);
+        },
+      });
   }
 }

@@ -106,6 +106,7 @@ export class SearchClientComponent implements OnInit, OnDestroy {
 
   createdContract() {
     this.createNewContractDialog = false;
+    this.consultClient();
     this.messageService.add({
       severity: "success",
       summary: "Contrato Criado",
