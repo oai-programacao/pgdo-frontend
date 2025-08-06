@@ -341,7 +341,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       id: "settings",
       label: "Configurações",
       icon: "pi pi-cog",
-      action: this.handleSettingsClick,
+      route: "/app/configuracoes",
     },
   ];
 

@@ -47,4 +47,8 @@ export class EmployeeService {
   update(id: string, dto: UpdateEmployeeDto): Observable<ViewEmployeeDto> {
     return this.http.patch<ViewEmployeeDto>(`${this.apiUrl}/${id}`, dto);
   }
-}
+
+
+
+  }
+

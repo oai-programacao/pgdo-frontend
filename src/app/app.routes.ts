@@ -233,6 +233,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/diagnosis/pages/diagnostic/diagnostic.component').then(m => m.DiagnosticComponent),
         title: 'Diagnósticos'
       },
+      {
+        path: 'configuracoes',
+        loadComponent: () => import('./features/update-user/pages/update-user/update-user.component').then(m => m.UpdateUserComponent),
+        title: 'Configurações'
+      },
 
       { path: "", redirectTo: "home", pathMatch: "full" }, // Rota padrão dentro de /app
     ],
