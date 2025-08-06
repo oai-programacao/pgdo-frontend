@@ -136,6 +136,20 @@ getclienteContractByIdAdhesionBillet(id: string): Observable<string>{
   );
 }
 
+getClientContractPermanantPdf(idClient: string, idContract: string): Observable<Blob> {
+  return this.http.get(
+    `${this.apiUrl}/clientRegister/contrato-permanencia-pdf/${idClient}/${idContract}`,
+    {
+      params: { idContract },
+      responseType: 'blob'
+    }
+  );
+}
+getClientRegisterPdf(idClient: string, idContract: string): Observable<Blob> {
+  return this.http.get(`${this.apiUrl}/clientRegister/registro-pdf/${idClient}/${idContract}`, {
+    responseType: 'blob'
+  });
+}
 
 
 }

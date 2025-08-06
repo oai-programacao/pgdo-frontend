@@ -7,12 +7,26 @@
       <p class="text-lg font-semibold text-slate-800 dark:text-white">
         {{ getPlanLabel(contract.codePlan) }}
       </p>
-      <p-button
-        severity="success"
-        styleClass="p-button-sm"
-       (onClick)="op.toggle($event); getPaymentByBillet(contract.id)"
-        label="Gerar Boleto"
-      ></p-button>
+      <div class="flex gap-4 justify-between">
+        <p-button
+          severity="success"
+          styleClass="p-button-sm"
+         (onClick)="op.toggle($event); getPaymentByBillet(contract.id)"
+          label="Gerar Boleto"
+        ></p-button>
+        <p-button
+          severity="info"
+          styleClass="p-button-sm"
+          (onClick)="getRegisterPdf()"
+          label="Contrato de Registro"
+        ></p-button>
+        <p-button
+          severity="warn"
+          styleClass="p-button-sm"
+          (onClick)="getClientContractPermanantPdf()"
+          label="Contrato de Permanência"
+        ></p-button>
+      </div>
     </div>
     <div class="flex flex-col gap-2 justify-center py-1">
       <div class="text-sm text-slate-600 dark:text-slate-300 mt-2">
@@ -40,6 +54,46 @@
     </div>
   </div>
 </div>
+
+<!-- <p-popover #rpdf>
+  <div class="w-[30rem]">
+    <span class="font-medium text-surface-900 dark:text-surface-0 block mb-2">
+      Registro de Cliente
+    </span>
+
+    <p-inputgroup>
+      <ng-container >
+        <p-progressSpinner styleClass="w-6 h-6" strokeWidth="4"></p-progressSpinner>
+        <span class="ml-2">Gerando PDF...</span>
+      </ng-container>
+
+      <ng-template #showRegisterPdf>
+<ng-container *ngIf="registerPdf; else noRegisterPdf">
+  <input
+    pInputText
+    [value]="registerPdf"
+    disabled
+    readonly
+    class="w-[10rem]"
+    fluid
+  />
+  <p-inputgroup-addon>
+    <a [href]="registerPdf" target="_blank">
+      <i class="pi pi-eye cursor-pointer"></i>
+    </a>
+  </p-inputgroup-addon>
+</ng-container> -->
+<!-- 
+        <ng-template #noRegisterPdf>
+          <span class="text-sm text-gray-400">Nenhum registro disponível.</span>
+        </ng-template>
+      </ng-template>
+    </p-inputgroup>
+  </div>
+
+</p-popover> -->
+
+
 
 <p-popover #op>
   <div class="w-[30rem]">
