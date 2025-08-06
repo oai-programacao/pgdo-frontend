@@ -39,6 +39,12 @@
           class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
           >Senha</label
         >
+        @if (form.get('password')?.value?.length > 0 &&
+        form.get('password')?.value?.length < 6) {
+        <span class="text-red-500 text-sm">
+          A senha deve ter pelo menos 6 caracteres.
+        </span>
+        }
         <input
           pInputText
           id="password"
@@ -51,9 +57,12 @@
         <p-button
           label="Atualizar"
           icon="pi pi-save"
-          (onClick)="updatePassword()"
+          (click)="confirm($event)"
+          [disabled]="form.invalid || form.get('password')?.value?.length < 6"
         ></p-button>
       </div>
     </form>
   </div>
 </div>
+<p-toast></p-toast>
+<p-confirmdialog></p-confirmdialog>
