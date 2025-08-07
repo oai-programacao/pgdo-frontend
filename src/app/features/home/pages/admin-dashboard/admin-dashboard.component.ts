@@ -130,6 +130,7 @@ export class AdminDashboardComponent implements OnInit {
     this.dashboardService.getTechnicianActualMonthData().subscribe({
       next: (data) => {
         const rawData: any[] = data;
+        
 
         // Transformação dos dados
         const labels = rawData.map((item) => item.technicianName);

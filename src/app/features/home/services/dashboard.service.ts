@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { TypeOfOs } from '../../../interfaces/enums.model';
 import { environment } from '../../../../environments/environment';
+import { TechnicianServiceCount } from '../../../interfaces/dashboard-charts.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -17,12 +18,16 @@ export class DashboardService {
       throw new Error('Service order type is required');
     }
     
-    return this.http.get<any>(`${this.apiUrl}/service-orders`, {
+    return this.http.get<any>(`${this.apiUrl}/service-orders/summary`, {
       params: { serviceOrderType }
     });
   }
 
-  getTechnicianActualMonthData(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/technician-service-count`);
-  }
+  getTechnicianActualMonthData(startDate?: any, endDate?:any): Observable<any> {
+      return this.http.get<any>(
+        `${this.apiUrl}/technician-count`,
+        { params: { startDate, endDate } }
+      );
+}
+
 }
