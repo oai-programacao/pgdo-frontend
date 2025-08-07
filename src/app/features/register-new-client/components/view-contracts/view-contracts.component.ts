@@ -6,6 +6,7 @@ import {
   inject,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   SimpleChanges,
 } from "@angular/core";
@@ -32,7 +33,6 @@ import { MessageService } from "primeng/api";
   ],
   templateUrl: "./view-contracts.component.html",
   styleUrls: ["./view-contracts.component.scss"],
-  providers: [RegisterClientService, MessageService, Router],
 })
 export class ViewContractsComponent implements OnInit, OnChanges {
   @Input() clientData: any[] = [];
@@ -49,11 +49,16 @@ export class ViewContractsComponent implements OnInit, OnChanges {
 
   registerPdf: string | null = null;
   permanentContractPdf: string | null = null;
+
+  
+
   ngOnInit() {}
 
+
+
 ngOnChanges(changes: SimpleChanges): void {
-  console.log('clientData changed:', this.clientData);
-  console.log('contracts from RBX and DB:', this.contractsFromRbxAndDb);
+  // console.log('clientData changed:', this.clientData);
+  // console.log('contracts from RBX and DB:', this.contractsFromRbxAndDb);
   if (
     this.clientData &&
     this.clientData.length > 0 &&

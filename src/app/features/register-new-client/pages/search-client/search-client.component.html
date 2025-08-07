@@ -203,21 +203,30 @@
     (contractCreated)="createdContract()"
   ></app-create-contract>
 </p-dialog>
-} @if (viewContractsDialog) {
-<p-dialog
-  [(visible)]="viewContractsDialog"
-  header="Visualizar Contratos"
-  [modal]="true"
-  [draggable]="false"
-  position="top"
-  [resizable]="false"
-  [style]="{ width: '40rem', height: '70vh' }"
->
-  <app-view-contracts
-    [clientData]="dataClient"
-    [isPJorPF]="clientType"
-  ></app-view-contracts>
-</p-dialog>
+} 
+
+@if (viewContractsDialog) {
+  <p-dialog
+    [(visible)]="viewContractsDialog"
+    header="Visualizar Contratos"
+    [modal]="true"
+    [draggable]="false"
+    position="top"
+    [resizable]="false"
+    (onHide)="onDialogHide()"
+    [style]="{ width: '40rem', height: '70vh' }"
+  >
+  @if(viewContractsDialog){
+
+    <ng-container>
+    <app-view-contracts
+      [clientData]="dataClient"
+      [isPJorPF]="clientType"
+    ></app-view-contracts>  
+    </ng-container>
+  }
+    
+  </p-dialog>
 }
 
 <p-toast />

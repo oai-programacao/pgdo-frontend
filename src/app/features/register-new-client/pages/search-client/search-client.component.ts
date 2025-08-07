@@ -81,6 +81,12 @@ export class SearchClientComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
+onDialogHide() {
+  this.dataClient = [];
+  this.viewContractsDialog = false;
+
+}
+
   ngOnInit() {
     this.route.queryParams
       .pipe(takeUntil(this.destroy$))
@@ -122,6 +128,7 @@ export class SearchClientComponent implements OnInit, OnDestroy {
   viewContractsDialogVisible(client: any) {
     this.dataClient = client ? [client] : [];
     this.viewContractsDialog = true;
+
   }
 
   onClientTypeChange() {
