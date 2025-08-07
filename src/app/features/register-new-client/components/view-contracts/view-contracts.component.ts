@@ -51,24 +51,29 @@ export class ViewContractsComponent implements OnInit, OnChanges {
   permanentContractPdf: string | null = null;
   ngOnInit() {}
 
-  ngOnChanges(changes: SimpleChanges): void {
-    // console.log("clientData:", this.clientData);
-    // console.log("contractsFromRbxAndDb:", this.contractsFromRbxAndDb);
-    if (
-      this.clientData &&
-      this.clientData.length > 0 &&
-      Array.isArray(this.clientData[0].contracts)
-    ) {
-      const onlyWithId = this.clientData[0].contracts.filter(
-        (contract: any) => !!contract.id
-      );
-      if (onlyWithId.length > 0) {
-        this.contractsList = onlyWithId;
-      }
-    } else {
-      this.contractsList = [];
-    }
+ngOnChanges(changes: SimpleChanges): void {
+  console.log('clientData changed:', this.clientData);
+  console.log('contracts from RBX and DB:', this.contractsFromRbxAndDb);
+  if (
+    this.clientData &&
+    this.clientData.length > 0 &&
+    Array.isArray(this.clientData[0].contracts)
+  ) {
+    const onlyWithId = this.clientData[0].contracts
+      .filter((contract: any) => !!contract.id)
+.map((contract: any) => ({
+  codePlan: contract.codePlan,
+  subscriptionDiscount: contract.subscriptionDiscount,
+  beginningCollection: contract.beginningCollection,
+  addressCobranca: contract.addressCobranca, // <-- aqui!
+  observation: contract.observation,
+  id: contract.id
+}))
+    this.contractsList = onlyWithId;
+  } else {
+    this.contractsList = [];
   }
+}
 
   get contractsFromRbxAndDb() {
     return this.clientData[0]?.contracts || [];

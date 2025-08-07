@@ -11,7 +11,7 @@
         <p-button
           severity="success"
           styleClass="p-button-sm"
-         (onClick)="op.toggle($event); getPaymentByBillet(contract.id)"
+          (onClick)="op.toggle($event); getPaymentByBillet(contract.id)"
           label="Gerar Boleto"
         ></p-button>
         <p-button
@@ -30,10 +30,9 @@
     </div>
     <div class="flex flex-col gap-2 justify-center py-1">
       <div class="text-sm text-slate-600 dark:text-slate-300 mt-2">
-
         <div>
           <strong>Valor de Adesão:</strong>
-          {{ contract.Cliente_Nome | currency : "BRL" }}
+          {{ contract.subscriptionDiscount | currency : "BRL" }}
         </div>
         <div>
           <strong>Dia de Vencimento:</strong>
@@ -41,21 +40,26 @@
         </div>
         <div>
           <strong>Endereço:</strong>
-          {{ contract.addressCobranca.street }},
-          {{ contract.addressCobranca.number }}
-          {{ contract.addressCobranca.neighborhood }} -
-          {{ contract.addressCobranca.city }} <br />
-          <strong>CEP</strong>: {{ contract.addressCobranca.zipCode }}
-        </div>
-        <div *ngIf="contract.observation">
-          <strong>Observação:</strong> {{ contract.observation }}
+          @if(contract.addressCobranca){
+          <ng-container >
+            {{ contract.addressCobranca.street }},
+            {{ contract.addressCobranca.number }}
+            {{ contract.addressCobranca.neighborhood }} -
+            {{ contract.addressCobranca.city }} <br />
+            <strong>CEP</strong>: {{ contract.addressCobranca.zipCode }}
+          </ng-container>
+          }
+          @if(!contract.addressCobranca){
+          <ng-container >
+            <span class="text-red-500">Endereço não informado</span>
+          </ng-container>
+          }
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- <p-popover #rpdf>
+  <!-- <p-popover #rpdf>
   <div class="w-[30rem]">
     <span class="font-medium text-surface-900 dark:text-surface-0 block mb-2">
       Registro de Cliente
@@ -83,7 +87,7 @@
     </a>
   </p-inputgroup-addon>
 </ng-container> -->
-<!-- 
+  <!-- 
         <ng-template #noRegisterPdf>
           <span class="text-sm text-gray-400">Nenhum registro disponível.</span>
         </ng-template>
@@ -93,39 +97,44 @@
 
 </p-popover> -->
 
+  <p-popover #op>
+    <div class="w-[30rem]">
+      <span class="font-medium text-surface-900 dark:text-surface-0 block mb-2">
+        Link de Pagamento
+      </span>
 
-
-<p-popover #op>
-  <div class="w-[30rem]">
-    <span class="font-medium text-surface-900 dark:text-surface-0 block mb-2">
-      Link de Pagamento
-    </span>
-
-    <p-inputgroup>
-      <ng-container *ngIf="isLoadingLink; else showLink">
-        <p-progressSpinner styleClass="w-6 h-6" strokeWidth="4"></p-progressSpinner>
-        <span class="ml-2">Gerando boleto...</span>
-      </ng-container>
-
-      <ng-template #showLink>
-        <ng-container *ngIf="link; else noLink">
-          <input
-            pInputText
-            [value]="link"
-            disabled
-            readonly
-            class="w-[10rem]"
-            fluid
-          />
-          <p-inputgroup-addon>
-            <i class="pi pi-eye cursor-pointer" (click)="copyToClipboard(link)"></i>
-          </p-inputgroup-addon>
+      <p-inputgroup>
+        <ng-container *ngIf="isLoadingLink; else showLink">
+          <p-progressSpinner
+            styleClass="w-6 h-6"
+            strokeWidth="4"
+          ></p-progressSpinner>
+          <span class="ml-2">Gerando boleto...</span>
         </ng-container>
 
-        <ng-template #noLink>
-          <span class="text-sm text-gray-400">Nenhum link disponível.</span>
+        <ng-template #showLink>
+          <ng-container *ngIf="link; else noLink">
+            <input
+              pInputText
+              [value]="link"
+              disabled
+              readonly
+              class="w-[10rem]"
+              fluid
+            />
+            <p-inputgroup-addon>
+              <i
+                class="pi pi-eye cursor-pointer"
+                (click)="copyToClipboard(link)"
+              ></i>
+            </p-inputgroup-addon>
+          </ng-container>
+
+          <ng-template #noLink>
+            <span class="text-sm text-gray-400">Nenhum link disponível.</span>
+          </ng-template>
         </ng-template>
-      </ng-template>
-    </p-inputgroup>
-  </div>
-</p-popover>
+      </p-inputgroup>
+    </div>
+  </p-popover>
+</div>
