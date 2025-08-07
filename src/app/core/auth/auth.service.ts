@@ -14,6 +14,7 @@ import { Router } from "@angular/router";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { AuthenticatedUser, CustomJwtPayload, LoginDto, LoginResponseDto } from "./auth.model";
 import { SseService } from "../sse/sse.service";
+import { environment } from "../../../environments/environment";
 
 const ACCESS_TOKEN_KEY = "pgdo_access_token";
 const REFRESH_TOKEN_KEY = "pgdo_refresh_token";
@@ -24,7 +25,7 @@ const REFRESH_TOKEN_KEY = "pgdo_refresh_token";
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private apiUrl = "http://localhost:8080/api/auth";
+  private apiUrl = environment.apiUrl + '/auth';
 
   public currentUserSubject = new BehaviorSubject<AuthenticatedUser | null>(
     this.getUserFromToken()

@@ -5,4 +5,3 @@ export const environment = {
     googleMapsApiKey: 'AIzaSyCmavFR3WM6LhreBeGEBSKr5nKBAHcWVms'
 }
 
-//ng build
