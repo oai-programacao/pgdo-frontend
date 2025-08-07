@@ -172,30 +172,39 @@ export class SearchClientComponent implements OnInit, OnDestroy {
       });
   }
 
-  confirmToRegisterNewClient(event: Event, cpfCnpj: string) {
-    this.confirmationService.confirm({
-      target: event?.target as EventTarget,
-      message: "Deseja registrar um novo cliente?",
-      icon: "pi pi-exclamation-triangle",
-      accept: () => {
-        const clientData: any = {
-          cpf: this.clientType === "PF" ? cpfCnpj : null,
-          cnpj: this.clientType === "PJ" ? cpfCnpj : null,
-          clientType: this.clientType,
-        };
-        this.clientSharedService.setClientData(clientData);
-        this.router.navigate(["/app/clientes/cliente-cadastrar"]);
-      },
-      reject: () => {
-        this.messageService.add({
-          severity: "info",
-          summary: "Registrar Cliente",
-          detail: "Ação cancelada.",
-        });
-        this.hasSearched = false;
-      },
+confirmToRegisterNewClient(event: Event, cpfCnpj: string) {
+  console.log('Tipo:', this.clientType, 'CPF/CNPJ:', cpfCnpj); // debug
+  if (!cpfCnpj || !this.clientType) {
+    this.messageService.add({
+      severity: "warn",
+      summary: "Dados inválidos",
+      detail: "Informe o CPF ou CNPJ e selecione o tipo de cliente.",
     });
+    return;
   }
+  this.confirmationService.confirm({
+    target: event?.target as HTMLElement,
+    message: "Deseja registrar um novo cliente?",
+    icon: "pi pi-exclamation-triangle",
+    accept: () => {
+      const clientData: any = {
+        cpf: this.clientType === "PF" ? cpfCnpj : null,
+        cnpj: this.clientType === "PJ" ? cpfCnpj : null,
+        clientType: this.clientType,
+      };
+      this.clientSharedService.setClientData(clientData);
+      this.router.navigate(["/app/clientes/cliente-cadastrar"]);
+    },
+    reject: () => {
+      this.messageService.add({
+        severity: "info",
+        summary: "Registrar Cliente",
+        detail: "Ação cancelada.",
+      });
+      this.hasSearched = false;
+    },
+  });
+}
 
   registerNewClient() {
     if (!this.cpfCnpj || !this.clientType) return;
