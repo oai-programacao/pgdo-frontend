@@ -1,1 +1,28 @@
-<p>home-body works!</p>
+<div class="relative h-[90vh] rounded-xl overflow-hidden flex items-center justify-center bg-slate-900">
+  <!-- Fundo com imagem + gradiente -->
+  <div 
+    class="absolute inset-0 bg-cover bg-center"
+    style="background-image: linear-gradient(rgba(10,25,47,0.85), rgba(10,25,47,0.85)), url('/OAILogo.png');">
+  </div>
+
+  <!-- Partículas -->
+  <div class="absolute inset-0" id="particles"></div>
+
+  <!-- Conteúdo -->
+  <div class="relative z-10 text-center max-w-2xl px-4 text-white animate-fade-in">
+    <h2 class="text-4xl md:text-5xl font-extrabold mb-2 animate-glow">
+      Seja bem-vindo, <span class="text-sky-400">{{ userName }}</span>!
+    </h2>
+
+    <!-- Typewriter -->
+    <p class="text-lg font-semibold mb-4">
+      <span id="typewriter" class="font-mono"></span>
+    </p>
+
+    <p class="text-base md:text-lg text-slate-200 mb-6 leading-relaxed">
+      Conectando você com velocidade, segurança e inovação.<br>
+      Experimente a internet como nunca antes!
+    </p>
+
+  </div>
+</div>

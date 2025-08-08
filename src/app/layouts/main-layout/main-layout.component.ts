@@ -23,7 +23,13 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   private authStateSubscription?: Subscription;
 
   menuItems: MenuItem[] = [
-    { id: "home", label: "Home", icon: "pi pi-home", route: "/app/home" },
+    {
+      id: "home",
+      label: "Home",
+      icon: "pi pi-home",
+      route: "/app/home",
+     
+    },
     // Clientes
     {
       id: "clients",
