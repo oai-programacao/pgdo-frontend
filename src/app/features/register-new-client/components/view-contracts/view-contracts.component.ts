@@ -56,7 +56,7 @@ export class ViewContractsComponent implements OnInit, OnChanges {
 
 
 
-ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(changes: SimpleChanges): void {
   // console.log('clientData changed:', this.clientData);
   // console.log('contracts from RBX and DB:', this.contractsFromRbxAndDb);
   if (
@@ -70,7 +70,8 @@ ngOnChanges(changes: SimpleChanges): void {
   codePlan: contract.codePlan,
   subscriptionDiscount: contract.subscriptionDiscount,
   beginningCollection: contract.beginningCollection,
-  addressCobranca: contract.addressCobranca, // <-- aqui!
+  addressCobranca: contract.addressCobranca,
+  parcels: contract.parcels[0]?.price,
   observation: contract.observation,
   id: contract.id
 }))

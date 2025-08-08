@@ -122,37 +122,37 @@ export class CreateContractComponent implements OnInit, OnChanges {
       });
 
     // Lógica para calcular e mapear os valores de desconto e preço final
-    this.contractForm
-      .get("subscriptionDiscount")
-      ?.valueChanges.subscribe((valorDigitadoPeloUsuario) => {
-        const parcels = this.contractForm.get("parcels") as FormArray;
+    // this.contractForm
+    //   .get("subscriptionDiscount")
+    //   ?.valueChanges.subscribe((valorDigitadoPeloUsuario) => {
+    //     const parcels = this.contractForm.get("parcels") as FormArray;
 
         // O valor que o usuário digita no campo 'subscriptionDiscount' é o VALOR FINAL (ex: 900)
-        const finalPrice = Number(valorDigitadoPeloUsuario) || 0;
+        // const finalPrice = Number(valorDigitadoPeloUsuario) || 0;
 
         // Calculamos o DESCONTO a partir do valor final digitado (ex: 1000 - 900 = 100)
-        let discountAmount = this.valorBaseAdesao - finalPrice;
+        // let discountAmount = this.valorBaseAdesao - finalPrice;
 
         // Garante que o desconto não seja negativo
-        if (discountAmount < 0) {
-          discountAmount = 0;
-        }
+        // if (discountAmount < 0) {
+        //   discountAmount = 0;
+        // }
 
-        if (parcels && parcels.length > 0) {
+        // if (parcels && parcels.length > 0) {
           // Mapeamento conforme a sua regra FINAL:
           // 1. 'price' da parcela deve receber o VALOR DO DESCONTO (ex: 100)
-          parcels
-            .at(0)
-            .get("price")
-            ?.setValue(discountAmount, { emitEvent: false });
+          // parcels
+          //   .at(0)
+          //   .get("price")
+          //   ?.setValue(discountAmount, { emitEvent: false });
 
           // 2. 'subscriptionDiscount' já contém o VALOR FINAL (ex: 900)
           // Não precisamos setar ele aqui, pois o usuário já o alterou no input.
           // O importante é que o 'price' da parcela seja atualizado com o desconto.
-        }
-      });
-  }
-
+  //       }
+  //     });
+  // }
+    }
   ngOnChanges(changes: SimpleChanges): void {
     const clientChanged = changes["clientData"] && this.clientData;
     const typeChanged = changes["isPJorPF"];
