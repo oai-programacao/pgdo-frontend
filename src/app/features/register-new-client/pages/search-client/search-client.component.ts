@@ -112,6 +112,7 @@ onDialogHide() {
 
   createdContract() {
     this.createNewContractDialog = false;
+     this.registerNewClient()
     this.consultClient();
     this.messageService.add({
       severity: "success",
