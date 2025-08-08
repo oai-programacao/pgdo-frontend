@@ -38,6 +38,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       allowedRoles: [
         "ROLE_ADMIN",
         "ROLE_STORE_MANAGER",
+        "ROLE_USER",
         "ROLE_STORE_EMPLOYEE",
         "ROLE_CDS",
       ],
