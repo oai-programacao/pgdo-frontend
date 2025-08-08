@@ -28,7 +28,6 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       label: "Home",
       icon: "pi pi-home",
       route: "/app/home",
-     
     },
     // Clientes
     {
@@ -78,6 +77,17 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           icon: "pi pi-check",
           route: "/app/clientes/confirmar-instalacao",
           exactMatch: true,
+        },
+        {
+          id: "change-owner",
+          label: "Troca de Titularidade",
+          icon: "pi pi-file-export",
+          route: "/app/troca-titularidade",
+          allowedRoles: [
+            "ROLE_ADMIN",
+            "ROLE_STORE_MANAGER",
+            "ROLE_STORE_EMPLOYEE",
+          ],
         },
       ],
     },
@@ -315,13 +325,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         },
       ],
     },
-    {
-      id: "change-owner",
-      label: "Troca de Titularidade",
-      icon: "pi pi-file-export",
-      route: "/app/troca-titularidade",
-      allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_STORE_EMPLOYEE"],
-    },
+
     // {
     //   id: "avaliations",
     //   label: "Avaliações",

@@ -31,6 +31,7 @@ import { GoogleMapsComponent } from "../../../../shared/components/google-maps/g
 import { StepperModule } from "primeng/stepper";
 import { CodePlans } from "../../../../interfaces/register-client.model";
 import { ToastModule } from "primeng/toast";
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @Component({
   selector: "app-create-contract",
@@ -46,7 +47,8 @@ import { ToastModule } from "primeng/toast";
     SignaturePadComponent,
     GoogleMapsComponent,
     StepperModule,
-    ToastModule
+    ToastModule,
+    ProgressSpinnerModule
   ],
   templateUrl: "./create-contract.component.html",
   styleUrl: "./create-contract.component.scss",
@@ -60,6 +62,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
   signaturePadData: string = "";
   contractForm!: FormGroup;
   fb = new FormBuilder();
+  isCreatingContract: boolean = false;
   viaCepService = inject(ViaCepService);
   messageService = inject(MessageService);
   contractService = inject(RegisterClientService);
@@ -397,6 +400,8 @@ export class CreateContractComponent implements OnInit, OnChanges {
       },
     };
 
+    this.isCreatingContract = true;
+
     this.contractService.postClientContract(contractData).subscribe({
       next: () => {
         this.contractForm.reset();
@@ -406,6 +411,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
           summary: "Contrato Criado",
           detail: "O contrato foi criado com sucesso.",
         });
+        this.isCreatingContract = false;
       },
       error: (error) => {
         this.messageService.add({
