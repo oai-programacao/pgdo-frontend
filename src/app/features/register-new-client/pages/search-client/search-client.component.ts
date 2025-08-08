@@ -109,10 +109,10 @@ onDialogHide() {
     this.destroy$.complete();
   }
 
-
+ 
   createdContract() {
     this.createNewContractDialog = false;
-     this.registerNewClient()
+
     this.consultClient();
     this.messageService.add({
       severity: "success",
@@ -129,6 +129,20 @@ onDialogHide() {
   viewContractsDialogVisible(client: any) {
     this.dataClient = client ? [client] : [];
     this.viewContractsDialog = true;
+    if(!client){
+       const clientCpfCnpj = client.cpf || client.cnpj;
+    this.registerClientService.postSyncContracts(clientCpfCnpj).subscribe({
+      next: () => {
+        this.consultClient();
+      },
+      error: (e) => {
+        console.log(e);
+      }
+    })
+    }
+
+    
+   
 
   }
 

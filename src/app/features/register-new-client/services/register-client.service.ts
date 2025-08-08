@@ -151,6 +151,12 @@ getClientRegisterPdf(idClient: string, idContract: string): Observable<Blob> {
   });
 }
 
+postSyncContracts(cpfCnpj: string): Observable<string>{
+  return this.http.post<string>(
+    `${this.apiUrl}/clientContract/sync-contracts`, {cpfCnpj}
+  );
+}
+
 
 }
 
