@@ -32,7 +32,11 @@
       <div class="text-sm text-slate-600 dark:text-slate-300 mt-2">
         <div>
           <strong>Valor de Adesão:</strong>
-          {{ contract.parcels | currency : "BRL" }}
+          {{
+            contract.parcels != null
+              ? (contract.parcels | currency : "BRL")
+              : (0 | currency : "BRL")
+          }}
         </div>
         <div>
           <strong>Dia de Vencimento:</strong>
@@ -41,16 +45,15 @@
         <div>
           <strong>Endereço:</strong>
           @if(contract.addressCobranca){
-          <ng-container >
+          <ng-container>
             {{ contract.addressCobranca.street }},
             {{ contract.addressCobranca.number }}
             {{ contract.addressCobranca.neighborhood }} -
             {{ contract.addressCobranca.city }} <br />
             <strong>CEP</strong>: {{ contract.addressCobranca.zipCode }}
           </ng-container>
-          }
-          @if(!contract.addressCobranca){
-          <ng-container >
+          } @if(!contract.addressCobranca){
+          <ng-container>
             <span class="text-red-500">Endereço não informado</span>
           </ng-container>
           }

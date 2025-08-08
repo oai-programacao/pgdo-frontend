@@ -44,7 +44,7 @@
     <div class="w-full sm:w-3/4 md:w-2/3 lg:w-1/2 flex justify-center">
       <p-button
         icon="pi pi-search"
-        (onClick)="consultClient();"
+        (onClick)="consultClient(); registerNewClient()"
         label="Consultar Cliente"
         severity="info"
         [disabled]="!cpfCnpj || !clientType"
