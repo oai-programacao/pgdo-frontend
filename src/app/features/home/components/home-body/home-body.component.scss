@@ -1,0 +1,5 @@
+// CSS da flutuação
+@keyframes float {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50px); }
+}

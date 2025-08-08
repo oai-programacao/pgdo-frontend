@@ -4,6 +4,7 @@ import { CardWidgetComponent, WidgetTrend } from '../../../../shared/components/
 import { CommonModule } from '@angular/common';
 import { DashboardChartComponent } from '../../../../shared/chart/dashboard-chart/dashboard-chart.component';
 import { ContentPanelComponent } from '../../../../shared/components/content-panel/content-panel.component';
+import { HomeBodyComponent } from "../../components/home-body/home-body.component";
 
 @Component({
   selector: "app-store-manager-dashboard",
@@ -12,7 +13,8 @@ import { ContentPanelComponent } from '../../../../shared/components/content-pan
     ContentPanelComponent,
     CommonModule,
     DashboardChartComponent,
-  ],
+    HomeBodyComponent
+],
   templateUrl: "./store-manager-dashboard.component.html",
   styleUrl: "./store-manager-dashboard.component.scss",
 })

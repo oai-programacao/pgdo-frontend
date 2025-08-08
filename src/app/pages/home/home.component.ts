@@ -8,10 +8,11 @@ import { AuthService } from '../../core/auth/auth.service';
 import { map, Observable } from 'rxjs';
 import { AdminDashboardComponent } from "../../features/home/pages/admin-dashboard/admin-dashboard.component";
 import { StoreManagerDashboardComponent } from '../../features/home/pages/store-manager-dashboard/store-manager-dashboard.component';
+import { HomeBodyComponent } from "../../features/home/components/home-body/home-body.component";
 
 @Component({
   selector: "app-home",
-  imports: [CommonModule, AdminDashboardComponent, StoreManagerDashboardComponent],
+  imports: [CommonModule, AdminDashboardComponent, StoreManagerDashboardComponent, HomeBodyComponent],
   templateUrl: "./home.component.html",
   styleUrl: "./home.component.scss",
 })
