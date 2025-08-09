@@ -13,7 +13,7 @@ import {
 import { Router } from "@angular/router";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { AuthenticatedUser, CustomJwtPayload, LoginDto, LoginResponseDto } from "./auth.model";
-// import { SseService } from "../sse/sse.service";
+import { SseService } from "../sse/sse.service";
 import { environment } from "../../../environments/environment";
 
 const ACCESS_TOKEN_KEY = "pgdo_access_token";
