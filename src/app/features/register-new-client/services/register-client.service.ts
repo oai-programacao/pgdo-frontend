@@ -157,8 +157,12 @@ postSyncContracts(cpfCnpj: string): Observable<string>{
   );
 }
 
-
+getClientContractById(clientId: string): Observable<ViewRegisterClientResponseDto> {
+  return this.http.get<ViewRegisterClientResponseDto>(
+    `${this.apiUrl}/clientContract//clients/${clientId}/contracts`
+  );
 }
 
 
+}
 

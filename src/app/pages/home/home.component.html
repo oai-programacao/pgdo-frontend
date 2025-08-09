@@ -4,6 +4,7 @@
   <app-home-body *ngIf="userHasRole(roles, 'ROLE_ADMIN')"></app-home-body>
   <app-home-body *ngIf="userHasRole(roles, 'ROLE_STORE_MANAGER')"></app-home-body>
   <app-home-body *ngIf="userHasRole(roles, 'ROLE_USER')"></app-home-body>
+  <app-home-body *ngIf="userHasRole(roles, 'ROLE_STORE_EMPLOYEE')"></app-home-body>
 
 
   <div *ngIf="roles && roles.length === 0"> <p class="p-4 text-slate-700 dark:text-slate-300">Bem-vindo(a)! Seu painel personalizado está sendo preparado.</p>
