@@ -129,8 +129,10 @@ onDialogHide() {
   viewContractsDialogVisible(client: any) {
     this.dataClient = client ? [client] : [];
     this.viewContractsDialog = true;
-    if(!client){
-       const clientCpfCnpj = client.cpf || client.cnpj;
+
+if (!client.contract) {
+  const clientCpfCnpj = (client.cpf || client.cnpj || '').replace(/\D/g, '');
+  if (clientCpfCnpj) {
     this.registerClientService.postSyncContracts(clientCpfCnpj).subscribe({
       next: () => {
         this.consultClient();
@@ -138,8 +140,9 @@ onDialogHide() {
       error: (e) => {
         console.log(e);
       }
-    })
-    }
+    });
+  }
+}
 
     
    
