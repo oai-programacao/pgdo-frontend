@@ -22,7 +22,7 @@ import { TooltipModule } from "primeng/tooltip";
 import { ViewContractsComponent } from "../../components/view-contracts/view-contracts.component";
 import { CpfCnpjPipe } from "../../../../shared/pipes/cpf-cnpj.pipe";
 import { Subject, Subscription } from "rxjs";
-import { SseService } from "../../../../core/sse/sse.service";
+// import { SseService } from "../../../../core/sse/sse.service";
 
 @Component({
   selector: "app-search-client",
