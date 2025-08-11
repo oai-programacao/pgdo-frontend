@@ -13,6 +13,7 @@ import {
   ViewUnproductiveVisits,
 } from "../../../interfaces/service-order.model";
 import { environment } from "../../../../environments/environment";
+import { ViewEmployeeDto } from "../../../interfaces/employee.model";
 
 @Injectable({
   providedIn: "root",
@@ -140,7 +141,13 @@ export class ServiceOrderService {
     );
   }
 
-  deleteServiceOrderById(serviceOrderId: string):Observable<ViewServiceOrderDto>{
-    return this.http.delete<ViewServiceOrderDto>(`${this.apiUrl}/${serviceOrderId}`)
+  deleteServiceOrderById(
+    serviceOrderId: string
+  ): Observable<ViewServiceOrderDto> {
+    return this.http.delete<ViewServiceOrderDto>(
+      `${this.apiUrl}/${serviceOrderId}`
+    );
   }
+
+
 }

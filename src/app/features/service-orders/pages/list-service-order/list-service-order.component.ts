@@ -4,7 +4,7 @@ import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, Observable, map, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { Subject, Observable, map, debounceTime, distinctUntilChanged, takeUntil, of } from 'rxjs';
 import { MessageService } from 'primeng/api';
 
 // Módulos PrimeNG
@@ -28,7 +28,7 @@ import { TechnicianService } from '../../../technicians/services/technician.serv
 // Modelos
 import { ViewServiceOrderDto, ServiceOrderFilters, CustomPageResponse } from '../../../../interfaces/service-order.model';
 import { City, ClientType, Period, ServiceOrderStatus, TypeOfOsLabels, ServiceOrderStatusLabels, CitiesLabels, PeriodLabels, TypeOfOs } from '../../../../interfaces/enums.model';
-import { ViewEmployeeDto } from '../../../../interfaces/employee.model';
+import { EmployeeRole, ViewEmployeeDto } from '../../../../interfaces/employee.model';
 import { ViewTechnicianDto } from '../../../../interfaces/technician.model';
 import { FieldsetModule } from 'primeng/fieldset';
 import { SelectModule } from 'primeng/select';
@@ -78,6 +78,7 @@ export class ListServiceOrderComponent implements OnInit, OnDestroy {
   rows = 10;
   first = 0;
 
+
   // --- Filtros e Opções de Dropdown ---
   filterForm!: FormGroup;
   statusOptions: any[];
@@ -105,6 +106,9 @@ export class ListServiceOrderComponent implements OnInit, OnDestroy {
     this.technicians$ = this.technicianService.findAll(true);
     this.responsiblePersons$ = this.employeeService.findAll(true); // Busca todos os funcionários ativos
   }
+
+
+
 
   ngOnInit(): void {
     this.initFilterForm();
