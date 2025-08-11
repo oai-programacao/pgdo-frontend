@@ -235,6 +235,7 @@ export class CreateServiceOrderComponent implements OnInit, OnDestroy {
           return;
         }
 
+        -
         periodControl.enable();
         this.periodOptions = this.offersOptions
           .filter(offer =>

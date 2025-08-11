@@ -26,10 +26,24 @@ import { ToastModule } from "primeng/toast"; // Para notificações
 import { MessageService } from "primeng/api";
 
 import { OffersService } from "../../services/offers.service"; // Ajuste o caminho
-import { TypeOfOs, City, Period, TypeOfOsLabels, CitiesLabels, PeriodLabels } from "../../../../interfaces/enums.model";
-import { CreateOfferRequestDto, ViewOfferDto } from "../../../../interfaces/offers.model";
+import {
+  TypeOfOs,
+  City,
+  Period,
+  TypeOfOsLabels,
+  CitiesLabels,
+  PeriodLabels,
+} from "../../../../interfaces/enums.model";
+import {
+  CreateOfferRequestDto,
+  ViewOfferDto,
+} from "../../../../interfaces/offers.model";
 import { BlockOffersRequestService } from "../../services/block-offers-request.service";
-import { BlockPeriodOffers, BlockPeriodOffersLabels, ViewBlockOffersDto } from "../../../../interfaces/block-offers-request.model";
+import {
+  BlockPeriodOffers,
+  BlockPeriodOffersLabels,
+  ViewBlockOffersDto,
+} from "../../../../interfaces/block-offers-request.model";
 import { DatePickerModule } from "primeng/datepicker";
 import { SelectModule } from "primeng/select";
 
@@ -88,28 +102,34 @@ export class CreateRequestOfferComponent implements OnInit {
     }
   }
 
-private loadExistingBlocks(): void {
-    this.blockOffersRequestService.getAllBlockOffers().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (blocks) => {
-        // Pega a regra mais recente (com a maior data de liberação)
-        if (blocks && blocks.length > 0) {
-          this.activeBlock = blocks[0];
-          const releaseDate = this.parsePtBrDate(this.activeBlock.initialDate);
-          const today = new Date();
-          today.setHours(0, 0, 0, 0); // Normaliza para o início do dia
+  private loadExistingBlocks(): void {
+    this.blockOffersRequestService
+      .getAllBlockOffers()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blocks) => {
+          // Pega a regra mais recente (com a maior data de liberação)
+          if (blocks && blocks.length > 0) {
+            this.activeBlock = blocks[0];
+            const releaseDate = this.parsePtBrDate(
+              this.activeBlock.initialDate
+            );
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Normaliza para o início do dia
 
-          // A data mínima será a data de liberação OU hoje (o que for maior)
-          if (releaseDate && releaseDate > today) {
-            this.minDateValue = releaseDate;
-          } else {
-            this.minDateValue = today;
+            // A data mínima será a data de liberação OU hoje (o que for maior)
+            if (releaseDate && releaseDate > today) {
+              this.minDateValue = releaseDate;
+            } else {
+              this.minDateValue = today;
+            }
+
+            this.createOfferForm?.updateValueAndValidity(); // Força a revalidação
           }
-          
-          this.createOfferForm?.updateValueAndValidity(); // Força a revalidação
-        }
-      },
-      error: (err) => console.error("Erro ao carregar blocos existentes:", err),
-    });
+        },
+        error: (err) =>
+          console.error("Erro ao carregar blocos existentes:", err),
+      });
   }
 
   private loadDropdownOptions(): void {
@@ -128,14 +148,17 @@ private loadExistingBlocks(): void {
   }
 
   private initForm(): void {
-    this.createOfferForm = this.fb.group({
-      typeOfOs: [null, Validators.required],
-      city: [null, Validators.required],
-      period: [null, Validators.required],
-      date: [null, Validators.required],
-    }, {
-      validators: this.dateAndPeriodReleaseValidator(), // Adiciona o validador customizado
-    });
+    this.createOfferForm = this.fb.group(
+      {
+        typeOfOs: [null, Validators.required],
+        city: [null, Validators.required],
+        period: [null, Validators.required],
+        date: [null, Validators.required],
+      },
+      {
+        validators: this.dateAndPeriodReleaseValidator(), // Adiciona o validador customizado
+      }
+    );
 
     if (this.initialData) {
       this.createOfferForm.patchValue(this.initialData);
@@ -147,57 +170,73 @@ private loadExistingBlocks(): void {
     return (form: AbstractControl): ValidationErrors | null => {
       if (!this.activeBlock) return null; // Sem regra, sem validação
 
-      const dateControl = form.get('date');
-      const periodControl = form.get('period');
+      const dateControl = form.get("date");
+      const periodControl = form.get("period");
 
       if (!dateControl?.value || !periodControl?.value) return null;
 
       // As datas do formulário e do backend estão como "dd/MM/yyyy"
       const selectedDateString = dateControl.value;
       const releaseDateString = this.activeBlock.initialDate;
-      
+
       // Converte ambas para um formato comparável (YYYY-MM-DD)
-      const comparableSelectedDate = this.toComparableFormat(selectedDateString);
+      const comparableSelectedDate =
+        this.toComparableFormat(selectedDateString);
       const comparableReleaseDate = this.toComparableFormat(releaseDateString);
 
       if (!comparableSelectedDate || !comparableReleaseDate) return null; // Formato inválido
 
       // REGRA 1: Data selecionada não pode ser anterior à data de liberação
       if (comparableSelectedDate < comparableReleaseDate) {
-        return { dateIsBeforeRelease: `As solicitações estão liberadas apenas a partir de ${releaseDateString}.` };
+        return {
+          dateIsBeforeRelease: `As solicitações estão liberadas apenas a partir de ${releaseDateString}.`,
+        };
       }
 
       // REGRA 2: Se for exatamente na data de liberação, validar o período
       if (comparableSelectedDate === comparableReleaseDate) {
         const releasePeriod = this.activeBlock.periodOffer;
         const selectedPeriod = periodControl.value;
-        
-        if (releasePeriod === BlockPeriodOffers.MORNING && selectedPeriod !== Period.MORNING) {
-          return { periodNotAllowed: `Neste dia, as solicitações estão liberadas apenas para o período da MANHÃ.` };
+
+        if (
+          releasePeriod === BlockPeriodOffers.MORNING &&
+          selectedPeriod !== Period.MORNING
+        ) {
+          return {
+            periodNotAllowed: `Neste dia, as solicitações estão liberadas apenas para o período da MANHÃ.`,
+          };
         }
-        
-        if (releasePeriod === BlockPeriodOffers.AFTERNOON && selectedPeriod !== Period.AFTERNOON) {
-          return { periodNotAllowed: `Neste dia, as solicitações estão liberadas apenas para o período da TARDE.` };
+
+        if (
+          releasePeriod === BlockPeriodOffers.AFTERNOON &&
+          selectedPeriod !== Period.AFTERNOON
+        ) {
+          return {
+            periodNotAllowed: `Neste dia, as solicitações estão liberadas apenas para o período da TARDE.`,
+          };
         }
       }
-      
+
       return null; // Sem erros de validação
     };
   }
-  
+
   // --- FUNÇÕES AUXILIARES ---
-  
+
   // Converte "DD/MM/YYYY" para "YYYY-MM-DD" para comparação segura
   private toComparableFormat(dateStr: string): string | null {
     if (!dateStr || !/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) return null;
-    const parts = dateStr.split('/');
-    return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    const parts = dateStr.split("/");
+    return `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(
+      2,
+      "0"
+    )}`;
   }
 
   // Converte "DD/MM/YYYY" para um objeto Date
   private parsePtBrDate(dateStr: string): Date | null {
     const comparableFormat = this.toComparableFormat(dateStr);
-    return comparableFormat ? new Date(comparableFormat + 'T00:00:00') : null;
+    return comparableFormat ? new Date(comparableFormat + "T00:00:00") : null;
   }
 
   onSubmit(): void {
@@ -223,6 +262,8 @@ private loadExistingBlocks(): void {
 
     this.offersService.createRequestOffer(dto).subscribe({
       next: (createdOffer) => {
+        const audio = new Audio("/mixkit-software-interface-start-2574.wav");
+        audio.play();
         this.messageService.add({
           severity: "success",
           summary: "Sucesso",

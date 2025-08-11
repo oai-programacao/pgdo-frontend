@@ -273,7 +273,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       .findAll(this.filterForm.value, page, this.rows)
       .subscribe({
         next: (dataPage) => {
-          console.log("Dados recebidos:", dataPage);
           this.os = dataPage.content;
           this.totalRecords = dataPage.page.totalElements;
           this.populateOrdersArray();
