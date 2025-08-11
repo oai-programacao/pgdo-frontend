@@ -132,6 +132,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           route: "/app/anotacoes",
           allowedRoles: [
             "ROLE_ADMIN",
+            "ROLE_CALL_CENTER",
             "ROLE_STORE_MANAGER",
             "ROLE_ANALYST",
             "ROLE_CDS",
@@ -146,6 +147,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       icon: "pi pi-briefcase",
       allowedRoles: [
         "ROLE_ADMIN",
+        "ROLE_CALL_CENTER",
         "ROLE_STORE_MANAGER",
         "ROLE_STORE_EMPLOYEE",
         "ROLE_CDS",

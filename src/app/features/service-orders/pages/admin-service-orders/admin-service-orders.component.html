@@ -359,6 +359,15 @@
                     icon="pi pi-info-circle"
                     class="p-button-rounded p-button-text p-button-info"
                   ></button>
+                  <button
+                    type="button"
+                    pButton
+                    icon="pi pi-trash"
+                    class="p-button-rounded p-button-text p-button-danger"
+                    pTooltip="Excluir OS"
+                    (click)="confirmDeleteServiceOrder($event, os)"
+                    tooltipPosition="left"
+                  ></button>
                 </div>
               </div>
             </td>
@@ -446,3 +455,6 @@
   ></app-observation>
   }
 </p-dialog>
+
+
+<p-confirmdialog />

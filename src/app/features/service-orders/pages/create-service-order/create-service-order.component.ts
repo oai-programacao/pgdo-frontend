@@ -224,14 +224,25 @@ export class CreateServiceOrderComponent implements OnInit, OnDestroy {
         .filter((date, index, self) => self.indexOf(date) === index)
     })
 
-    scheduleDateControl.valueChanges.subscribe((value) => {
-      this.periodOptions = []; // Limpa os períodos disponíveis
-      if (value && this.offersOptions.length > 0) {
-        periodControl.enable(); // Habilita o campo de período
+    scheduleDateControl.valueChanges.subscribe((selectedDate) => {
+      this.periodOptions = [];
+      periodControl.setValue(null, { emitEvent: false });
+      periodControl.disable(); 
+
+      if (selectedDate && this.offersOptions.length > 0) {
+        const selectedTypeOfOs = this.createOsForm.get('serviceOrderType')?.value;
+        if (!selectedTypeOfOs) {
+          return;
+        }
+
+        periodControl.enable();
         this.periodOptions = this.offersOptions
-          .filter(offer => offer.date === value)
+          .filter(offer =>
+            offer.date === selectedDate && 
+            offer.typeOfOs === selectedTypeOfOs
+          )
           .map(offer => ({ label: PeriodLabels[offer.period], value: offer.period }))
-          .filter((period, index, self) => self.findIndex(p => p.value === period.value) === index); // Remove duplicatas
+          .filter((period, index, self) => self.findIndex(p => p.value === period.value) === index);
       }
     });
   }
