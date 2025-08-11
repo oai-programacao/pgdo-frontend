@@ -360,12 +360,8 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Ouve as mudanças no estado do usuário
-    this.authStateSubscription = this.authService.currentUser$
-      .pipe(
-        tap((user: any) => console.log("Current user:", user)),
-        distinctUntilChanged()
-      )
-      .subscribe((user) => {
+    this.authStateSubscription = this.authService.currentUser$.subscribe(
+      (user) => {
         if (user) {
           // Se há um usuário, conecta o SSE
           console.log("User logged in, connecting to SSE...");
@@ -375,7 +371,8 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           console.log("User logged out, disconnecting from SSE...");
           this.sseService.disconnect();
         }
-      });
+      }
+    );
   }
 
   ngOnDestroy(): void {
