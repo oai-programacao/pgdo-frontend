@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { PrimeNGConfigType } from 'primeng/config';
 import { Subscription } from 'rxjs';
 import { AuthService } from './core/auth/auth.service';
+import { SseService } from './core/sse/sse.service';
 // import { SseService } from './core/sse/sse.service';
 
 @Component({
@@ -12,6 +13,19 @@ import { AuthService } from './core/auth/auth.service';
   templateUrl: "./app.component.html",
   styleUrl: "./app.component.scss",
 })
-export class AppComponent {
-  
+export class AppComponent implements OnInit, OnDestroy {
+  private sseService = inject(SseService);
+  private sseSubscription?: Subscription;
+
+  ngOnDestroy() {
+    if (this.sseSubscription) {
+      this.sseSubscription.unsubscribe();
+    }
+  }
+ ngOnInit() {
+    this.sseSubscription = this.sseService.notificationEvents$.subscribe(notification => {
+      const audio = new Audio('/mixkit-software-interface-start-2574.wav');
+      audio.play();
+    });
+  }
 }
