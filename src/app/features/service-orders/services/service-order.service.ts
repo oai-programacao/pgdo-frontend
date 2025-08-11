@@ -139,4 +139,8 @@ export class ServiceOrderService {
       dto
     );
   }
+
+  deleteServiceOrderById(serviceOrderId: string):Observable<ViewServiceOrderDto>{
+    return this.http.delete<ViewServiceOrderDto>(`${this.apiUrl}/${serviceOrderId}`)
+  }
 }

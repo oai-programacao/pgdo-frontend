@@ -16,7 +16,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
-import { MessageService } from "primeng/api";
+import { ConfirmationService, MessageService } from "primeng/api";
 import { DatePickerModule } from "primeng/datepicker";
 import { InputTextModule } from "primeng/inputtext";
 import { SelectModule } from "primeng/select";
@@ -55,6 +55,8 @@ import { UnproductiveVisitsComponent } from "../../components/unproductive-visit
 import { HelperTechComponent } from "../../components/helper-tech/helper-tech.component";
 import { EditComponent } from "../../components/edit/edit.component";
 import { ObservationComponent } from "../../components/observation/observation.component";
+import { ConfirmDialogModule } from "primeng/confirmdialog";
+
 @Component({
   selector: "app-admin-service-orders",
   imports: [
@@ -78,11 +80,12 @@ import { ObservationComponent } from "../../components/observation/observation.c
     UnproductiveVisitsComponent,
     HelperTechComponent,
     EditComponent,
-    ObservationComponent
-],
+    ObservationComponent,
+    ConfirmDialogModule,
+  ],
   templateUrl: "./admin-service-orders.component.html",
   styleUrl: "./admin-service-orders.component.scss",
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
 })
 export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   @ViewChild("helperTech") helperTech!: HelperTechComponent;
@@ -98,6 +101,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly confirmationService = inject(ConfirmationService);
   private destroy$ = new Subject<void>();
   private pendingFirstValue: number | null = null;
 
@@ -136,7 +140,8 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   isUnproductiveVisitDialogVisible = false;
   isHelperTechDialogVisible = false;
   isEditingTechDialogVisible = false;
-  isPostingObeservationTechDialogVisible = false
+  isPostingObeservationTechDialogVisible = false;
+  isDeleteTechDialogVisible = false;
 
   constructor() {
     // this.statusOptions = this.mapLabelsToOptions(ServiceOrderStatusLabels);
@@ -166,7 +171,9 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.isEditingTechDialogVisible = true;
   }
 
-  openObservationTechDialog(selectedServiceOrder: ViewServiceOrderDto | null = null){
+  openObservationTechDialog(
+    selectedServiceOrder: ViewServiceOrderDto | null = null
+  ) {
     this.selectedServiceOrder = selectedServiceOrder;
     this.isPostingObeservationTechDialogVisible = true;
   }
@@ -192,7 +199,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.isHelperTechDialogVisible = false;
   }
 
-  onObservationSuccess(){
+  onObservationSuccess() {
     this.messageService.add({
       severity: "success",
       summary: "Sucesso",
@@ -203,9 +210,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.loadServiceOrders();
   }
 
-
-
-  
   // ciclo de vida
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -530,4 +534,62 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   getCitiesLabel = (city: City) => CitiesLabels[city] || city;
   getTypeOfOsLabel = (type: TypeOfOs) => TypeOfOsLabels[type] || type;
   getPeriodLabel = (period: Period) => PeriodLabels[period] || period;
+
+confirmDeleteServiceOrder(event: Event, os: ViewServiceOrderDto) {
+  this.confirmationService.confirm({
+    target: event.target as EventTarget,
+    message: "Tem certeza que deseja excluir esta ordem de serviço?",
+    header: "Confirmação de Exclusão",
+    icon: "pi pi-exclamation-triangle",
+    rejectButtonProps: {
+      label: "Cancelar",
+      severity: "secondary",
+      outlined: true,
+    },
+    acceptButtonProps: {
+      label: "Confirmar",
+      severity: "success",
+      outlined: true,
+    },
+    accept: () => {
+      this.deleteOS(os.id);
+    },
+    reject: () => {
+      this.messageService.add({
+        severity: "info",
+        summary: "Cancelado",
+        detail: "Ordem de serviço não excluída.",
+      });
+    },
+  });
+}
+
+deleteOS(id: string) {
+  if (!id) {
+    this.messageService.add({
+      severity: "error",
+      summary: "Erro",
+      detail: "ID da ordem de serviço não encontrado.",
+    });
+    return;
+  }
+
+  this.serviceOrderService.deleteServiceOrderById(id).subscribe({
+    next: () => {
+      this.messageService.add({
+        severity: "success",
+        summary: "Sucesso",
+        detail: "Ordem de serviço excluída com sucesso.",
+      });
+      this.loadServiceOrders();
+    },
+    error: () => {
+      this.messageService.add({
+        severity: "error",
+        summary: "Erro",
+        detail: "Erro ao excluir a ordem de serviço.",
+      });
+    },
+  });
+}
 }
