@@ -118,6 +118,7 @@ export class OffersListComponent implements OnInit, OnDestroy {
   offers: any[] = [];
   requestedOffers: any[] = [];
   isLoading = false;
+  private lastOffersSnapshot: any[] = [];
 
 
 
@@ -145,19 +146,19 @@ export class OffersListComponent implements OnInit, OnDestroy {
     }
   }
 
-  private checkForNewOffers() {
+private checkForNewOffers() {
     this.offersService
-      .getAllOffers(undefined, undefined, undefined, OfferStatus.PENDING)
+      .getSummaryOffers(
+        this.selectedCity === null ? undefined : this.selectedCity,
+        this.selectedTypeOfOs === null ? undefined : this.selectedTypeOfOs,
+        this.selectedPeriod === null ? undefined : this.selectedPeriod
+      )
       .subscribe({
         next: (offers) => {
-          if (offers.length > this.lastOffersCount) {
-            const audio = new Audio(
-              "/mixkit-software-interface-start-2574.wav"
-            );
-            audio.play();
+          if (JSON.stringify(this.lastOffersSnapshot) !== JSON.stringify(offers)) {
+            this.lastOffersSnapshot = offers;
+            this.offers = offers;
           }
-          this.lastOffersCount = offers.length;
-          this.requestedOffers = offers;
         },
         error: (e) => {
           console.log(e);
@@ -175,32 +176,21 @@ export class OffersListComponent implements OnInit, OnDestroy {
     });
   }
 
-  private subscribeToRealtimeUpdates(): void {
+private subscribeToRealtimeUpdates(): void {
     this.sseSubscription = this.sseService.notificationEvents$.subscribe(
       (notification) => {
-       
-
         const audio = new Audio("/mixkit-software-interface-start-2574.wav");
-
-        audio
-          .play()
-          .then(() => {
-            console.log("Áudio tocado com sucesso!");
-          })
-          .catch((err) => {
-            console.error("Erro ao tentar tocar o áudio:", err);
-          });
+        audio.play().catch(() => {});
 
         this.messageService.add({
           severity: "info",
           summary: "Atualização",
-          detail:
-            notification.message ||
-            "Novas ofertas solicitadas foram recebidas.",
+          detail: notification.message || "Novas ofertas solicitadas foram recebidas.",
           life: 5000,
         });
 
         this.loadRequestedOffers();
+        this.loadOffers(); 
       }
     );
   }
@@ -216,6 +206,7 @@ export class OffersListComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (offers) => {
           this.offers = offers;
+          this.lastOffersSnapshot = offers; 
           this.isLoading = false;
         },
         error: (error) => {
@@ -224,6 +215,7 @@ export class OffersListComponent implements OnInit, OnDestroy {
         },
       });
   }
+
 
   private loadRequestedOffers() {
     this.offersService

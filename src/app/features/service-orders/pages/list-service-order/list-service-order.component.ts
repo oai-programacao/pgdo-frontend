@@ -92,6 +92,8 @@ export class ListServiceOrderComponent implements OnInit, OnDestroy {
   selectedServiceOrder?: ViewServiceOrderDto;
   displayDetails = false;
 
+  private pollingIntervalId?: any;
+
   showDetails(serviceOrder: ViewServiceOrderDto): void {
     this.selectedServiceOrder = serviceOrder;
     this.displayDetails = true;
@@ -113,11 +115,21 @@ export class ListServiceOrderComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initFilterForm();
     this.syncFiltersWithUrl();
+
+    this.pollingIntervalId = setInterval(() => {
+      if(!this.displayDetails){
+        this.loadServiceOrders();
+      }
+    }, 5000);
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+
+    if(this.pollingIntervalId){
+      clearInterval(this.pollingIntervalId);
+    }
   }
 
   private initFilterForm(): void {
