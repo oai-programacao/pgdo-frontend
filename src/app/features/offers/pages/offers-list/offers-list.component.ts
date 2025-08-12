@@ -1,5 +1,11 @@
 import { CommonModule, DatePipe } from "@angular/common";
-import { Component, inject, OnDestroy, OnInit } from "@angular/core";
+import {
+  ChangeDetectorRef,
+  Component,
+  inject,
+  OnDestroy,
+  OnInit,
+} from "@angular/core";
 import { TableModule } from "primeng/table";
 import { OffersService } from "../../services/offers.service";
 import { ButtonModule } from "primeng/button";
@@ -59,14 +65,13 @@ export class OffersListComponent implements OnInit, OnDestroy {
   private messageService = inject(MessageService);
   private sseService = inject(SseService);
   private datePipe = inject(DatePipe);
+  private cdRef = inject(ChangeDetectorRef);
 
-  // Propriedades para o SSE
-  private sseSubscription?: Subscription; // Propriedade para guardar a inscrição
+  private sseSubscription?: Subscription;
+  private notificationSubscription?: Subscription;
   private pollingSubscription?: Subscription;
-  private lastOffersCount = 0;
+  private lastOffersSnapshot: any[] = [];
 
-  
-  // Filtros
   cities = [
     { label: "Todas as Cidades", value: null },
     { label: "Assis", value: City.ASSIS },
@@ -101,34 +106,40 @@ export class OffersListComponent implements OnInit, OnDestroy {
   selectedTypeOfOs: TypeOfOs | null = null;
   selectedPeriod: Period | null = null;
 
-  // Propriedades para o formulário de criação
   displayCreateDialog = false;
   createOffersForm!: FormGroup;
   isSubmitting = false;
 
-  // Propriedades para as ofertas solicitadas
   displayRequestedOffersDialog = false;
-
-  // Propriedades para o Dialog de Exclusão
   displayDeleteDialog = false;
   quantityToDelete = 1;
   offerToDelete?: any;
 
-  // Data
   offers: any[] = [];
   requestedOffers: any[] = [];
   isLoading = false;
-  private lastOffersSnapshot: any[] = [];
-
-
 
   ngOnInit() {
     this.loadOffers();
     this.loadRequestedOffers();
     this.initCreateOfferForm();
 
-    // Inscreve-se nos eventos de notificação do SseService
     this.subscribeToRealtimeUpdates();
+
+    this.notificationSubscription = this.offersService.notification$.subscribe(
+      (event) => {
+        if (event) {
+          this.messageService.add({
+            severity: "info",
+            summary: "Nova Solicitação",
+           detail: `Nova oferta: ${this.formattedTypeOfOs(event.typeOfOs)} em ${this.formattedCity(event.city)} (${this.formattedPeriod(event.period)}) - ${event.date ?? ""}`,
+            life: 5000,
+          });
+          this.loadRequestedOffers();
+          this.cdRef.detectChanges();
+        }
+      }
+    );
 
     this.pollingSubscription = interval(5000).subscribe(() => {
       this.checkForNewOffers();
@@ -136,17 +147,13 @@ export class OffersListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // É CRUCIAL se desinscrever para evitar memory leaks!
-    if (this.sseSubscription) {
-      this.sseSubscription.unsubscribe();
-    }
-
-    if (this.pollingSubscription) {
-      this.pollingSubscription.unsubscribe();
-    }
+    if (this.sseSubscription) this.sseSubscription.unsubscribe();
+    if (this.pollingSubscription) this.pollingSubscription.unsubscribe();
+    if (this.notificationSubscription)
+      this.notificationSubscription.unsubscribe();
   }
 
-private checkForNewOffers() {
+  private checkForNewOffers() {
     this.offersService
       .getSummaryOffers(
         this.selectedCity === null ? undefined : this.selectedCity,
@@ -155,17 +162,57 @@ private checkForNewOffers() {
       )
       .subscribe({
         next: (offers) => {
-          if (JSON.stringify(this.lastOffersSnapshot) !== JSON.stringify(offers)) {
+          if (
+            JSON.stringify(this.lastOffersSnapshot) !== JSON.stringify(offers)
+          ) {
             this.lastOffersSnapshot = offers;
             this.offers = offers;
           }
         },
         error: (e) => {
           console.log(e);
-        }
+        },
       });
   }
 
+  notifyAllPendingRequests(): void {
+    this.offersService
+      .getAllOffers(undefined, undefined, undefined, OfferStatus.PENDING)
+      .subscribe({
+        next: (offers) => {
+          if (!offers || offers.length === 0) {
+            this.messageService.add({
+              severity: "info",
+              summary: "Solicitações",
+              detail: "Nenhuma solicitação pendente encontrada.",
+              life: 4000,
+            });
+            return;
+          }
+          offers.forEach((offer) => {
+            this.messageService.add({
+              severity: "warn",
+              summary: "Solicitação Pendente",
+              detail: `${this.formattedTypeOfOs(
+                offer.typeOfOs
+              )} em ${this.formattedCity(
+                offer.city as City
+              )} (${this.formattedPeriod(offer.period)}) - ${offer.date}`,
+              life: 6000,
+            });
+          });
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: "error",
+            summary: "Erro",
+            detail: "Falha ao buscar solicitações pendentes.",
+            life: 5000,
+          });
+          console.error("Erro ao buscar solicitações pendentes:", error);
+        },
+      });
+  }
   private initCreateOfferForm() {
     this.createOffersForm = this.fb.group({
       typeOfOs: [null, Validators.required],
@@ -176,21 +223,10 @@ private checkForNewOffers() {
     });
   }
 
-private subscribeToRealtimeUpdates(): void {
+  private subscribeToRealtimeUpdates(): void {
     this.sseSubscription = this.sseService.notificationEvents$.subscribe(
       (notification) => {
-        const audio = new Audio("/mixkit-software-interface-start-2574.wav");
-        audio.play().catch(() => {});
-
-        this.messageService.add({
-          severity: "info",
-          summary: "Atualização",
-          detail: notification.message || "Novas ofertas solicitadas foram recebidas.",
-          life: 5000,
-        });
-
-        this.loadRequestedOffers();
-        this.loadOffers(); 
+        this.offersService.emitNotification(notification);
       }
     );
   }
@@ -206,7 +242,7 @@ private subscribeToRealtimeUpdates(): void {
       .subscribe({
         next: (offers) => {
           this.offers = offers;
-          this.lastOffersSnapshot = offers; 
+          this.lastOffersSnapshot = offers;
           this.isLoading = false;
         },
         error: (error) => {
@@ -216,13 +252,13 @@ private subscribeToRealtimeUpdates(): void {
       });
   }
 
-
   private loadRequestedOffers() {
     this.offersService
       .getAllOffers(undefined, undefined, undefined, OfferStatus.PENDING)
       .subscribe({
         next: (offers) => {
           this.requestedOffers = offers;
+          this.cdRef.detectChanges();
         },
         error: (error) => {
           console.error("Erro ao carregar ofertas solicitadas:", error);
@@ -234,22 +270,18 @@ private subscribeToRealtimeUpdates(): void {
     this.loadOffers();
   }
 
-  //-------Método de exclusão de ofertas-------//
-  // Abre o dialog de exclusão
   openDeleteDialog(offer: any): void {
     this.offerToDelete = offer;
-    this.quantityToDelete = 1; // Reseta para 1 toda vez que abre
+    this.quantityToDelete = 1;
     this.displayDeleteDialog = true;
   }
 
-  // Fecha o dialog
   cancelDelete(): void {
     this.displayDeleteDialog = false;
     this.offerToDelete = undefined;
     this.quantityToDelete = 1;
   }
 
-  // Executa a exclusão
   confirmDelete(): void {
     if (!this.offerToDelete || this.quantityToDelete <= 0) {
       this.messageService.add({
@@ -261,9 +293,6 @@ private subscribeToRealtimeUpdates(): void {
     }
 
     const offer = this.offerToDelete;
-
-    // O backend espera YYYY-MM-DD, então formatamos a data "DD/MM/YYYY" de volta
-    // Isso é um pouco frágil, o ideal seria que a projeção retornasse LocalDate/Date
     const dateParts = offer.date.split("/");
     const formattedDateForApi = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
 
@@ -282,12 +311,11 @@ private subscribeToRealtimeUpdates(): void {
             summary: "Sucesso",
             detail: `${this.quantityToDelete} oferta(s) deletada(s).`,
           });
-          this.cancelDelete(); // Fecha o dialog
-          this.loadOffers(); // Recarrega a lista
+          this.cancelDelete();
+          this.loadOffers();
         },
         error: (err) => {
           console.error("Erro ao deletar ofertas:", err);
-          // Exibe a mensagem de erro vinda do backend
           const detail =
             err.error?.detail || err.message || "Falha ao deletar ofertas.";
           this.messageService.add({
@@ -299,7 +327,6 @@ private subscribeToRealtimeUpdates(): void {
       });
   }
 
-  //-------Método de aceitar/rejeitar ofertas-------//
   acceptOffer(offerId: string): void {
     this.adminOffersService.acceptOffer(offerId).subscribe({
       next: (updatedOffer) => {
@@ -308,7 +335,7 @@ private subscribeToRealtimeUpdates(): void {
           summary: "Sucesso",
           detail: "Oferta aceita com sucesso!",
         });
-        this.loadRequestedOffers(); // Recarrega a lista de ofertas solicitadas
+        this.loadRequestedOffers();
       },
       error: (err) => {
         this.messageService.add({
@@ -329,7 +356,7 @@ private subscribeToRealtimeUpdates(): void {
           summary: "Sucesso",
           detail: "Oferta rejeitada com sucesso!",
         });
-        this.loadRequestedOffers(); // Recarrega a lista de ofertas solicitadas
+        this.loadRequestedOffers();
       },
       error: (err) => {
         this.messageService.add({
@@ -342,10 +369,8 @@ private subscribeToRealtimeUpdates(): void {
     });
   }
 
-  //-------Método de criação de ofertas-------//
-
   showCreateDialog(): void {
-    this.createOffersForm.reset({ quantity: 1 }); // Reseta o form e define quantidade=1
+    this.createOffersForm.reset({ quantity: 1 });
     this.displayCreateDialog = true;
   }
 
@@ -361,7 +386,6 @@ private subscribeToRealtimeUpdates(): void {
     }
     this.isSubmitting = true;
     const formValue = this.createOffersForm.value;
-
     const dto: CreateManyAvailableOffersDto = formValue;
 
     this.adminOffersService.createAvailableOffer(dto).subscribe({
@@ -373,7 +397,7 @@ private subscribeToRealtimeUpdates(): void {
         });
         this.isSubmitting = false;
         this.displayCreateDialog = false;
-        this.loadOffers(); // Recarrega a lista para mostrar as novas ofertas
+        this.loadOffers();
       },
       error: (err) => {
         this.messageService.add({
@@ -386,8 +410,6 @@ private subscribeToRealtimeUpdates(): void {
       },
     });
   }
-
-  //-------Métodos formatação-------//
 
   get formattedPeriod() {
     return (period: Period | null) => {
