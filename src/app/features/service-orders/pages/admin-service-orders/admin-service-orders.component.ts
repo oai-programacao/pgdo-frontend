@@ -287,66 +287,79 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   }
 
   updateServiceOrder(index: number): void {
-    const formGroup = this.orders.at(index) as FormGroup;
-    const id = formGroup.get("id")?.value;
+  const formGroup = this.orders.at(index) as FormGroup;
+  const id = formGroup.get("id")?.value;
 
-    if (!id) return;
+  if (!id) return;
 
-    const technician = formGroup.get("technician")?.value;
-    const startOfOs = formGroup.get("startOfOs")?.value;
-    const endOfOs = formGroup.get("endOfOs")?.value;
+  const technician = formGroup.get("technician")?.value;
+  const startOfOs = formGroup.get("startOfOs")?.value;
+  const endOfOs = formGroup.get("endOfOs")?.value;
 
-    // Validações com base nas regras de negócio
-    if (!technician && (startOfOs || endOfOs)) {
-      this.messageService.add({
-        severity: "warn",
-        summary: "Validação",
-        detail:
-          "Para informar horário de início ou fim, é necessário definir um técnico.",
-      });
-      formGroup.get("startOfOs")?.setValue(null, { emitEvent: false });
-      formGroup.get("endOfOs")?.setValue(null, { emitEvent: false });
-      return;
-    }
-
-    if (technician && !startOfOs && endOfOs) {
-      this.messageService.add({
-        severity: "warn",
-        summary: "Validação",
-        detail:
-          "Para informar o horário de fim, o horário de início deve estar preenchido.",
-      });
-      formGroup.get("endOfOs")?.setValue(null, { emitEvent: false });
-      return;
-    }
-
-    const dto: UpdateServiceOrderDto = {
-      scheduleDate: formGroup.get("scheduleDate")?.value || null,
-      period: formGroup.get("period")?.value || null,
-      technology: formGroup.get("technology")?.value || null,
-      technicianId: technician || null,
-      status: formGroup.get("status")?.value || null,
-      cabling: formGroup.get("cabling")?.value ?? null,
-      isActiveToReport: undefined,
-      startOfOs: startOfOs || null,
-      endOfOs: endOfOs || null,
-      observation: formGroup.get("observation")?.value || null,
-    };
-
-    this.serviceOrderService.update(id, dto).subscribe({
-      next: () => {
-        this.loadServiceOrders(); // Recarrega as ordens de serviço após a atualização
-      },
-      error: (err) => {
-        console.error("Erro ao atualizar Ordem de Serviço:", err);
-        this.messageService.add({
-          severity: "error",
-          summary: "Erro",
-          detail: "Erro ao atualizar Ordem de Serviço.",
-        });
-      },
+  // Validações...
+  if (!technician && (startOfOs || endOfOs)) {
+    this.messageService.add({
+      severity: "warn",
+      summary: "Validação",
+      detail: "Para informar horário de início ou fim, é necessário definir um técnico.",
     });
+    formGroup.get("startOfOs")?.setValue(null, { emitEvent: false });
+    formGroup.get("endOfOs")?.setValue(null, { emitEvent: false });
+    return;
   }
+
+  if (technician && !startOfOs && endOfOs) {
+    this.messageService.add({
+      severity: "warn",
+      summary: "Validação",
+      detail: "Para informar o horário de fim, o horário de início deve estar preenchido.",
+    });
+    formGroup.get("endOfOs")?.setValue(null, { emitEvent: false });
+    return;
+  }
+
+  const dto: UpdateServiceOrderDto = {
+    scheduleDate: formGroup.get("scheduleDate")?.value || null,
+    period: formGroup.get("period")?.value || null,
+    technology: formGroup.get("technology")?.value || null,
+    technicianId: technician || null,
+    status: formGroup.get("status")?.value || null,
+    cabling: formGroup.get("cabling")?.value ?? null,
+    isActiveToReport: undefined,
+    startOfOs: startOfOs || null,
+    endOfOs: endOfOs || null,
+    observation: formGroup.get("observation")?.value || null,
+  };
+
+  this.serviceOrderService.update(id, dto).subscribe({
+    next: (updated?: ViewServiceOrderDto) => {
+      // Patch local: atualiza só os campos alterados, sem reload global
+      formGroup.patchValue(
+        {
+          technician: updated?.technician?.id ?? dto.technicianId,
+          status: updated?.status ?? dto.status,
+          startOfOs: updated?.startOfOs ?? dto.startOfOs,
+          endOfOs: updated?.endOfOs ?? dto.endOfOs,
+          observation: updated?.observation ?? dto.observation,
+        },
+        { emitEvent: false }
+      );
+      this.messageService.add({
+        severity: "success",
+        summary: "Salvo",
+        detail: "Ordem atualizada.",
+        life: 800,
+      });
+    },
+    error: (err) => {
+      this.messageService.add({
+        severity: "error",
+        summary: "Erro",
+        detail: "Erro ao atualizar Ordem de Serviço.",
+      });
+    },
+  });
+}
 
   clearFilters(): void {
     this.filterForm.reset();
@@ -371,7 +384,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
         if (!control) return;
 
         control.valueChanges
-          .pipe(debounceTime(2000), takeUntil(this.destroy$))
+          .pipe(debounceTime(5000), takeUntil(this.destroy$))
           .subscribe((currentValue) => {
             this.updateServiceOrder(index);
           });
