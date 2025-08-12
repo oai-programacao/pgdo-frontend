@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { TypeOfOs, City, Period, OfferStatus } from '../../../interfaces/enums.model';
 import { CreateOfferRequestDto, ViewOfferDto } from '../../../interfaces/offers.model';
 import { environment } from '../../../../environments/environment';
@@ -75,4 +75,12 @@ export class OffersService {
     }
     return this.http.get<any[]>(`${this.apiUrl}/summary`, { params });
   }
+
+
+  private notificationSubject = new BehaviorSubject<any | null>(null);
+notification$ = this.notificationSubject.asObservable();
+
+emitNotification(event: any) {
+  this.notificationSubject.next(event);
+}
 }
