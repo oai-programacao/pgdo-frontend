@@ -93,6 +93,7 @@ export class ListServiceOrderComponent implements OnInit, OnDestroy {
   displayDetails = false;
 
   private pollingIntervalId?: any;
+private lastServiceOrdersSnapshot: ViewServiceOrderDto[] = [];
 
   showDetails(serviceOrder: ViewServiceOrderDto): void {
     this.selectedServiceOrder = serviceOrder;
@@ -112,16 +113,16 @@ export class ListServiceOrderComponent implements OnInit, OnDestroy {
 
 
 
-  ngOnInit(): void {
-    this.initFilterForm();
-    this.syncFiltersWithUrl();
+ngOnInit(): void {
+  this.initFilterForm();
+  this.syncFiltersWithUrl();
 
-    this.pollingIntervalId = setInterval(() => {
-      if(!this.displayDetails){
-        this.loadServiceOrders();
-      }
-    }, 5000);
-  }
+  this.pollingIntervalId = setInterval(() => {
+    if (!this.displayDetails) {
+      this.loadServiceOrdersPolling();
+    }
+  }, 5000);
+}
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -131,6 +132,24 @@ export class ListServiceOrderComponent implements OnInit, OnDestroy {
       clearInterval(this.pollingIntervalId);
     }
   }
+
+  private loadServiceOrdersPolling(): void {
+  const page = Math.floor(this.first / this.rows);
+  const filters = this.formatFilters(this.filterForm.value);
+
+  this.serviceOrderService.findAll(filters, page, this.rows).subscribe({
+    next: (dataPage: CustomPageResponse<ViewServiceOrderDto>) => {
+      // Só atualiza se mudou
+      if (JSON.stringify(this.lastServiceOrdersSnapshot) !== JSON.stringify(dataPage.content)) {
+        this.serviceOrders = dataPage.content;
+        this.totalRecords = dataPage.page.totalElements;
+        this.lastServiceOrdersSnapshot = dataPage.content;
+      }
+    },
+    error: () => {
+    }
+  });
+}
 
   private initFilterForm(): void {
     this.filterForm = this.fb.group({
