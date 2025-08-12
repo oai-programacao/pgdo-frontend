@@ -122,7 +122,6 @@ export class ManageAnnotationsComponent implements OnInit, OnDestroy {
         this.employeesAndTechnicians = [...mappedEmployees, ...mappedTechnicians]
           .sort((a, b) => a.label.localeCompare(b.label));
         
-        console.log('Dados combinados carregados:', this.employeesAndTechnicians); // Agora o log mostrará os dados
         this.isLoadingDropdown = false;
       },
       error: (err) => {
