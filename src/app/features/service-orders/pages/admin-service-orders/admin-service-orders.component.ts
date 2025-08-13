@@ -29,6 +29,7 @@ import { Router, ActivatedRoute } from "@angular/router";
 import { debounceTime, Subject, takeUntil } from "rxjs";
 import { ViewTechnicianDto } from "../../../../interfaces/technician.model";
 import {
+ 
   UpdateServiceOrderDto,
   ViewServiceOrderDto,
 } from "../../../../interfaces/service-order.model";
@@ -56,6 +57,7 @@ import { HelperTechComponent } from "../../components/helper-tech/helper-tech.co
 import { EditComponent } from "../../components/edit/edit.component";
 import { ObservationComponent } from "../../components/observation/observation.component";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { BadgeModule } from 'primeng/badge';
 
 @Component({
   selector: "app-admin-service-orders",
@@ -82,6 +84,7 @@ import { ConfirmDialogModule } from "primeng/confirmdialog";
     EditComponent,
     ObservationComponent,
     ConfirmDialogModule,
+    BadgeModule
   ],
   templateUrl: "./admin-service-orders.component.html",
   styleUrl: "./admin-service-orders.component.scss",
@@ -109,6 +112,9 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   technicians: ViewTechnicianDto[] = [];
   technicianOptions: { label: string; value: string | null }[] = [];
   os: ViewServiceOrderDto[] = [];
+  expiredOs: ViewServiceOrderDto[] = [];
+  expiredOsCount = 0;
+  showingExpired = false;
   osGroup!: FormGroup;
   totalRecords = 0;
   isLoading = true;
@@ -221,6 +227,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.initializeStateFromUrl(); // 2. Lemos a URL e populamos o formulário/paginação
     this.initTechnicians();
     this.loadServiceOrders();
+    this.loadExpiredOsCount();
   }
 
   /**
@@ -285,6 +292,42 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
           }),
       });
   }
+
+private loadExpiredOsCount(): void {
+  this.serviceOrderService.getExpiredCliente().subscribe({
+    next: (result) => {
+      this.expiredOsCount = result?.page?.totalElements ?? 0;
+    },
+    error: (e) => {
+      console.log(e);
+    }
+  });
+}
+
+showExpiredOs(): void {
+  this.isLoading = true;
+  this.serviceOrderService.getExpiredCliente().subscribe({
+    next: (result) => {
+      this.os = result.content ?? [];
+      this.totalRecords = this.os.length;
+      this.populateOrdersArray();
+      this.showingExpired = true;
+      this.isLoading = false;
+    },
+    error: () => {
+      this.messageService.add({
+        severity: "error",
+        summary: "Erro",
+        detail: "Falha ao carregar OS expiradas.",
+      });
+      this.isLoading = false;
+    }
+  });
+}
+showAllOs(): void {
+  this.showingExpired = false;
+  this.loadServiceOrders();
+}
 
   updateServiceOrder(index: number): void {
   const formGroup = this.orders.at(index) as FormGroup;
