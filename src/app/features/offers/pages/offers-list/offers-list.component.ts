@@ -130,9 +130,9 @@ export class OffersListComponent implements OnInit, OnDestroy {
     // Inscreve-se nos eventos de notificação do SseService
     this.subscribeToRealtimeUpdates();
 
-    this.pollingSubscription = interval(5000).subscribe(() => {
-      this.checkForNewOffers();
-    });
+   this.pollingSubscription = interval(5000).subscribe(() => {
+  this.loadRequestedOffers();
+});
   }
 
   ngOnDestroy(): void {
@@ -147,24 +147,25 @@ export class OffersListComponent implements OnInit, OnDestroy {
   }
 
 private checkForNewOffers() {
-    this.offersService
-      .getSummaryOffers(
-        this.selectedCity === null ? undefined : this.selectedCity,
-        this.selectedTypeOfOs === null ? undefined : this.selectedTypeOfOs,
-        this.selectedPeriod === null ? undefined : this.selectedPeriod
-      )
-      .subscribe({
-        next: (offers) => {
-          if (JSON.stringify(this.lastOffersSnapshot) !== JSON.stringify(offers)) {
-            this.lastOffersSnapshot = offers;
-            this.offers = offers;
-          }
-        },
-        error: (e) => {
-          console.log(e);
+  this.offersService
+    .getSummaryOffers(
+      this.selectedCity === null ? undefined : this.selectedCity,
+      this.selectedTypeOfOs === null ? undefined : this.selectedTypeOfOs,
+      this.selectedPeriod === null ? undefined : this.selectedPeriod
+    )
+    .subscribe({
+      next: (offers) => {
+        if (JSON.stringify(this.lastOffersSnapshot) !== JSON.stringify(offers)) {
+          this.lastOffersSnapshot = offers;
+          this.offers = offers;
+          this.loadRequestedOffers(); // Adicione esta linha!
         }
-      });
-  }
+      },
+      error: (e) => {
+        console.log(e);
+      }
+    });
+}
 
   private initCreateOfferForm() {
     this.createOffersForm = this.fb.group({
@@ -177,23 +178,26 @@ private checkForNewOffers() {
   }
 
 private subscribeToRealtimeUpdates(): void {
-    this.sseSubscription = this.sseService.notificationEvents$.subscribe(
-      (notification) => {
-        const audio = new Audio("/mixkit-software-interface-start-2574.wav");
-        audio.play().catch(() => {});
+  this.sseSubscription = this.sseService.notificationEvents$.subscribe(
+    (notification) => {
+      // Notificação visual e som
+       console.log('SSE recebido:', notification);
+      const audio = new Audio("/mixkit-software-interface-start-2574.wav");
+      audio.play().catch(() => {});
 
-        this.messageService.add({
-          severity: "info",
-          summary: "Atualização",
-          detail: notification.message || "Novas ofertas solicitadas foram recebidas.",
-          life: 5000,
-        });
+      this.messageService.add({
+        severity: "info",
+        summary: "Atualização",
+        detail: notification.message || "Novas ofertas solicitadas foram recebidas.",
+        life: 5000,
+      });
 
-        this.loadRequestedOffers();
-        this.loadOffers(); 
-      }
-    );
-  }
+      // Atualiza as listas
+      this.loadRequestedOffers();
+      this.loadOffers(); 
+    }
+  );
+}
 
   loadOffers() {
     this.isLoading = true;
@@ -218,16 +222,15 @@ private subscribeToRealtimeUpdates(): void {
 
 
   private loadRequestedOffers() {
-    this.offersService
-      .getAllOffers(undefined, undefined, undefined, OfferStatus.PENDING)
-      .subscribe({
-        next: (offers) => {
-          this.requestedOffers = offers;
-        },
-        error: (error) => {
-          console.error("Erro ao carregar ofertas solicitadas:", error);
-        },
-      });
+this.offersService.getAllOffers(undefined, undefined, undefined, OfferStatus.PENDING)
+  .subscribe({
+    next: (offers) => {
+      this.requestedOffers = offers;
+    },
+    error: (error) => {
+      console.error("Erro ao carregar ofertas solicitadas:", error);
+    },
+  });
   }
 
   onFilterChange() {
