@@ -74,11 +74,11 @@ export class CreateContractComponent implements OnInit, OnChanges {
   readonly valorBaseAdesao = 1000;
 
   pfPlans: any[] = [
-    { Codigo: 9009, Descricao: "9009 - Plano Básico" }
+    { Codigo: 10703, Descricao: "10703 - Plano Básico" }
   ];
 
   pjPlans: any[] = [
-    { Codigo: 9009, Descricao: "9009 - Plano Básico" }
+    { Codigo: 10703, Descricao: "10703 - Plano Básico" }
   ];
 
   addressLocationOptions = [
