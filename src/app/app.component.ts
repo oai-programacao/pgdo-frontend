@@ -39,7 +39,7 @@ export class AppComponent implements OnInit {
 ngOnInit(): void {
   this.sseService.notificationEvents$.subscribe({
     next: (notification) => {
-      // Só notifica se o status for 'ACCEPTED' e o responsável for o usuário logado
+      console.log('SSE recebido:', notification);
       if (
         notification.status === 'ACCEPTED' &&
         notification.responsible === this.getCurrentUserName()

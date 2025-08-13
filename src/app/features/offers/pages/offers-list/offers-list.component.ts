@@ -301,25 +301,33 @@ private subscribeToRealtimeUpdates(): void {
 
   //-------Método de aceitar/rejeitar ofertas-------//
   acceptOffer(offerId: string): void {
-    this.adminOffersService.acceptOffer(offerId).subscribe({
-      next: (updatedOffer) => {
-        this.messageService.add({
-          severity: "success",
-          summary: "Sucesso",
-          detail: "Oferta aceita com sucesso!",
-        });
-        this.loadRequestedOffers(); // Recarrega a lista de ofertas solicitadas
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: "error",
-          summary: "Erro",
-          detail: "Falha ao aceitar oferta.",
-        });
-        console.error(err);
-      },
-    });
-  }
+  this.adminOffersService.acceptOffer(offerId).subscribe({
+    next: (updatedOffer) => {
+      this.messageService.add({
+        severity: "success",
+        summary: "Sucesso",
+        detail: "Oferta aceita com sucesso!",
+        life: 4000
+      });
+      this.playNotificationSound();
+      this.loadRequestedOffers(); // Recarrega a lista de ofertas solicitadas
+    },
+    error: (err) => {
+      this.messageService.add({
+        severity: "error",
+        summary: "Erro",
+        detail: "Falha ao aceitar oferta.",
+        life: 4000
+      });
+      console.error(err);
+    },
+  });
+}
+
+playNotificationSound() {
+  const audio = new Audio('/livechat-129007.mp3'); // ajuste o caminho conforme seu arquivo
+  audio.play();
+}
 
   rejectOffer(offerId: string): void {
     this.adminOffersService.rejectOffer(offerId).subscribe({
