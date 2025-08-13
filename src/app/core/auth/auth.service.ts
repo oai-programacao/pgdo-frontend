@@ -74,12 +74,14 @@ export class AuthService {
         return null;
       }
 
+      
       const user: AuthenticatedUser = {
         email: decodedToken.email!,
         roles: decodedToken.roles || [], // Garante que roles seja um array, mesmo se ausente
         employeeId: decodedToken.sub, // Se o backend enviar
         name: decodedToken.name, // Se o backend enviar
       };
+      console.log('USUARIO LOGADO É:', user);
       return user;
     } catch (error) {
       console.error("Erro ao decodificar o token de acesso:", error);

@@ -1,77 +1,62 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { PrimeNGConfigType } from 'primeng/config';
-import { Subscription } from 'rxjs';
 import { AuthService } from './core/auth/auth.service';
 import { SseService } from './core/sse/sse.service';
 import { MessageService } from 'primeng/api';
-
 import { ToastModule } from 'primeng/toast';
-
-// import { SseService } from './core/sse/sse.service';
+import { AudioUnlockService } from './core/audio/audio-unlock.service';
+import { AdminOffersService } from './features/offers/services/admin-offers.service';
 
 @Component({
   selector: "app-root",
+  standalone: true,
   imports: [RouterOutlet, CommonModule, ToastModule],
   templateUrl: "./app.component.html",
   styleUrl: "./app.component.scss",
-  providers: [MessageService]
+  // Não coloque providers: [MessageService] aqui!
 })
 export class AppComponent implements OnInit {
   constructor(
     private sseService: SseService,
     private messageService: MessageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private audioUnlockService: AudioUnlockService,
+    private offersAdmin: AdminOffersService
   ) {}
 
-
-//   ngOnInit(): void {
-//   this.messageService.add({
-//     severity: 'success',
-//     summary: 'Teste',
-//     detail: 'Toast de teste!',
-//     life: 4000
-//   });
-//   this.playNotificationSound();
-// }
-
+  @HostListener('window:click')
+  onFirstClick() {
+    this.audioUnlockService.unlockAudio();
+  }
 ngOnInit(): void {
-  this.sseService.notificationEvents$.subscribe({
-    next: (notification) => {
-      console.log('SSE recebido:', notification);
-      if (
-        notification.status === 'ACCEPTED' &&
-        notification.responsible === this.getCurrentUserName()
-      ) {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Oferta Aceita',
-          detail: 'Sua solicitação de oferta foi aceita!',
-          life: 4000
-        });
-        this.playNotificationSound();
+  this.sseService.notificationEvents$.subscribe((notification: any) => {
+    console.log("DIAGNÓSTICO 1: Evento SSE recebido:", JSON.stringify(notification, null, 2));
+
+    const status = notification.status;
+
+    // Só notifica se status for ACCEPTED, independente de quem é o usuário
+    if (status === 'ACCEPTED') {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Oferta Aceita!',
+        detail: 'Uma solicitação de oferta foi aceita por um administrador.',
+        life: 7000
+      });
+
+      if (this.audioUnlockService.canPlayAudio()) {
+        const audio = new Audio('/livechat-129007.mp3');
+        audio.play().catch(e => console.error("Falha ao tocar o áudio.", e));
       }
+    } else {
+      console.log("DIAGNÓSTICO 4: Evento não é de aceitação. Nenhuma notificação será exibida.");
     }
   });
 }
 
-getCurrentUserName(): string | null {
-  return this.authService.currentUserSubject.value?.name ?? null;
-}
-
-  isMyOffer(notification: any): boolean {
-    // Implemente a lógica para saber se a oferta é do usuário logado
-    return notification.userId === this.getCurrentUserId();
+  getCurrentUserId(): string | null {
+    // Ajuste aqui se o identificador for o e-mail:
+    // return this.authService.currentUserSubject.value?.email ?? null;
+    return this.authService.currentUserSubject.value?.employeeId ?? null;
   }
-
-getCurrentUserId(): string | null {
-  // Se o usuário estiver logado, retorna o employeeId
-  return this.authService.currentUserSubject.value?.employeeId ?? null;
-}
-
-playNotificationSound() {
-  const audio = new Audio('/livechat-129007.mp3');
-  audio.play();
-}
 }

@@ -365,7 +365,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         if (user) {
           // Se há um usuário, conecta o SSE
           console.log("User logged in, connecting to SSE...");
-          this.sseService.connect();
+          this.sseService.connect(this.authService.getAccessToken());
         } else {
           // Se não há usuário (logout), desconecta o SSE
           console.log("User logged out, disconnecting from SSE...");

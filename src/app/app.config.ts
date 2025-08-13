@@ -7,11 +7,13 @@ import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-br
 import Aura from '@primeng/themes/aura';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { jwtInterceptor } from './core/auth/jwt.interceptor';
+import { MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
   
     provideAnimationsAsync(),
+    MessageService,
     providePrimeNG({
       theme: {
         preset: Aura,
