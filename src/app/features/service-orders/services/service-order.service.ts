@@ -7,6 +7,7 @@ import {
   CreateServiceOrderUnproductiveVisitDto,
   CustomPageResponse,
   ServiceOrderFilters,
+  ServiceOrderPage,
   UpdateServiceOrderDto,
   ViewServiceOrderDto,
   ViewTechnicalHelpDto,
@@ -150,4 +151,7 @@ export class ServiceOrderService {
   }
 
 
+getExpiredCliente(): Observable<ServiceOrderPage> {
+  return this.http.get<ServiceOrderPage>(`${this.apiUrl}/status/expired`);
+}
 }

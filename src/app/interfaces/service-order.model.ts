@@ -133,3 +133,13 @@ export interface ServiceOrderFilters {
   periods?: Period[] | null;
   statuses?: ServiceOrderStatus[] | null;
 }
+
+export interface ServiceOrderPage {
+  content: ViewServiceOrderDto[];
+  page: {
+    size: number;
+    number: number;
+    totalElements: number;
+    totalPages: number;
+  };
+}
