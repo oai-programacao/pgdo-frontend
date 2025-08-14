@@ -35,6 +35,8 @@ import {
 } from "../../../../interfaces/enums.model";
 import { CreateManyAvailableOffersDto } from "../../../../interfaces/offers.model";
 import { TooltipModule } from "primeng/tooltip";
+import { AuthService } from "../../../../core/auth/auth.service";
+import { AudioUnlockService } from "../../../../core/audio/audio-unlock.service";
 
 @Component({
   selector: "app-offers-list",
@@ -56,7 +58,7 @@ import { TooltipModule } from "primeng/tooltip";
   ],
   templateUrl: "./offers-list.component.html",
   styleUrl: "./offers-list.component.scss",
-  providers: [MessageService, ConfirmationService, DatePipe],
+   providers: [ MessageService,ConfirmationService, DatePipe],
 })
 export class OffersListComponent implements OnInit, OnDestroy {
   private offersService = inject(OffersService);
@@ -66,7 +68,8 @@ export class OffersListComponent implements OnInit, OnDestroy {
   private sseService = inject(SseService);
   private datePipe = inject(DatePipe);
   private cdRef = inject(ChangeDetectorRef);
-
+private authService = inject(AuthService);
+  private audioUnlockService = inject(AudioUnlockService);
   private sseSubscription?: Subscription;
   private notificationSubscription?: Subscription;
   private pollingSubscription?: Subscription;
@@ -114,6 +117,8 @@ export class OffersListComponent implements OnInit, OnDestroy {
   displayDeleteDialog = false;
   quantityToDelete = 1;
   offerToDelete?: any;
+  private lastResquestedOffersCount = 0;
+  private isInitialLoad = true;
 
   offers: any[] = [];
   requestedOffers: any[] = [];
@@ -141,9 +146,11 @@ export class OffersListComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.pollingSubscription = interval(5000).subscribe(() => {
-      this.checkForNewOffers();
+  this.pollingSubscription = interval(5000).subscribe(() => {
+      this.loadRequestedOffers();
+      this.loadOffers();
     });
+    this.subscribeToRealtimeUpdates();
   }
 
   ngOnDestroy(): void {
@@ -153,7 +160,7 @@ export class OffersListComponent implements OnInit, OnDestroy {
       this.notificationSubscription.unsubscribe();
   }
 
-  private checkForNewOffers() {
+   private checkForNewOffers() {
     this.offersService
       .getSummaryOffers(
         this.selectedCity === null ? undefined : this.selectedCity,
@@ -163,11 +170,14 @@ export class OffersListComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (offers) => {
           if (
-            JSON.stringify(this.lastOffersSnapshot) !== JSON.stringify(offers)
+            offers.length > this.lastResquestedOffersCount &&
+            this.audioUnlockService.canPlayAudio()
           ) {
-            this.lastOffersSnapshot = offers;
-            this.offers = offers;
+            if (this.isAdmin()) {
+              this.playNotificationSound();
+            }
           }
+
         },
         error: (e) => {
           console.log(e);
@@ -226,11 +236,23 @@ export class OffersListComponent implements OnInit, OnDestroy {
   private subscribeToRealtimeUpdates(): void {
     this.sseSubscription = this.sseService.notificationEvents$.subscribe(
       (notification) => {
-        this.offersService.emitNotification(notification);
+        if (this.isAdmin()) {
+
+             }
+        this.loadRequestedOffers();
+        this.loadOffers();
       }
     );
   }
 
+    isAdmin(): boolean {
+    // Ajuste conforme sua estrutura de usuário
+    return (
+      this.authService.isAuthenticated() &&
+      Array.isArray(this.authService.currentUserSubject.value?.roles) &&
+      this.authService.currentUserSubject.value?.roles.includes("ROLE_ADMIN")
+    );
+  }
   loadOffers() {
     this.isLoading = true;
     this.offersService
@@ -257,8 +279,24 @@ export class OffersListComponent implements OnInit, OnDestroy {
       .getAllOffers(undefined, undefined, undefined, OfferStatus.PENDING)
       .subscribe({
         next: (offers) => {
+          if (
+            offers.length > this.lastResquestedOffersCount &&
+            !this.isInitialLoad
+          ) {
+            if (this.isAdmin()) {
+               this.messageService.add({
+              severity: "info",
+              summary: "Nova Solicitação",
+              detail: "Uma nova oferta foi criada!",
+                life: 3000
+            });
+              this.playNotificationSound();
+            }
+          }
           this.requestedOffers = offers;
-          this.cdRef.detectChanges();
+          this.lastResquestedOffersCount = offers.length;
+          this.isInitialLoad = false;
+        
         },
         error: (error) => {
           console.error("Erro ao carregar ofertas solicitadas:", error);
@@ -328,26 +366,35 @@ export class OffersListComponent implements OnInit, OnDestroy {
   }
 
   acceptOffer(offerId: string): void {
-    this.adminOffersService.acceptOffer(offerId).subscribe({
+     this.adminOffersService.acceptOffer(offerId).subscribe({
       next: (updatedOffer) => {
         this.messageService.add({
           severity: "success",
           summary: "Sucesso",
           detail: "Oferta aceita com sucesso!",
+          life: 4000,
         });
-        this.loadRequestedOffers();
+        this.playNotificationSound();
+        this.loadRequestedOffers(); // Recarrega a lista de ofertas solicitadas
       },
       error: (err) => {
         this.messageService.add({
           severity: "error",
           summary: "Erro",
           detail: "Falha ao aceitar oferta.",
+          life: 4000,
         });
         console.error(err);
       },
     });
   }
-
+ playNotificationSound() {
+    const audio = new Audio("/livechat-129007.mp3"); // ajuste o caminho conforme seu arquivo
+    audio
+      .play()
+      .then()
+      .catch((e) => console.error("Erro ao reproduzir notificação sonora", e));
+  }
   rejectOffer(offerId: string): void {
     this.adminOffersService.rejectOffer(offerId).subscribe({
       next: (updatedOffer) => {

@@ -18,18 +18,19 @@ export class SseService {
   // private serviceOrderSubject = new Subject<any>();
 
   // Expomos os Observables para os componentes se inscreverem
-  public notificationEvents$: Observable<any> =
-    this.notificationSubject.asObservable();
+  public notificationEvents$: Observable<any> = this.notificationSubject.asObservable();
   // public serviceOrderEvents$: Observable<any> = this.serviceOrderSubject.asObservable();
 
+  private offerStatusSubject = new Subject<any>();
+  public offerStatusEvents$: Observable<any> = this.offerStatusSubject.asObservable();
+
   // Conecta ao endpoint SSE. Deve ser chamado pelo AuthService após o login/refresh.
-  connect(): void {
+  connect(token: string | null): void {
     // Se já houver uma conexão, feche-a primeiro para evitar múltiplas conexões
     if (this.eventSource) {
       this.disconnect();
     }
 
-    const token = this.authService.getAccessToken();
     if (!token) {
       console.error("SSE Connection: Cannot connect without an access token.");
       return;
@@ -43,18 +44,26 @@ export class SseService {
     this.eventSource.addEventListener("notification", (event: MessageEvent) => {
       this.ngZone.run(() => {
         try {
-          const notificationData: any = JSON.parse(event.data);
-          console.log("SSE: Received notification event:", notificationData);
-          this.notificationSubject.next(notificationData);
+           const data = JSON.parse(event.data);
+          console.log("SSE: Received 'notification' event ->", data);
+          this.notificationSubject.next(data);
         } catch (error) {
-          console.error("SSE: Error parsing notification event data.", error);
+           console.error("SSE: Error parsing 'notification' event.", error);
         }
       });
     });
 
     // Listener para o evento de conexão bem-sucedida (opcional, mas bom para debug)
-    this.eventSource.addEventListener("connected", (event: MessageEvent) => {
-      console.log("SSE: Connection established successfully.", event.data);
+    this.eventSource.addEventListener("offer_status_update", (event: MessageEvent) => {
+      this.ngZone.run(() => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log("SSE: Received 'offer_status_update' event ->", data);
+          this.offerStatusSubject.next(data);
+        } catch (error) {
+          console.error("SSE: Error parsing 'offer_status_update' event.", error);
+        }
+      });
     });
 
     // Listener para erros na conexão
