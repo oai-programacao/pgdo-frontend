@@ -157,8 +157,8 @@ export class ServiceOrderService {
     return this.http.patch<ViewTechnicalHelpDto>(`${this.apiUrl}/orderHelper/${helperId}`, dto);
   }
 
-  deleteTechnicianHelper(serviceOrderId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/orderHelper/${serviceOrderId}`);
-  }
+deleteTechnicianHelper(helperId: string): Observable<void> {
+  return this.http.delete<void>(`${this.apiUrl}/orderHelper/${helperId}`);
+}
 
 }

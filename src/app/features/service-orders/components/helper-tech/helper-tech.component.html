@@ -70,13 +70,18 @@
   } @else {
   <div class="pt-4">
     <div class="flex flex-row justify-center gap-4">
-      <p-button type="submit" severity="success" icon="pi pi-check" label="Salvar"> </p-button>
+      <p-button
+        type="submit"
+        severity="success"
+        icon="pi pi-check"
+        label="Salvar"
+      >
+      </p-button>
       <p-button
         type="button"
         severity="warn"
         label="Cancelar"
         (onClick)="editingHelperId = null; helperForm.reset()"
-        
       ></p-button>
     </div>
   </div>
@@ -113,6 +118,7 @@
             [rounded]="true"
             [text]="true"
             severity="danger"
+            (onClick)="deleteTechnicianHelper(helper.id)"
           ></p-button>
         </div>
       </div>
