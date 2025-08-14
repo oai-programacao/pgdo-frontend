@@ -192,27 +192,26 @@ export class HelperTechComponent implements OnInit {
     this.editingHelperId = helper.id;
   }
 
-  deleteTechnicianHelper(helperId: string) {
-    this.serviceOrderHelper.deleteTechnicianHelper(helperId).subscribe({
-      next: (response) => {
-        this.loadServiceOrder();
-        this.messageService.add({
-          severity: "warn",
-          summary: "Removido",
-          detail: "Ajuda Técnica removida com sucesso!",
-        });
-      },
-      error: (e) => {
-        console.log(e);
-        this.messageService.add({
-          severity: "error",
-          summary: "Erro",
-          detail: "Erro ao excluir técnico.",
-        });
-      },
-    });
-  }
-
+deleteTechnicianHelper(helperId: string) {
+  this.serviceOrderHelper.deleteTechnicianHelper(helperId).subscribe({
+    next: () => {
+      this.loadServiceOrder();
+      this.messageService.add({
+        severity: "warn",
+        summary: "Removido",
+        detail: "Ajuda Técnica removida com sucesso!",
+      });
+    },
+    error: (e) => {
+      console.log(e);
+      this.messageService.add({
+        severity: "error",
+        summary: "Erro",
+        detail: "Erro ao excluir técnico.",
+      });
+    },
+  });
+}
   private getTechnicianId(value: any): string | null {
     if (!value && value !== 0) return null;
     if (typeof value === "string") return value;
