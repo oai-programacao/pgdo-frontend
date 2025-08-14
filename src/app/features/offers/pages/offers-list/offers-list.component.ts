@@ -29,6 +29,8 @@ import {
 } from "../../../../interfaces/enums.model";
 import { CreateManyAvailableOffersDto } from "../../../../interfaces/offers.model";
 import { TooltipModule } from "primeng/tooltip";
+import { AuthService } from "../../../../core/auth/auth.service";
+import { AudioUnlockService } from "../../../../core/audio/audio-unlock.service";
 
 @Component({
   selector: "app-offers-list",
@@ -50,7 +52,7 @@ import { TooltipModule } from "primeng/tooltip";
   ],
   templateUrl: "./offers-list.component.html",
   styleUrl: "./offers-list.component.scss",
-  providers: [MessageService, ConfirmationService, DatePipe],
+  providers: [ MessageService,ConfirmationService, DatePipe],
 })
 export class OffersListComponent implements OnInit, OnDestroy {
   private offersService = inject(OffersService);
@@ -59,13 +61,13 @@ export class OffersListComponent implements OnInit, OnDestroy {
   private messageService = inject(MessageService);
   private sseService = inject(SseService);
   private datePipe = inject(DatePipe);
-
+  private authService = inject(AuthService);
+  private audioUnlockService = inject(AudioUnlockService);
   // Propriedades para o SSE
   private sseSubscription?: Subscription; // Propriedade para guardar a inscrição
   private pollingSubscription?: Subscription;
   private lastOffersCount = 0;
 
-  
   // Filtros
   cities = [
     { label: "Todas as Cidades", value: null },
@@ -119,8 +121,8 @@ export class OffersListComponent implements OnInit, OnDestroy {
   requestedOffers: any[] = [];
   isLoading = false;
   private lastOffersSnapshot: any[] = [];
-
-
+  private lastResquestedOffersCount = 0;
+  private isInitialLoad = true;
 
   ngOnInit() {
     this.loadOffers();
@@ -128,11 +130,12 @@ export class OffersListComponent implements OnInit, OnDestroy {
     this.initCreateOfferForm();
 
     // Inscreve-se nos eventos de notificação do SseService
-    this.subscribeToRealtimeUpdates();
 
-   this.pollingSubscription = interval(5000).subscribe(() => {
-  this.loadRequestedOffers();
-});
+    this.pollingSubscription = interval(5000).subscribe(() => {
+      this.loadRequestedOffers();
+      this.loadOffers();
+    });
+    this.subscribeToRealtimeUpdates();
   }
 
   ngOnDestroy(): void {
@@ -146,26 +149,30 @@ export class OffersListComponent implements OnInit, OnDestroy {
     }
   }
 
-private checkForNewOffers() {
-  this.offersService
-    .getSummaryOffers(
-      this.selectedCity === null ? undefined : this.selectedCity,
-      this.selectedTypeOfOs === null ? undefined : this.selectedTypeOfOs,
-      this.selectedPeriod === null ? undefined : this.selectedPeriod
-    )
-    .subscribe({
-      next: (offers) => {
-        if (JSON.stringify(this.lastOffersSnapshot) !== JSON.stringify(offers)) {
-          this.lastOffersSnapshot = offers;
-          this.offers = offers;
-          this.loadRequestedOffers(); // Adicione esta linha!
-        }
-      },
-      error: (e) => {
-        console.log(e);
-      }
-    });
-}
+  private checkForNewOffers() {
+    this.offersService
+      .getSummaryOffers(
+        this.selectedCity === null ? undefined : this.selectedCity,
+        this.selectedTypeOfOs === null ? undefined : this.selectedTypeOfOs,
+        this.selectedPeriod === null ? undefined : this.selectedPeriod
+      )
+      .subscribe({
+        next: (offers) => {
+          if (
+            offers.length > this.lastResquestedOffersCount &&
+            this.audioUnlockService.canPlayAudio()
+          ) {
+            if (this.isAdmin()) {
+              this.playNotificationSound();
+            }
+          }
+
+        },
+        error: (e) => {
+          console.log(e);
+        },
+      });
+  }
 
   private initCreateOfferForm() {
     this.createOffersForm = this.fb.group({
@@ -177,27 +184,27 @@ private checkForNewOffers() {
     });
   }
 
-private subscribeToRealtimeUpdates(): void {
-  this.sseSubscription = this.sseService.notificationEvents$.subscribe(
-    (notification) => {
-      // Notificação visual e som
-       console.log('SSE recebido:', notification);
-      const audio = new Audio("/mixkit-software-interface-start-2574.wav");
-      audio.play().catch(() => {});
+  private subscribeToRealtimeUpdates(): void {
+    this.sseSubscription = this.sseService.notificationEvents$.subscribe(
+      (notification) => {
+        if (this.isAdmin()) {
 
-      this.messageService.add({
-        severity: "info",
-        summary: "Atualização",
-        detail: notification.message || "Novas ofertas solicitadas foram recebidas.",
-        life: 5000,
-      });
+          // Toca o som
+        }
+        this.loadRequestedOffers();
+        this.loadOffers();
+      }
+    );
+  }
 
-      // Atualiza as listas
-      this.loadRequestedOffers();
-      this.loadOffers(); 
-    }
-  );
-}
+  isAdmin(): boolean {
+    // Ajuste conforme sua estrutura de usuário
+    return (
+      this.authService.isAuthenticated() &&
+      Array.isArray(this.authService.currentUserSubject.value?.roles) &&
+      this.authService.currentUserSubject.value?.roles.includes("ROLE_ADMIN")
+    );
+  }
 
   loadOffers() {
     this.isLoading = true;
@@ -210,7 +217,7 @@ private subscribeToRealtimeUpdates(): void {
       .subscribe({
         next: (offers) => {
           this.offers = offers;
-          this.lastOffersSnapshot = offers; 
+          this.lastOffersSnapshot = offers;
           this.isLoading = false;
         },
         error: (error) => {
@@ -220,17 +227,34 @@ private subscribeToRealtimeUpdates(): void {
       });
   }
 
-
   private loadRequestedOffers() {
-this.offersService.getAllOffers(undefined, undefined, undefined, OfferStatus.PENDING)
-  .subscribe({
-    next: (offers) => {
-      this.requestedOffers = offers;
-    },
-    error: (error) => {
-      console.error("Erro ao carregar ofertas solicitadas:", error);
-    },
-  });
+    this.offersService
+      .getAllOffers(undefined, undefined, undefined, OfferStatus.PENDING)
+      .subscribe({
+        next: (offers) => {
+          if (
+            offers.length > this.lastResquestedOffersCount &&
+            !this.isInitialLoad
+          ) {
+            if (this.isAdmin()) {
+               this.messageService.add({
+              severity: "info",
+              summary: "Nova Solicitação",
+              detail: "Uma nova oferta foi criada!",
+                life: 3000
+            });
+              this.playNotificationSound();
+            }
+          }
+          this.requestedOffers = offers;
+          this.lastResquestedOffersCount = offers.length;
+          this.isInitialLoad = false;
+        
+        },
+        error: (error) => {
+          console.error("Erro ao carregar ofertas solicitadas:", error);
+        },
+      });
   }
 
   onFilterChange() {
@@ -304,33 +328,36 @@ this.offersService.getAllOffers(undefined, undefined, undefined, OfferStatus.PEN
 
   //-------Método de aceitar/rejeitar ofertas-------//
   acceptOffer(offerId: string): void {
-  this.adminOffersService.acceptOffer(offerId).subscribe({
-    next: (updatedOffer) => {
-      this.messageService.add({
-        severity: "success",
-        summary: "Sucesso",
-        detail: "Oferta aceita com sucesso!",
-        life: 4000
-      });
-      this.playNotificationSound();
-      this.loadRequestedOffers(); // Recarrega a lista de ofertas solicitadas
-    },
-    error: (err) => {
-      this.messageService.add({
-        severity: "error",
-        summary: "Erro",
-        detail: "Falha ao aceitar oferta.",
-        life: 4000
-      });
-      console.error(err);
-    },
-  });
-}
+    this.adminOffersService.acceptOffer(offerId).subscribe({
+      next: (updatedOffer) => {
+        this.messageService.add({
+          severity: "success",
+          summary: "Sucesso",
+          detail: "Oferta aceita com sucesso!",
+          life: 4000,
+        });
+        this.playNotificationSound();
+        this.loadRequestedOffers(); // Recarrega a lista de ofertas solicitadas
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: "error",
+          summary: "Erro",
+          detail: "Falha ao aceitar oferta.",
+          life: 4000,
+        });
+        console.error(err);
+      },
+    });
+  }
 
-playNotificationSound() {
-  const audio = new Audio('/livechat-129007.mp3'); // ajuste o caminho conforme seu arquivo
-  audio.play();
-}
+  playNotificationSound() {
+    const audio = new Audio("/livechat-129007.mp3"); // ajuste o caminho conforme seu arquivo
+    audio
+      .play()
+      .then()
+      .catch((e) => console.error("Erro ao reproduzir notificação sonora", e));
+  }
 
   rejectOffer(offerId: string): void {
     this.adminOffersService.rejectOffer(offerId).subscribe({
