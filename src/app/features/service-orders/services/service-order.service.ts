@@ -149,5 +149,16 @@ export class ServiceOrderService {
     );
   }
 
+  getExpiredCliente(): Observable<ServiceOrderPage> {
+    return this.http.get<ServiceOrderPage>(`${this.apiUrl}/status/expired`);
+  }
+
+  patchTechnicianHelper(helperId: string, dto: CreateServiceOrderHelperDto): Observable<ViewTechnicalHelpDto> {
+    return this.http.patch<ViewTechnicalHelpDto>(`${this.apiUrl}/orderHelper/${helperId}`, dto);
+  }
+
+  deleteTechnicianHelper(serviceOrderId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/orderHelper/${serviceOrderId}`);
+  }
 
 }
