@@ -50,7 +50,7 @@
               <span
                 class="block text-xs text-gray-400 mt-2 mb-1 whitespace-nowrap"
               >
-                *A data de inicio da cobranca nao pode ser menor do que a data
+                *A data de inicio da cobranca não pode ser menor do que a data
                 de assinatura.
               </span>
               <p-datepicker
@@ -200,6 +200,12 @@
                   formControlName="complement"
                   class="min-w-0 flex-1"
                 />
+                </div>
+                <div class="flex flex-col w-full">
+                <p-iftalabel>
+                  <textarea pTextarea rows="5"  cols="30" style="resize: none" formControlName="observation_address" fluid ></textarea>
+                  <label for="observation_address">Observação</label>
+                </p-iftalabel>
               </div>
 
               <!-- Mapa Google -->
