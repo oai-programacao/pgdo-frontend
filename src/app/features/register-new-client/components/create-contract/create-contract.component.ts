@@ -32,6 +32,8 @@ import { StepperModule } from "primeng/stepper";
 import { CodePlans } from "../../../../interfaces/register-client.model";
 import { ToastModule } from "primeng/toast";
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { IftaLabelModule } from 'primeng/iftalabel';
+import { NgxMaskDirective, provideNgxMask } from "ngx-mask";
 
 @Component({
   selector: "app-create-contract",
@@ -48,11 +50,13 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
     GoogleMapsComponent,
     StepperModule,
     ToastModule,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
+    IftaLabelModule,
+    NgxMaskDirective,
   ],
   templateUrl: "./create-contract.component.html",
   styleUrl: "./create-contract.component.scss",
-  providers: [ViaCepService, MessageService],
+  providers: [ViaCepService, MessageService, provideNgxMask()],
 })
 export class CreateContractComponent implements OnInit, OnChanges {
   @Output() contractCreated = new EventEmitter<void>();
@@ -178,6 +182,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
           referencePoint: this.clientData?.[0]?.addresses?.referencePoint || "",
           addressType: "INSTALLATION",
           addressLocation: "",
+          observation_address: '',
           ibge: 3504008,
         },
         addressCobranca: {
@@ -192,6 +197,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
           referencePoint: this.clientData?.[0]?.addresses?.referencePoint || "",
           addressType: "INSTALLATION",
           addressLocation: null,
+          observation_address: '',
           ibge: this.clientData?.[0]?.addresses?.ibge || 3504008,
         },
       });
@@ -243,6 +249,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
       referencePoint: [""],
       addressType: ["INSTALLATION"],
       addressLocation: ["", Validators.required],
+      observation_address: [''],
       ibge: [3504008],
     };
 
