@@ -172,25 +172,48 @@
       </div>
 
       <div
-        class="flex justify-end items-center gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700"
+       class="flex justify-between items-center gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700"
       >
-        <button
-          pButton
-          type="button"
-          label="Limpar Filtros"
-          icon="pi pi-filter-slash"
-          class="p-button-outlined p-button-secondary"
-          (click)="clearFilters()"
-        ></button>
-        <button
-          pButton
-          type="button"
-          label="Pesquisar"
-          icon="pi pi-search"
-          class="p-button-outlined p-button-primary"
-          (click)="applyFilters()"
-        ></button>
-      </div>
+       <div class="flex items-center gap-2">
+          <p-button
+            label="OS Expiradas"
+            icon="pi pi-exclamation-triangle"
+            outlined
+            text
+            severity="danger"
+            [badge]="expiredOsCount.toString()"
+            [badgeSeverity]="'danger'"
+            (click)="showExpiredOs()"
+          />
+          <p-button
+            label="Todas OS"
+            icon="pi pi-list"
+            outlined
+            text
+            severity="info"
+            class="ml-2"
+            (click)="showAllOs()"
+          />
+        </div>
+        <div class="flex items-center gap-3">
+          <button
+            pButton
+            type="button"
+            label="Limpar Filtros"
+            icon="pi pi-filter-slash"
+            class="p-button-outlined p-button-secondary"
+            (click)="clearFilters()"
+          ></button>
+          <button
+            pButton
+            type="button"
+            label="Pesquisar"
+            icon="pi pi-search"
+            class="p-button-outlined p-button-primary"
+            (click)="applyFilters()"
+          ></button>
+        </div>
+        </div>
     </form>
   </p-fieldset>
 

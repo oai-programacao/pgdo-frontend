@@ -7,6 +7,7 @@ import {
   CreateServiceOrderUnproductiveVisitDto,
   CustomPageResponse,
   ServiceOrderFilters,
+  ServiceOrderPage,
   UpdateServiceOrderDto,
   ViewServiceOrderDto,
   ViewTechnicalHelpDto,
@@ -149,10 +150,9 @@ export class ServiceOrderService {
     );
   }
 
-  getExpiredCliente(): Observable<CustomPageResponse<ViewServiceOrderDto>> {
-    return this.http.get<CustomPageResponse<ViewServiceOrderDto>>(`${this.apiUrl}/status/expired`);
-  }
-
+getExpiredCliente(): Observable<ServiceOrderPage> {
+  return this.http.get<ServiceOrderPage>(`${this.apiUrl}/status/expired`);
+}
   patchTechnicianHelper(helperId: string, dto: CreateServiceOrderHelperDto): Observable<ViewTechnicalHelpDto> {
     return this.http.patch<ViewTechnicalHelpDto>(`${this.apiUrl}/orderHelper/${helperId}`, dto);
   }

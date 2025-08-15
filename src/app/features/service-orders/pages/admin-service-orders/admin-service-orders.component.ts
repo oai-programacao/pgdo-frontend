@@ -56,6 +56,7 @@ import { HelperTechComponent } from "../../components/helper-tech/helper-tech.co
 import { EditComponent } from "../../components/edit/edit.component";
 import { ObservationComponent } from "../../components/observation/observation.component";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { BadgeModule } from 'primeng/badge';
 
 @Component({
   selector: "app-admin-service-orders",
@@ -82,6 +83,7 @@ import { ConfirmDialogModule } from "primeng/confirmdialog";
     EditComponent,
     ObservationComponent,
     ConfirmDialogModule,
+    BadgeModule,
   ],
   templateUrl: "./admin-service-orders.component.html",
   styleUrl: "./admin-service-orders.component.scss",
@@ -93,7 +95,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   @ViewChild("editOS") editOS!: EditComponent;
   @ViewChild("helperTechDialog") helperTechDialog!: HelperTechComponent;
 
-  // Injeções de dependências
   private readonly messageService = inject(MessageService);
   private readonly serviceOrderService = inject(ServiceOrderService);
   private readonly fb = inject(FormBuilder);
@@ -105,20 +106,20 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private pendingFirstValue: number | null = null;
 
-  // Variaveis do componente
   technicians: ViewTechnicianDto[] = [];
   technicianOptions: { label: string; value: string | null }[] = [];
   os: ViewServiceOrderDto[] = [];
+  expiredOs: ViewServiceOrderDto[] = [];
+  expiredOsCount = 0;
+  showingExpired = false;
   osGroup!: FormGroup;
   totalRecords = 0;
   isLoading = true;
   rows = 20;
   first = 0;
 
-  // Ordem de Serviço Selecionada
   selectedServiceOrder: ViewServiceOrderDto | null = null;
 
-  //Opções de filtro
   statusOptions: any[] = [
     { label: "Em Branco", value: null },
     ...Object.entries(ServiceOrderStatusLabels).map(([key, value]) => ({
@@ -130,13 +131,11 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   cityOptions: any[];
   periodOptions: any[];
 
-  // Formulários
   filterForm!: FormGroup;
   helperForm!: FormGroup;
   unproductiveVisitForm!: FormGroup;
-  isSubmittingSubForm = false; // Flag de loading para os sub-formulários
+  isSubmittingSubForm = false;
 
-  // Dialogs
   isUnproductiveVisitDialogVisible = false;
   isHelperTechDialogVisible = false;
   isEditingTechDialogVisible = false;
@@ -144,16 +143,14 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   isDeleteTechDialogVisible = false;
 
   constructor() {
-    // this.statusOptions = this.mapLabelsToOptions(ServiceOrderStatusLabels);
     this.serviceOrderTypeOptions = this.mapLabelsToOptions(TypeOfOsLabels);
     this.cityOptions = this.mapLabelsToOptions(CitiesLabels);
     this.periodOptions = this.mapLabelsToOptions(PeriodLabels);
     this.osGroup = this.fb.group({
-      orders: this.fb.array([]), // FormArray para armazenar as ordens de serviço
+      orders: this.fb.array([]),
     });
   }
 
-  // abertura dos dialogs
   openUnproductiveVisitDialog(
     selectServiceOrder: ViewServiceOrderDto | null = null
   ) {
@@ -178,7 +175,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.isPostingObeservationTechDialogVisible = true;
   }
 
-  //Dialogs após ação no filho
   onEditSuccess() {
     this.messageService.add({
       severity: "success",
@@ -210,7 +206,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.loadServiceOrders();
   }
 
-  // ciclo de vida
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -218,14 +213,12 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initForms();
-    this.initializeStateFromUrl(); // 2. Lemos a URL e populamos o formulário/paginação
+    this.initializeStateFromUrl();
     this.initTechnicians();
     this.loadServiceOrders();
+    this.loadExpiredOsCount();
   }
 
-  /**
-   * Retorna o FormArray de ordens de serviço
-   */
   get orders(): FormArray {
     return this.osGroup.get("orders") as FormArray;
   }
@@ -235,22 +228,13 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   }
 
   applyFilters(): void {
-    // 1. Reseta a paginação para a primeira página
     this.first = 0;
-
-    // 2. Chama o método de carregamento, que já usa filterForm.value
     this.loadServiceOrders();
   }
 
   private initializeStateFromUrl(): void {
     const params = this.route.snapshot.queryParams;
-
-    // Popula o formulário de filtros com os parâmetros da URL
-    // patchValue é seguro e só atualiza os campos que existem
     this.filterForm.patchValue(params);
-
-    // Trata os parâmetros de paginação
-    // O '+' converte a string da URL para número
     this.rows = params["rows"] ? +params["rows"] : 20;
     const page = params["page"] ? +params["page"] : 0;
     this.first = page * this.rows;
@@ -264,9 +248,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     }
     const page = Math.floor(this.first / this.rows);
 
-    // A mágica acontece aqui: toda vez que carregamos dados, atualizamos a URL
     this.updateUrlQueryParams();
-    // Em vez de tentar definir algo aqui, guardamos o valor que queremos aplicar
     this.pendingFirstValue = this.first;
 
     this.serviceOrderService
@@ -286,75 +268,119 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       });
   }
 
-  updateServiceOrder(index: number): void {
-    const formGroup = this.orders.at(index) as FormGroup;
-    const id = formGroup.get("id")?.value;
-
-    if (!id) return;
-
-    const technician = formGroup.get("technician")?.value;
-    const startOfOs = formGroup.get("startOfOs")?.value;
-    const endOfOs = formGroup.get("endOfOs")?.value;
-
-    // Validações com base nas regras de negócio
-    if (!technician && (startOfOs || endOfOs)) {
-      this.messageService.add({
-        severity: "warn",
-        summary: "Validação",
-        detail:
-          "Para informar horário de início ou fim, é necessário definir um técnico.",
-      });
-      formGroup.get("startOfOs")?.setValue(null, { emitEvent: false });
-      formGroup.get("endOfOs")?.setValue(null, { emitEvent: false });
-      return;
-    }
-
-    if (technician && !startOfOs && endOfOs) {
-      this.messageService.add({
-        severity: "warn",
-        summary: "Validação",
-        detail:
-          "Para informar o horário de fim, o horário de início deve estar preenchido.",
-      });
-      formGroup.get("endOfOs")?.setValue(null, { emitEvent: false });
-      return;
-    }
-
-    const dto: UpdateServiceOrderDto = {
-      scheduleDate: formGroup.get("scheduleDate")?.value || null,
-      period: formGroup.get("period")?.value || null,
-      technology: formGroup.get("technology")?.value || null,
-      technicianId: technician || null,
-      status: formGroup.get("status")?.value || null,
-      cabling: formGroup.get("cabling")?.value ?? null,
-      isActiveToReport: undefined,
-      startOfOs: startOfOs || null,
-      endOfOs: endOfOs || null,
-      observation: formGroup.get("observation")?.value || null,
-    };
-
-    this.serviceOrderService.update(id, dto).subscribe({
-      next: () => {
-        this.loadServiceOrders(); // Recarrega as ordens de serviço após a atualização
+  private loadExpiredOsCount(): void {
+    this.serviceOrderService.getExpiredCliente().subscribe({
+      next: (result) => {
+        this.expiredOsCount = result?.page?.totalElements ?? 0;
       },
-      error: (err) => {
-        console.error("Erro ao atualizar Ordem de Serviço:", err);
-        this.messageService.add({
-          severity: "error",
-          summary: "Erro",
-          detail: "Erro ao atualizar Ordem de Serviço.",
-        });
-      },
+      error: (e) => {
+        console.log(e);
+      }
     });
   }
 
-  clearFilters(): void {
-    this.filterForm.reset();
-    this.first = 0; // Reseta a paginação para a primeira página
-    this.loadServiceOrders(); // Recarrega as ordens de serviço sem filtros
+  showExpiredOs(): void {
+    this.isLoading = true;
+    this.serviceOrderService.getExpiredCliente().subscribe({
+      next: (result) => {
+        this.os = result.content ?? [];
+        this.totalRecords = this.os.length;
+        this.populateOrdersArray();
+        this.showingExpired = true;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.messageService.add({
+          severity: "error",
+          summary: "Erro",
+          detail: "Falha ao carregar OS expiradas.",
+        });
+        this.isLoading = false;
+      }
+    });
   }
 
-  // Adicione este método auxiliar no componente
+  showAllOs(): void {
+    this.showingExpired = false;
+    this.loadServiceOrders();
+  }
+
+updateServiceOrder(index: number): void {
+  const formGroup = this.orders.at(index) as FormGroup;
+  const id = formGroup.get("id")?.value;
+
+  if (!id) return;
+
+  const technician = formGroup.get("technician")?.value;
+  const startOfOs = formGroup.get("startOfOs")?.value;
+  const endOfOs = formGroup.get("endOfOs")?.value;
+
+  // Validações
+  if (!technician && (startOfOs || endOfOs)) {
+    this.messageService.add({
+      severity: "warn",
+      summary: "Validação",
+      detail: "Para informar horário de início ou fim, é necessário definir um técnico.",
+    });
+    formGroup.get("startOfOs")?.setValue(null, { emitEvent: false });
+    formGroup.get("endOfOs")?.setValue(null, { emitEvent: false });
+    return;
+  }
+
+  if (technician && !startOfOs && endOfOs) {
+    this.messageService.add({
+      severity: "warn",
+      summary: "Validação",
+      detail: "Para informar o horário de fim, o horário de início deve estar preenchido.",
+    });
+    formGroup.get("endOfOs")?.setValue(null, { emitEvent: false });
+    return;
+  }
+
+  const dto: UpdateServiceOrderDto = {
+    scheduleDate: formGroup.get("scheduleDate")?.value || null,
+    period: formGroup.get("period")?.value || null,
+    technology: formGroup.get("technology")?.value || null,
+    technicianId: technician || null,
+    status: formGroup.get("status")?.value || null,
+    cabling: formGroup.get("cabling")?.value ?? null,
+    isActiveToReport: undefined,
+    startOfOs: startOfOs || null,
+    endOfOs: endOfOs || null,
+    observation: formGroup.get("observation")?.value || null,
+  };
+
+  this.serviceOrderService.update(id, dto).subscribe({
+    next: (updated?: ViewServiceOrderDto) => {
+      formGroup.patchValue(
+        {
+          technician: updated?.technician?.id ?? dto.technicianId,
+          status: updated?.status ?? dto.status,
+          startOfOs: updated?.startOfOs ?? dto.startOfOs,
+          endOfOs: updated?.endOfOs ?? dto.endOfOs,
+          observation: updated?.observation ?? dto.observation,
+          durationOfOs: updated?.durationOfOs,
+        },
+        { emitEvent: false }
+      );
+      // Remova o toast de sucesso!
+    },
+    error: (err) => {
+      this.messageService.add({
+        severity: "error",
+        summary: "Erro",
+        detail: "Erro ao atualizar Ordem de Serviço.",
+      });
+    },
+  });
+}
+
+  clearFilters(): void {
+    this.filterForm.reset();
+    this.first = 0;
+    this.loadServiceOrders();
+  }
+
   private setupFormListeners(): void {
     this.orders.controls.forEach((group, index) => {
       const controlsToWatch = [
@@ -371,8 +397,8 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
         if (!control) return;
 
         control.valueChanges
-          .pipe(debounceTime(2000), takeUntil(this.destroy$))
-          .subscribe((currentValue) => {
+          .pipe(debounceTime(5000), takeUntil(this.destroy$))
+          .subscribe(() => {
             this.updateServiceOrder(index);
           });
       });
@@ -383,11 +409,10 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     const page = Math.floor(this.first / this.rows);
 
     const params: any = {
-      page: page > 0 ? page : null, // Não mostra 'page=0' na URL
-      rows: this.rows !== 20 ? this.rows : null, // Não mostra o valor padrão 'rows=20'
+      page: page > 0 ? page : null,
+      rows: this.rows !== 20 ? this.rows : null,
     };
 
-    // Adiciona os valores do formulário de filtro que não sejam nulos ou vazios
     for (const key in this.filterForm.value) {
       const value = this.filterForm.value[key];
       if (value && (!Array.isArray(value) || value.length > 0)) {
@@ -398,12 +423,11 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: params,
-      replaceUrl: true, // Evita poluir o histórico do navegador
+      replaceUrl: true,
     });
   }
 
   private initForms(): void {
-    // Formulário para filtrar Ordens de Serviço
     this.filterForm = this.fb.group({
       contractNumber: [null],
       clientName: [""],
@@ -415,13 +439,11 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       startDate: [null],
       endDate: [null],
     });
-    // Formulário para criar uma Ajuda Técnica na OS
     this.helperForm = this.fb.group({
       technicianId: [null, Validators.required],
       start: [null, Validators.required],
       end: [null, Validators.required],
     });
-    // Formulário para registrar uma Visita Não Produtiva
     this.unproductiveVisitForm = this.fb.group({
       technicianId: [null, Validators.required],
       date: [null, Validators.required],
@@ -451,8 +473,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   }
 
   private populateOrdersArray() {
-    // 2. Usamos o setTimeout para desacoplar a atualização do formulário
-    // do ciclo de detecção de mudanças do evento (onPage).
     setTimeout(() => {
       const serviceOrderGroups = this.os.map((order) =>
         this.createServiceOrderGroup(order)
@@ -460,34 +480,19 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       const newOrdersArray = this.fb.array(serviceOrderGroups);
       this.osGroup.setControl("orders", newOrdersArray);
 
-      // 3. AGORA, com o formulário 100% pronto e sincronizado,
-      // nós desligamos o loading. Isso fará o *ngIf recriar a tabela.
       this.isLoading = false;
-
-      // 4. Avisa o Angular para garantir a atualização da view.
       this.cdr.markForCheck();
       this.setupFormListeners();
     }, 0);
   }
 
-  // 2. ADICIONE O LIFECYCLE HOOK ngAfterViewChecked
   ngAfterViewChecked(): void {
-    // Este método é chamado depois que a view é checada/atualizada.
-    // Verificamos se há um valor de 'first' pendente para ser aplicado.
     if (this.pendingFirstValue !== null && this.dt) {
       this.dt.first = this.pendingFirstValue;
-
-      // Limpamos o valor pendente para que isso não execute novamente
-      // em cada ciclo de detecção de mudanças.
       this.pendingFirstValue = null;
     }
   }
 
-  /**
-   * Cria um FormGroup para uma Ordem de Serviço
-   * @param serviceOrder A ordem de serviço a ser mapeada
-   * @returns Um FormGroup representando a ordem de serviço
-   */
   private createServiceOrderGroup(
     serviceOrder: ViewServiceOrderDto
   ): FormGroup {
@@ -534,61 +539,61 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   getTypeOfOsLabel = (type: TypeOfOs) => TypeOfOsLabels[type] || type;
   getPeriodLabel = (period: Period) => PeriodLabels[period] || period;
 
-confirmDeleteServiceOrder(event: Event, os: ViewServiceOrderDto) {
-  this.confirmationService.confirm({
-    target: event.target as EventTarget,
-    message: "Tem certeza que deseja excluir esta ordem de serviço?",
-    header: "Confirmação de Exclusão",
-    icon: "pi pi-exclamation-triangle",
-    rejectButtonProps: {
-      label: "Cancelar",
-      severity: "secondary",
-      outlined: true,
-    },
-    acceptButtonProps: {
-      label: "Confirmar",
-      severity: "success",
-      outlined: true,
-    },
-    accept: () => {
-      this.deleteOS(os.id);
-    },
-    reject: () => {
-      this.messageService.add({
-        severity: "info",
-        summary: "Cancelado",
-        detail: "Ordem de serviço não excluída.",
-      });
-    },
-  });
-}
-
-deleteOS(id: string) {
-  if (!id) {
-    this.messageService.add({
-      severity: "error",
-      summary: "Erro",
-      detail: "ID da ordem de serviço não encontrado.",
+  confirmDeleteServiceOrder(event: Event, os: ViewServiceOrderDto) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: "Tem certeza que deseja excluir esta ordem de serviço?",
+      header: "Confirmação de Exclusão",
+      icon: "pi pi-exclamation-triangle",
+      rejectButtonProps: {
+        label: "Cancelar",
+        severity: "secondary",
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: "Confirmar",
+        severity: "success",
+        outlined: true,
+      },
+      accept: () => {
+        this.deleteOS(os.id);
+      },
+      reject: () => {
+        this.messageService.add({
+          severity: "info",
+          summary: "Cancelado",
+          detail: "Ordem de serviço não excluída.",
+        });
+      },
     });
-    return;
   }
 
-  this.serviceOrderService.deleteServiceOrderById(id).subscribe({
-    next: () => {
-      this.messageService.add({
-        severity: "success",
-        summary: "Sucesso",
-        detail: "Ordem de serviço excluída com sucesso.",
-      });
-      this.loadServiceOrders();
-    },
-    error: () => {
+  deleteOS(id: string) {
+    if (!id) {
       this.messageService.add({
         severity: "error",
         summary: "Erro",
-        detail: "Erro ao excluir a ordem de serviço.",
+        detail: "ID da ordem de serviço não encontrado.",
       });
-    },
-  });
-}
+      return;
+    }
+
+    this.serviceOrderService.deleteServiceOrderById(id).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: "success",
+          summary: "Sucesso",
+          detail: "Ordem de serviço excluída com sucesso.",
+        });
+        this.loadServiceOrders();
+      },
+      error: () => {
+        this.messageService.add({
+          severity: "error",
+          summary: "Erro",
+          detail: "Erro ao excluir a ordem de serviço.",
+        });
+      },
+    });
+  }
 }
