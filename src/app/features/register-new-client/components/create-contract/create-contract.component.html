@@ -1,10 +1,13 @@
-   @if(isCreatingContract){
-      <div class="flex flex-col items-center justify-center py-16">
-    <p-progressSpinner styleClass="w-8 h-8" strokeWidth="4" ariaLabel="Criando Contrato"></p-progressSpinner>
-    <span class="mt-4 text-lg text-gray-600">Criando contrato...</span>
-  </div>
-}
-  @else{
+@if(isCreatingContract){
+<div class="flex flex-col items-center justify-center py-16">
+  <p-progressSpinner
+    styleClass="w-8 h-8"
+    strokeWidth="4"
+    ariaLabel="Criando Contrato"
+  ></p-progressSpinner>
+  <span class="mt-4 text-lg text-gray-600">Criando contrato...</span>
+</div>
+} @else{
 <form [formGroup]="contractForm" class="bg-white p-2 rounded-xl shadow">
   <p-stepper [value]="stepOne">
     <!-- Passo 1: Dados do Contrato -->
@@ -123,6 +126,23 @@
               </div>
             </div>
           </div>
+          <div class="flex flex-col gap-2 mt-4">
+            <label class="font-semibold"
+              >Anexar fotos do contrato (até 5):</label
+            >
+            <p-fileUpload
+              name="photos"
+              [multiple]="true"
+              [maxFileSize]="10485760"
+              [accept]="'image/*'"
+              [showUploadButton]="false"
+              [showCancelButton]="false"
+              [auto]="false"
+              [disabled]="(contractForm.get('photos')?.value ?? []).length >= 5"
+              (onSelect)="onPhotosSelected($event)"
+              class="w-full"
+            />
+          </div>
           <!-- Botão Próximo -->
           <div class="flex justify-end mt-6">
             <p-button label="Próximo" (onClick)="activateCallback(2)" />
@@ -200,11 +220,18 @@
                   formControlName="complement"
                   class="min-w-0 flex-1"
                 />
-                </div>
-                <div class="flex flex-col w-full">
+              </div>
+              <div class="flex flex-col w-full">
                 <p-iftalabel>
-                  <textarea pTextarea rows="5"  cols="30" style="resize: none" formControlName="observation_address" fluid ></textarea>
-                  <label for="observation_address">Observação</label>
+                  <textarea
+                    pTextarea
+                    rows="5"
+                    cols="30"
+                    style="resize: none"
+                    formControlName="observations"
+                    fluid
+                  ></textarea>
+                  <label for="observations">Observação</label>
                 </p-iftalabel>
               </div>
 
@@ -264,8 +291,6 @@
                 label="Criar Contrato"
                 (onClick)="createNewContract()"
               ></p-button>
-           
-              
             </div>
           </div>
         </ng-template>
@@ -274,5 +299,5 @@
   </p-stepper>
 </form>
 }
-        
+
 <p-toast />
