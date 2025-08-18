@@ -34,6 +34,7 @@ import { ToastModule } from "primeng/toast";
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { NgxMaskDirective, provideNgxMask } from "ngx-mask";
+import { FileUploadModule } from 'primeng/fileupload';
 
 @Component({
   selector: "app-create-contract",
@@ -53,6 +54,7 @@ import { NgxMaskDirective, provideNgxMask } from "ngx-mask";
     ProgressSpinnerModule,
     IftaLabelModule,
     NgxMaskDirective,
+    FileUploadModule
   ],
   templateUrl: "./create-contract.component.html",
   styleUrl: "./create-contract.component.scss",
@@ -182,7 +184,6 @@ export class CreateContractComponent implements OnInit, OnChanges {
           referencePoint: this.clientData?.[0]?.addresses?.referencePoint || "",
           addressType: "INSTALLATION",
           addressLocation: "",
-          observation_address: '',
           ibge: 3504008,
         },
         addressCobranca: {
@@ -197,7 +198,6 @@ export class CreateContractComponent implements OnInit, OnChanges {
           referencePoint: this.clientData?.[0]?.addresses?.referencePoint || "",
           addressType: "INSTALLATION",
           addressLocation: null,
-          observation_address: '',
           ibge: this.clientData?.[0]?.addresses?.ibge || 3504008,
         },
       });
@@ -236,7 +236,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
     // Na inicialização, o usuário não digitou nada, então o 'subscriptionDiscount' é 0.
     // Isso significa que o 'price' da parcela (que é o desconto) é 0.
     // E o 'subscriptionDiscount' (que é o valor final) é o valor base.
-
+    
     const initialAddress = {
       zipCode: [""],
       state: ["SP"],
@@ -249,7 +249,7 @@ export class CreateContractComponent implements OnInit, OnChanges {
       referencePoint: [""],
       addressType: ["INSTALLATION"],
       addressLocation: ["", Validators.required],
-      observation_address: [''],
+      observations: [''],
       ibge: [3504008],
     };
 
@@ -284,8 +284,17 @@ export class CreateContractComponent implements OnInit, OnChanges {
       beginningCollection: ["", Validators.required],
       bundleCollection: ["N"],
       signaturePad: [null, Validators.required],
+      observations: '',
+      photos: [null],
     });
   }
+
+onPhotosSelected(event: any) {
+  const files = event.files;
+  const currentPhotos = this.contractForm.get('photos')?.value ?? [];
+  const newPhotos = [...currentPhotos, ...files].slice(0, 4);
+  this.contractForm.patchValue({ photos: newPhotos });
+}
 
   get isPF(): boolean {
     return this.contractForm.get("clientType")?.value === "PF";
@@ -365,71 +374,86 @@ export class CreateContractComponent implements OnInit, OnChanges {
     }
   }
 
-  createNewContract() {
-    function formatDateToBackend(date: string): string {
-      if (!date) return "";
-      if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
-      const [day, month, year] = date.split("/");
-      return `${year}-${month}-${day}`;
-    }
-
-    const parcels = this.contractForm.value.parcels.map((parcel: any) => ({
-      ...parcel,
-      dueDate: formatDateToBackend(parcel.dueDate),
-    }));
-
-    const beginningCollection = formatDateToBackend(
-      this.contractForm.value.beginningCollection
-    );
-    const signatureContract = formatDateToBackend(
-      this.contractForm.value.signatureContract
-    );
-
-    const contractData = {
-      ...this.contractForm.value,
-      parcels,
-      beginningCollection,
-      signatureContract,
-      codeItem: this.contractForm.value.codeItem,
-      addressInstalation: {
-        ...this.contractForm.value.addressInstalation,
-        zipCode: this.contractForm.value.addressInstalation.zipCode.replace(
-          /\D/g,
-          ""
-        ),
-      },
-      addressCobranca: {
-        ...this.contractForm.value.addressCobranca,
-        zipCode: this.contractForm.value.addressCobranca.zipCode.replace(
-          /\D/g,
-          ""
-        ),
-      },
-    };
-
-    this.isCreatingContract = true;
-
-    this.contractService.postClientContract(contractData).subscribe({
-      next: () => {
-        this.contractForm.reset();
-        this.contractCreated.emit();
-        this.messageService.add({
-          severity: "success",
-          summary: "Contrato Criado",
-          detail: "O contrato foi criado com sucesso.",
-        });
-        this.isCreatingContract = false;
-      },
-      error: (error) => {
-        this.messageService.add({
-          severity: "error",
-          summary: "Erro ao Criar Contrato",
-          detail: "Ocorreu um erro ao criar o contrato.",
-        });
-        console.error("Erro ao criar contrato:", error);
-      },
-    });
+async createNewContract() {
+  function formatDateToBackend(date: string): string {
+    if (!date) return "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+    const [day, month, year] = date.split("/");
+    return `${year}-${month}-${day}`;
   }
+
+  const parcels = this.contractForm.value.parcels.map((parcel: any) => ({
+    ...parcel,
+    dueDate: formatDateToBackend(parcel.dueDate),
+  }));
+
+  const beginningCollection = formatDateToBackend(
+    this.contractForm.value.beginningCollection
+  );
+  const signatureContract = formatDateToBackend(
+    this.contractForm.value.signatureContract
+  );
+
+  // Converte arquivos para base64
+  const photos = this.contractForm.value.photos ?? [];
+  const base64Photos = await Promise.all(
+    photos.map((file: File) => {
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    })
+  );
+
+  const photoFields: any = {};
+  base64Photos.forEach((base64, idx) => {
+    photoFields[`photo${idx + 1}`] = base64;
+  });
+
+  const contractData = {
+    ...this.contractForm.value,
+    parcels,
+    beginningCollection,
+    signatureContract,
+    observations: this.contractForm.value.addressInstalation.observations,
+    codeItem: this.contractForm.value.codeItem,
+    addressInstalation: {
+      ...this.contractForm.value.addressInstalation,
+      zipCode: this.contractForm.value.addressInstalation.zipCode.replace(/\D/g, "")
+    },
+    addressCobranca: {
+      ...this.contractForm.value.addressCobranca,
+      zipCode: this.contractForm.value.addressCobranca.zipCode.replace(/\D/g, "")
+    },
+    ...photoFields 
+  };
+
+
+  this.isCreatingContract = true;
+
+  this.contractService.postClientContract(contractData).subscribe({
+    next: () => {
+      this.contractForm.reset();
+      this.contractCreated.emit();
+      this.messageService.add({
+        severity: "success",
+        summary: "Contrato Criado",
+        detail: "O contrato foi criado com sucesso.",
+      });
+      this.isCreatingContract = false;
+    },
+    error: (error) => {
+      this.messageService.add({
+        severity: "error",
+        summary: "Erro ao Criar Contrato",
+        detail: "Ocorreu um erro ao criar o contrato.",
+      });
+      console.error("Erro ao criar contrato:", error);
+    },
+  });
+}
 
   public searchAddressOnMap(): void {
     this.contractForm.get("addressInstalation")?.markAllAsTouched();

@@ -240,33 +240,39 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.first = page * this.rows;
   }
 
-  loadServiceOrders(event?: TableLazyLoadEvent): void {
-    this.isLoading = true;
-    if (event) {
-      this.first = event.first ?? 0;
-      this.rows = event.rows ?? 10;
-    }
-    const page = Math.floor(this.first / this.rows);
-
-    this.updateUrlQueryParams();
-    this.pendingFirstValue = this.first;
-
-    this.serviceOrderService
-      .findAll(this.filterForm.value, page, this.rows)
-      .subscribe({
-        next: (dataPage) => {
-          this.os = dataPage.content;
-          this.totalRecords = dataPage.page.totalElements;
-          this.populateOrdersArray();
-        },
-        error: () =>
-          this.messageService.add({
-            severity: "error",
-            summary: "Erro",
-            detail: "Falha ao carregar Ordens de Serviço.",
-          }),
-      });
+ loadServiceOrders(event?: TableLazyLoadEvent): void {
+  this.isLoading = true;
+  if (event) {
+    this.first = event.first ?? 0;
+    this.rows = event.rows ?? 10;
   }
+  const page = Math.floor(this.first / this.rows);
+
+  this.updateUrlQueryParams();
+  this.pendingFirstValue = this.first;
+
+  this.serviceOrderService
+    .findAll(this.filterForm.value, page, this.rows)
+    .subscribe({
+      next: (dataPage) => {
+        let orders = dataPage.content ?? [];
+        // Só filtra "Executado" se o filtro NÃO pedir por ele
+        const statuses = this.filterForm.value.statuses;
+        if (!statuses || statuses.length === 0 || !statuses.includes(ServiceOrderStatus.EXECUTED)) {
+          orders = orders.filter((os) => os.status !== ServiceOrderStatus.EXECUTED);
+        }
+        this.os = orders;
+        this.totalRecords = this.os.length;
+        this.populateOrdersArray();
+      },
+      error: () =>
+        this.messageService.add({
+          severity: "error",
+          summary: "Erro",
+          detail: "Falha ao carregar Ordens de Serviço.",
+        }),
+    });
+}
 
   private loadExpiredOsCount(): void {
     this.serviceOrderService.getExpiredCliente().subscribe({
@@ -363,7 +369,13 @@ updateServiceOrder(index: number): void {
         },
         { emitEvent: false }
       );
-      // Remova o toast de sucesso!
+      // Se status for "Executado", recarrega a lista
+      if (
+        updated?.status === ServiceOrderStatus.EXECUTED ||
+        dto.status === ServiceOrderStatus.EXECUTED
+      ) {
+        this.loadServiceOrders();
+      }
     },
     error: (err) => {
       this.messageService.add({
@@ -374,7 +386,6 @@ updateServiceOrder(index: number): void {
     },
   });
 }
-
   clearFilters(): void {
     this.filterForm.reset();
     this.first = 0;
