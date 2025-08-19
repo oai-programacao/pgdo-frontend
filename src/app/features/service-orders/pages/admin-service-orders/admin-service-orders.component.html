@@ -381,6 +381,7 @@
                     "
                     icon="pi pi-info-circle"
                     class="p-button-rounded p-button-text p-button-info"
+                    [severity]="os.observation ?   'info' : 'warn' "
                   ></button>
                   <button
                     type="button"
@@ -472,6 +473,7 @@
   [style]="{ width: '30rem' }"
 >
   @if(selectedServiceOrder && isPostingObeservationTechDialogVisible){
+
   <app-observation
     (eventObservation)="onObservationSuccess()"
     [serviceOrder]="selectedServiceOrder"

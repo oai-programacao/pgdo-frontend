@@ -117,6 +117,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   isLoading = true;
   rows = 20;
   first = 0;
+  hasObservation: boolean = false;
 
   selectedServiceOrder: ViewServiceOrderDto | null = null;
 
