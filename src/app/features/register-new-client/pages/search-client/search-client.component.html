@@ -167,7 +167,7 @@
             [text]="true"
             pTooltip="Ver Detalhes"
             severity="info"
-            (onClick)="viewClient(client)"
+            (onClick)="openWatchDataDialog(client)"
           />
           <p-button
             icon="pi pi-file"
@@ -203,29 +203,86 @@
     (contractCreated)="createdContract()"
   ></app-create-contract>
 </p-dialog>
-} 
-
-@if (viewContractsDialog) {
-  <p-dialog
-    [(visible)]="viewContractsDialog"
-    header="Visualizar Contratos"
-    [modal]="true"
-    [draggable]="false"
-    position="top"
-    [resizable]="false"
-    (onHide)="onDialogHide()"
-    [style]="{ width: '40rem', height: '70vh' }"
-  >
+} @if (viewContractsDialog) {
+<p-dialog
+  [(visible)]="viewContractsDialog"
+  header="Visualizar Contratos"
+  [modal]="true"
+  [draggable]="false"
+  position="top"
+  [resizable]="false"
+  (onHide)="onDialogHide()"
+  [style]="{ width: '40rem', height: '70vh' }"
+>
   @if(viewContractsDialog){
 
-    <ng-container>
+  <ng-container>
     <app-view-contracts
       [clientData]="dataClient"
       [isPJorPF]="clientType"
-    ></app-view-contracts>  
-    </ng-container>
+    ></app-view-contracts>
+  </ng-container>
   }
-    
+</p-dialog>
+}
+
+
+
+@if(showDataClientDialog){
+  <p-dialog
+    header="Visualizar Dados do Cliente"
+    [(visible)]="showDataClientDialog"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="false"
+    [style]="{ width: '600px', minWidth: '500px' }"
+    [draggable]="false"
+  >
+<div class="w-full p-6 bg-white dark:bg-slate-900 rounded-xl shadow-md">
+  <p-fieldset legend="Dados do Cliente" [toggleable]="true" [collapsed]="false">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 text-sm">
+      <!-- Nome -->
+      <div class="flex flex-col justify-center">
+        <span class="text-xs font-bold text-slate-500 mb-1 md:text-left text-center uppercase tracking-wide">Nome</span>
+        <span class="text-base text-slate-900 font-medium md:text-left text-center truncate">
+          {{ clientType === 'PJ' ? dataClient[0]?.companyName : dataClient[0]?.name }}
+        </span>
+      </div>
+      <!-- CPF/CNPJ -->
+      <div class="flex flex-col justify-center">
+        <span class="text-xs font-bold text-slate-500 mb-1 md:text-left text-center uppercase tracking-wide">CPF/CNPJ</span>
+        <span class="text-base text-slate-900 font-medium md:text-left text-center truncate">
+          {{ clientType === 'PJ' ? dataClient[0]?.cnpj : dataClient[0]?.cpf | cpfCnpj }}
+        </span>
+      </div>
+      <!-- Telefone -->
+      <div class="flex flex-col justify-center">
+        <span class="text-xs font-bold text-slate-500 mb-1 md:text-left text-center uppercase tracking-wide">Telefone</span>
+        <span class="text-base text-slate-900 font-medium md:text-left text-center truncate">
+          {{ dataClient[0]?.mobilePhone | phones }}
+        </span>
+      </div>
+      <!-- Endereço -->
+      <div class="md:col-span-2 flex flex-col justify-center">
+        <span class="text-xs font-bold text-slate-500 mb-1 md:text-left text-center uppercase tracking-wide">Endereço</span>
+        <span class="text-base text-slate-900 font-medium md:text-left text-center leading-relaxed truncate">
+          {{ dataClient[0]?.addresses[0]?.street }},
+          {{ dataClient[0]?.addresses[0]?.number }},
+          {{ dataClient[0]?.addresses[0]?.neighborhood }},
+          {{ dataClient[0]?.addresses[0]?.city }}
+        </span>
+      </div>
+      <!-- Qtd. Contratos -->
+      <div class="flex flex-col justify-center">
+        <span class="text-xs font-bold text-slate-500 mb-1 md:text-left text-center uppercase tracking-wide">Qtd. Contratos</span>
+        <span class="text-base text-slate-900 font-medium md:text-left text-center">
+          {{ dataClient[0]?.contracts?.length || 0 }}
+        </span>
+      </div>
+    </div>
+  </p-fieldset>
+</div>
+
   </p-dialog>
 }
 

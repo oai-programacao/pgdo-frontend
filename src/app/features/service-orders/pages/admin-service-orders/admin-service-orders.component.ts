@@ -256,7 +256,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     .subscribe({
       next: (dataPage) => {
         let orders = dataPage.content ?? [];
-        // Só filtra "Executado" se o filtro NÃO pedir por ele
         const statuses = this.filterForm.value.statuses;
         if (!statuses || statuses.length === 0 || !statuses.includes(ServiceOrderStatus.EXECUTED)) {
           orders = orders.filter((os) => os.status !== ServiceOrderStatus.EXECUTED);

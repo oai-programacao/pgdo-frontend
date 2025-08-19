@@ -92,6 +92,7 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
   public showSuccessDialog = false;
   public addressForMapSearch: any = null;
 
+
   constructor() {
     this.fb = inject(FormBuilder);
     this.form = this.fb.group({
@@ -164,6 +165,7 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+ 
   public searchAddressOnMap(): void {
     // Primeiro, marcamos os campos do endereço como "tocados" para mostrar erros de validação
     this.contractForm.get("address")?.markAllAsTouched();
@@ -298,8 +300,7 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
           this.messageService.add({
             severity: "error",
             summary: "Erro de Rede",
-            detail:
-              "Não foi possível conectar ao serviço de CEP. Verifique sua conexão.",
+            detail: "Não foi possível buscar o CEP. Verifique sua conexão com a internet.",
           });
           console.error("Erro de rede ao buscar CEP:", error);
         },
@@ -350,7 +351,11 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error("Erro ao registrar cliente:", error);
-        // Aqui você pode mostrar uma mensagem de erro
+        this.messageService.add({
+          severity: "error",
+          summary: "Erro ao Registrar Cliente",
+          detail: "Ocorreu um erro ao tentar registrar o cliente. Tente novamente mais tarde.",
+        });
       },
     });
   }
@@ -574,5 +579,4 @@ addPhotoRgVerse(): void {
     };
     reader.readAsDataURL(file);
   }
-
 }
