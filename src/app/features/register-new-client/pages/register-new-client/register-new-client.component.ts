@@ -92,7 +92,6 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
   public showSuccessDialog = false;
   public addressForMapSearch: any = null;
 
-
   constructor() {
     this.fb = inject(FormBuilder);
     this.form = this.fb.group({
@@ -165,7 +164,6 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
- 
   public searchAddressOnMap(): void {
     // Primeiro, marcamos os campos do endereço como "tocados" para mostrar erros de validação
     this.contractForm.get("address")?.markAllAsTouched();
@@ -210,14 +208,18 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
    */
   onUpload(event: any, formControlName: string) {
     const file = event.files[0];
-if (!['image/jpeg', 'image/png', 'image/heic', 'image/heif'].includes(file.type)) {
-  this.messageService.add({
-    severity: 'warn',
-    summary: 'Formato não suportado',
-    detail: 'Por favor, envie uma imagem JPEG ou PNG.'
-  });
-  return;
-}
+    if (
+      !["image/jpeg", "image/png", "image/heic", "image/heif"].includes(
+        file.type
+      )
+    ) {
+      this.messageService.add({
+        severity: "warn",
+        summary: "Formato não suportado",
+        detail: "Por favor, envie uma imagem JPEG ou PNG.",
+      });
+      return;
+    }
     const reader = new FileReader();
 
     reader.onload = (e: any) => {
@@ -308,7 +310,8 @@ if (!['image/jpeg', 'image/png', 'image/heic', 'image/heif'].includes(file.type)
           this.messageService.add({
             severity: "error",
             summary: "Erro de Rede",
-            detail: "Não foi possível buscar o CEP. Verifique sua conexão com a internet.",
+            detail:
+              "Não foi possível buscar o CEP. Verifique sua conexão com a internet.",
           });
           console.error("Erro de rede ao buscar CEP:", error);
         },
@@ -362,7 +365,8 @@ if (!['image/jpeg', 'image/png', 'image/heic', 'image/heif'].includes(file.type)
         this.messageService.add({
           severity: "error",
           summary: "Erro ao Registrar Cliente",
-          detail: "Ocorreu um erro ao tentar registrar o cliente. Tente novamente mais tarde.",
+          detail:
+            "Ocorreu um erro ao tentar registrar o cliente. Tente novamente mais tarde.",
         });
       },
     });
@@ -562,17 +566,17 @@ if (!['image/jpeg', 'image/png', 'image/heic', 'image/heif'].includes(file.type)
     return this.form.get("photoRgVerses") as FormArray;
   }
 
-addPhotoRgVerse(): void {
-  if (this.photoRgVerses.length < 5) {
-    this.photoRgVerses.push(this.fb.control(null));
-  } else {
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Limite atingido',
-      detail: 'Você pode adicionar no máximo 5 fotos do verso do documento.'
-    });
+  addPhotoRgVerse(): void {
+    if (this.photoRgVerses.length < 5) {
+      this.photoRgVerses.push(this.fb.control(null));
+    } else {
+      this.messageService.add({
+        severity: "warn",
+        summary: "Limite atingido",
+        detail: "Você pode adicionar no máximo 5 fotos do verso do documento.",
+      });
+    }
   }
-}
 
   removePhotoRgVerse(index: number): void {
     this.photoRgVerses.removeAt(index);

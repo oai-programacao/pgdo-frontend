@@ -7,6 +7,7 @@ import { ViewRegisterClientResponseDto } from '../../../../interfaces/register-c
 import { TableLazyLoadEvent } from 'primeng/table';
 import { MessageService } from 'primeng/api';
 import { CustomPageResponse } from '../../../../interfaces/service-order.model';
+import { CpfCnpjPipe } from "../../../../shared/pipes/cpf-cnpj.pipe";
 
 @Component({
   selector: 'app-list-client-register',
@@ -14,8 +15,9 @@ import { CustomPageResponse } from '../../../../interfaces/service-order.model';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    ButtonModule
-  ],
+    ButtonModule,
+    CpfCnpjPipe
+],
   templateUrl: './list-client-register.component.html',
   styleUrl: './list-client-register.component.scss',
   providers: [MessageService]
