@@ -210,6 +210,14 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
    */
   onUpload(event: any, formControlName: string) {
     const file = event.files[0];
+if (!['image/jpeg', 'image/png', 'image/heic', 'image/heif'].includes(file.type)) {
+  this.messageService.add({
+    severity: 'warn',
+    summary: 'Formato não suportado',
+    detail: 'Por favor, envie uma imagem JPEG ou PNG.'
+  });
+  return;
+}
     const reader = new FileReader();
 
     reader.onload = (e: any) => {
