@@ -23,6 +23,7 @@ import { ViewContractsComponent } from "../../components/view-contracts/view-con
 import { CpfCnpjPipe } from "../../../../shared/pipes/cpf-cnpj.pipe";
 import { Subject, Subscription } from "rxjs";
 // import { SseService } from "../../../../core/sse/sse.service";
+import { FieldsetModule } from 'primeng/fieldset';
 
 @Component({
   selector: "app-search-client",
@@ -45,6 +46,7 @@ import { Subject, Subscription } from "rxjs";
     TooltipModule,
     ViewContractsComponent,
     CpfCnpjPipe,
+    FieldsetModule
   ],
   templateUrl: "./search-client.component.html",
   styleUrl: "./search-client.component.scss",
@@ -72,6 +74,7 @@ export class SearchClientComponent implements OnInit, OnDestroy {
   clientSharedService = inject(ClientSharedService);
   confirmationService = inject(ConfirmationService);
   messageService = inject(MessageService);
+  public showDataClientDialog = false;
 
   constructor(private router: Router, private route: ActivatedRoute) {}
 
@@ -86,6 +89,13 @@ onDialogHide() {
   this.viewContractsDialog = false;
 
 }
+
+
+ public openWatchDataDialog(client:any) {
+    this.dataClient = client ? [client] : [];
+    this.showDataClientDialog = true;
+  }
+
 
   ngOnInit() {
     this.route.queryParams
@@ -154,13 +164,13 @@ if (!client.contract) {
     this.dataClient = [];
   }
 
-  viewClient(client: any) {
-    this.clientSharedService.setClientData({
-      ...client,
-      contract: client.contract,
-    });
-    this.router.navigate(["/app/clientes/cliente-cadastrar"]);
-  }
+  // viewClient(client: any) {
+  //   this.clientSharedService.setClientData({
+  //     ...client,
+  //     contract: client.contract,
+  //   });
+  //   this.router.navigate(["/app/clientes/cliente-cadastrar"]);
+  // }
 
   consultClient() {
     if (!this.cpfCnpj || !this.clientType) return;
