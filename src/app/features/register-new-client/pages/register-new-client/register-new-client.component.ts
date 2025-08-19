@@ -209,7 +209,7 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
    * @param formControlName O nome do campo do formulário a ser atualizado ('photoRg' ou 'photoRgVerse').
    */
   onUpload(event: any, formControlName: string) {
-const file = event.files[0];
+ const file = event.files[0];
 if (!['image/jpeg', 'image/png', 'image/heic', 'image/heif'].includes(file.type)) {
   this.messageService.add({
     severity: 'warn',
