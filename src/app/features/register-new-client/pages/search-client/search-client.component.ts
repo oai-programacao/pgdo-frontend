@@ -94,7 +94,7 @@ onDialogHide() {
  public openWatchDataDialog(client:any) {
     this.dataClient = client ? [client] : [];
     this.showDataClientDialog = true;
-  }
+}
 
 
   ngOnInit() {

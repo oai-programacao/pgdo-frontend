@@ -19,7 +19,7 @@ export class ObservationComponent implements OnInit {
 @Output() eventObservation = new EventEmitter<void>();
  observationText!: string;
  isLoading = false;
-
+  hasObservation: boolean = false;
   
  serviceOrderToObservation = inject(ServiceOrderService);
 
@@ -31,7 +31,8 @@ export class ObservationComponent implements OnInit {
   submitObservation(){
     this.serviceOrderToObservation.patchServiceOrder(this.serviceOrder.id, { observation: this.observationText }).subscribe({
       next: () => {
-        this.eventObservation.emit();
+          this.eventObservation.emit();
+          
       },
       error: (e) => {
         console.log(e);
