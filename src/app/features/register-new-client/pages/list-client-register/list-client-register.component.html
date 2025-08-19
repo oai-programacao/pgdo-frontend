@@ -7,7 +7,7 @@
                     <div class="border rounded-lg p-3 mb-3 hover:bg-gray-100 hover:shadow-lg hover:scale-101 transition-transform">
                         <div class="flex flex-col">
                             <label for="name">Nome</label>
-                            {{ register.name }}
+                            {{ register.name || register.companyName }} - {{register.cpf || register.cnpj| cpfCnpj}}
                         </div>
                     </div>
                 }
