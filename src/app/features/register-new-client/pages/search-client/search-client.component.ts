@@ -23,8 +23,8 @@ import { ViewContractsComponent } from "../../components/view-contracts/view-con
 import { CpfCnpjPipe } from "../../../../shared/pipes/cpf-cnpj.pipe";
 import { Subject, Subscription } from "rxjs";
 // import { SseService } from "../../../../core/sse/sse.service";
-import { FieldsetModule } from 'primeng/fieldset';
-import { TableModule } from 'primeng/table';
+import { FieldsetModule } from "primeng/fieldset";
+import { TableModule } from "primeng/table";
 import { ShowOffersListComponent } from "../../../offers/components/show-offers-list/show-offers-list.component";
 import { CreateRequestOfferComponent } from "../../../offers/components/create-request-offer/create-request-offer.component";
 
@@ -52,8 +52,8 @@ import { CreateRequestOfferComponent } from "../../../offers/components/create-r
     FieldsetModule,
     TableModule,
     ShowOffersListComponent,
-    CreateRequestOfferComponent
-],
+    CreateRequestOfferComponent,
+  ],
   templateUrl: "./search-client.component.html",
   styleUrl: "./search-client.component.scss",
   providers: [
@@ -81,9 +81,9 @@ export class SearchClientComponent implements OnInit, OnDestroy {
   confirmationService = inject(ConfirmationService);
   messageService = inject(MessageService);
   public showDataClientDialog = false;
-showOffersDialog = false;
-offers: any[] = [];
-isLoadingOffers = false;
+  showOffersDialog = false;
+  offers: any[] = [];
+  isLoadingOffers = false;
   constructor(private router: Router, private route: ActivatedRoute) {}
 
   // Dialog
@@ -92,18 +92,15 @@ isLoadingOffers = false;
 
   private destroy$ = new Subject<void>();
 
-onDialogHide() {
-  this.dataClient = [];
-  this.viewContractsDialog = false;
+  onDialogHide() {
+    this.dataClient = [];
+    this.viewContractsDialog = false;
+  }
 
-}
-
-
- public openWatchDataDialog(client:any) {
+  public openWatchDataDialog(client: any) {
     this.dataClient = client ? [client] : [];
     this.showDataClientDialog = true;
-}
-
+  }
 
   ngOnInit() {
     this.route.queryParams
@@ -115,10 +112,9 @@ onDialogHide() {
           this.clientType = type;
           this.cpfCnpj = document;
           this.consultClient();
-        } 
+        }
         this.clientType = type;
         this.cpfCnpj = document;
-        
       });
   }
 
@@ -127,7 +123,6 @@ onDialogHide() {
     this.destroy$.complete();
   }
 
- 
   createdContract() {
     this.createNewContractDialog = false;
 
@@ -148,23 +143,22 @@ onDialogHide() {
     this.dataClient = client ? [client] : [];
     this.viewContractsDialog = true;
 
-if (!client.contract) {
-  const clientCpfCnpj = (client.cpf || client.cnpj || '').replace(/\D/g, '');
-  if (clientCpfCnpj) {
-    this.registerClientService.postSyncContracts(clientCpfCnpj).subscribe({
-      next: () => {
-        this.consultClient();
-      },
-      error: (e) => {
-        console.log(e);
+    if (!client.contract) {
+      const clientCpfCnpj = (client.cpf || client.cnpj || "").replace(
+        /\D/g,
+        ""
+      );
+      if (clientCpfCnpj) {
+        this.registerClientService.postSyncContracts(clientCpfCnpj).subscribe({
+          next: () => {
+            this.consultClient();
+          },
+          error: (e) => {
+            console.log(e);
+          },
+        });
       }
-    });
-  }
-}
-
-    
-   
-
+    }
   }
 
   onClientTypeChange() {
@@ -215,56 +209,52 @@ if (!client.contract) {
       });
   }
 
-confirmToRegisterNewClient(event: Event, cpfCnpj: string) {
-  console.log('Tipo:', this.clientType, 'CPF/CNPJ:', cpfCnpj); // debug
-  if (!cpfCnpj || !this.clientType) {
-    this.messageService.add({
-      severity: "warn",
-      summary: "Dados inválidos",
-      detail: "Informe o CPF ou CNPJ e selecione o tipo de cliente.",
-    });
-    return;
-  }
-  this.confirmationService.confirm({
-    target: event?.target as HTMLElement,
-    message: "Deseja registrar um novo cliente?",
-    icon: "pi pi-exclamation-triangle",
-    accept: () => {
-      const clientData: any = {
-        cpf: this.clientType === "PF" ? cpfCnpj : null,
-        cnpj: this.clientType === "PJ" ? cpfCnpj : null,
-        clientType: this.clientType,
-      };
-      this.clientSharedService.setClientData(clientData);
-      this.router.navigate(["/app/clientes/cliente-cadastrar"]);
-    },
-    reject: () => {
+  confirmToRegisterNewClient(event: Event, cpfCnpj: string) {
+    console.log("Tipo:", this.clientType, "CPF/CNPJ:", cpfCnpj); // debug
+    if (!cpfCnpj || !this.clientType) {
       this.messageService.add({
-        severity: "info",
-        summary: "Registrar Cliente",
-        detail: "Ação cancelada.",
+        severity: "warn",
+        summary: "Dados inválidos",
+        detail: "Informe o CPF ou CNPJ e selecione o tipo de cliente.",
       });
-      this.hasSearched = false;
-    },
-  });
-}
+      return;
+    }
+    this.confirmationService.confirm({
+      target: event?.target as HTMLElement,
+      message: "Deseja registrar um novo cliente?",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => {
+       
+      
+      },
+      reject: () => {
+        this.messageService.add({
+          severity: "info",
+          summary: "Registrar Cliente",
+          detail: "Ação cancelada.",
+        });
+        this.hasSearched = false;
+      },
+    });
+  }
 
   registerNewClient() {
     if (!this.cpfCnpj || !this.clientType) return;
-    this.registerClientService.getFindOrCreateOnRBX(this.cpfCnpj)
-    .pipe(takeUntil(this.destroy$))
-    .subscribe({
-      next: (client) => {
-        if (client.id) {
-          this.clientSharedService.setClientData(client);
-          this.dataClient = [client];
-          return true;
-        }
-        return false;
-      },
-      error: (e) => {
-        console.error(e);
-      },
-    });
+    this.registerClientService
+      .getFindOrCreateOnRBX(this.cpfCnpj)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (client) => {
+          if (client.id) {
+            this.clientSharedService.setClientData(client);
+            this.dataClient = [client];
+            return true;
+          }
+          return false;
+        },
+        error: (e) => {
+          console.error(e);
+        },
+      });
   }
 }
