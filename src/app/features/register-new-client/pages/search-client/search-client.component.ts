@@ -24,6 +24,9 @@ import { CpfCnpjPipe } from "../../../../shared/pipes/cpf-cnpj.pipe";
 import { Subject, Subscription } from "rxjs";
 // import { SseService } from "../../../../core/sse/sse.service";
 import { FieldsetModule } from 'primeng/fieldset';
+import { TableModule } from 'primeng/table';
+import { ShowOffersListComponent } from "../../../offers/components/show-offers-list/show-offers-list.component";
+import { CreateRequestOfferComponent } from "../../../offers/components/create-request-offer/create-request-offer.component";
 
 @Component({
   selector: "app-search-client",
@@ -46,8 +49,11 @@ import { FieldsetModule } from 'primeng/fieldset';
     TooltipModule,
     ViewContractsComponent,
     CpfCnpjPipe,
-    FieldsetModule
-  ],
+    FieldsetModule,
+    TableModule,
+    ShowOffersListComponent,
+    CreateRequestOfferComponent
+],
   templateUrl: "./search-client.component.html",
   styleUrl: "./search-client.component.scss",
   providers: [
@@ -75,7 +81,9 @@ export class SearchClientComponent implements OnInit, OnDestroy {
   confirmationService = inject(ConfirmationService);
   messageService = inject(MessageService);
   public showDataClientDialog = false;
-
+showOffersDialog = false;
+offers: any[] = [];
+isLoadingOffers = false;
   constructor(private router: Router, private route: ActivatedRoute) {}
 
   // Dialog
