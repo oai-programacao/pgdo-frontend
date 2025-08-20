@@ -591,4 +591,8 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
     };
     reader.readAsDataURL(file);
   }
+
+  removePicture(index: number): void{
+    this.photoRgVerses.removeAt(index)
+  }
 }

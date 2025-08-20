@@ -228,110 +228,117 @@
           </p-step-panel>
         </p-step-item>
 
-        <p-step-item [value]="2">
-          <p-step>Documentos do Cliente</p-step>
-          <p-step-panel>
-            <ng-template #content let-activateCallback="activateCallback">
-              <div class="flex flex-wrap gap-4">
-                <div class="flex-grow-1">
-                  <label>Foto da Frente do Documento</label>
+<p-step-item [value]="2">
+  <p-step>Documentos do Cliente</p-step>
+  <p-step-panel>
+    <ng-template #content let-activateCallback="activateCallback">
+      <div class="flex flex-wrap gap-4">
+        <!-- Foto da Frente do Documento -->
+        <div class="flex-grow-1">
+          <label>Foto da Frente do Documento</label>
+          <div *ngIf="!form.get('photoRg')?.value" class="mt-2">
+            <p-fileUpload
+              #fileUploadFront
+              name="photoRg"
+              accept="image/*"
+              [showUploadButton]="false"
+              [showCancelButton]="false"
+              chooseLabel="Anexar Frente"
+              chooseIcon="pi pi-upload"
+              (onSelect)="onUpload($event, 'photoRg')"
+              [auto]="true"
+            ></p-fileUpload>
+          </div>
+          <div
+            *ngIf="form.get('photoRg')?.value"
+            class="mt-2 flex flex-column align-items-center gap-3"
+          >
+            <img
+              [src]="form.get('photoRg')?.value"
+              alt="Preview Frente do Documento"
+              class="w-full border-round"
+            />
+            <p-button
+              rounded
+              icon="pi pi-trash"
+              styleClass="p-button-danger"
+              (onClick)="clearImage('photoRg', fileUploadFront)"
+              type="button"
+              ariaLabel="Remover foto da frente"
+            ></p-button>
+          </div>
+        </div>
 
-                  <div *ngIf="!form.get('photoRg')?.value" class="mt-2">
-                    <p-fileUpload
-                      #fileUploadFront
-                      name="photoRg"
-                      accept="image/*"
-                      [showUploadButton]="false"
-                      [showCancelButton]="false"
-                      chooseLabel="Anexar Frente"
-                      chooseIcon="pi pi-upload"
-                      (onSelect)="onUpload($event, 'photoRg')"
-                      [auto]="true"
-                    ></p-fileUpload>
-                  </div>
-
-                  <div
-                    *ngIf="form.get('photoRg')?.value"
-                    class="mt-2 flex flex-column align-items-center gap-3"
-                  >
-                    <img
-                      [src]="form.get('photoRg')?.value"
-                      alt="Preview Frente do Documento"
-                      class="w-full border-round"
-                    />
-                    <p-button
-                      rounded
-                      icon="pi pi-trash"
-                      styleClass="p-button-danger"
-                      (onClick)="clearImage('photoRg', fileUploadFront)"
-                    ></p-button>
-                  </div>
-                </div>
-
-                <div class="flex-grow-1">
-                  <label>Fotos do Verso do Documento</label>
-                  <div class="flex flex-column gap-3 mt-2">
-                    <ng-container
-                      *ngFor="
-                        let photo of photoRgVerses.controls;
-                        let i = index
-                      "
-                    >
-                      <div class="flex items-center gap-3" *ngIf="!photo.value">
-                        <p-fileUpload
-                          [name]="'photoRgVerse' + i"
-                          accept="image/*"
-                          [showUploadButton]="false"
-                          [showCancelButton]="false"
-                          chooseLabel="Anexar Verso"
-                          chooseIcon="pi pi-upload"
-                          (onSelect)="onUploadVerse($event, i)"
-                          [auto]="true"
-                        ></p-fileUpload>
-                        <p-button
-                          icon="pi pi-trash"
-                          styleClass="p-button-danger p-button-outlined"
-                          (onClick)="removePhotoRgVerse(i)"
-                          type="button"
-                          ariaLabel="Remover foto"
-                        ></p-button>
-                      </div>
-                      <div
-                        *ngIf="photo.value"
-                        class="flex flex-column align-items-center gap-3"
-                      >
-                        <img
-                          [src]="photo.value"
-                          alt="Preview Verso do Documento"
-                          class="w-full border-round"
-                        />
-                      </div>
-                    </ng-container>
-                    <p-button
-                      label="Adicionar mais foto"
-                      icon="pi pi-plus"
-                      styleClass="p-button-outlined"
-                      (onClick)="addPhotoRgVerse()"
-                      type="button"
-                      [disabled]="photoRgVerses.length >= 5"
-                    ></p-button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="flex py-6 gap-2 justify-between mt-4">
+        <!-- Fotos do Verso do Documento -->
+        <div class="flex-grow-1">
+          <label>Fotos do Verso do Documento</label>
+          <div class="flex flex-column gap-3 mt-2">
+            <ng-container
+              *ngFor="let photo of photoRgVerses.controls; let i = index"
+            >
+              <!-- Upload do verso -->
+              <div class="flex items-center gap-3" *ngIf="!photo.value">
+                <p-fileUpload
+                  [name]="'photoRgVerse' + i"
+                  accept="image/*"
+                  [showUploadButton]="false"
+                  [showCancelButton]="false"
+                  chooseLabel="Anexar Verso"
+                  chooseIcon="pi pi-upload"
+                  (onSelect)="onUploadVerse($event, i)"
+                  [auto]="true"
+                ></p-fileUpload>
                 <p-button
-                  label="Voltar"
-                  icon="pi pi-arrow-left"
-                  severity="secondary"
-                  (onClick)="activateCallback(1)"
-                />
-
-                <p-button label="Criar" (click)="submitRegistration()" />
+                  icon="pi pi-trash"
+                  styleClass="p-button-danger p-button-outlined"
+                  (onClick)="removePhotoRgVerse(i)"
+                  type="button"
+                  ariaLabel="Remover foto do verso"
+                ></p-button>
               </div>
-            </ng-template>
-          </p-step-panel>
-        </p-step-item>
+              <!-- Preview do verso + botão de remover -->
+              <div
+                *ngIf="photo.value"
+                class="flex flex-column align-items-center gap-3"
+              >
+                <img
+                  [src]="photo.value"
+                  alt="Preview Verso do Documento"
+                  class="w-full border-round"
+                />
+                <p-button
+                  icon="pi pi-trash"
+                  styleClass="p-button-danger"
+                  (onClick)="removePhotoRgVerse(i)"
+                  type="button"
+                  ariaLabel="Remover foto do verso"
+                ></p-button>
+              </div>
+            </ng-container>
+            <p-button
+              label="Adicionar mais foto"
+              icon="pi pi-plus"
+              styleClass="p-button-outlined"
+              (onClick)="addPhotoRgVerse()"
+              type="button"
+              [disabled]="photoRgVerses.length >= 5"
+            ></p-button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex py-6 gap-2 justify-between mt-4">
+        <p-button
+          label="Voltar"
+          icon="pi pi-arrow-left"
+          severity="secondary"
+          (onClick)="activateCallback(1)"
+        />
+        <p-button label="Criar" (click)="submitRegistration()" />
+      </div>
+    </ng-template>
+  </p-step-panel>
+</p-step-item>
       </p-stepper>
     </div>
   </form>
