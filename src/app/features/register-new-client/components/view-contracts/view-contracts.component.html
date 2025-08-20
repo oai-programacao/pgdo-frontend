@@ -3,141 +3,105 @@
     *ngFor="let contract of contractsList; let i = index"
     class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-md p-5 flex flex-col gap-3 mb-6 mt-6"
   >
-    <div class="flex flex-wrap justify-between items-start gap-4">
-      <p class="text-lg font-semibold text-slate-800 dark:text-white">
-        {{ getPlanLabel(contract.codePlan) }}
-      </p>
-      <div class="flex gap-4 justify-between">
-        <p-button
-          severity="success"
-          styleClass="p-button-sm"
-          (onClick)="op.toggle($event); getPaymentByBillet(contract.id)"
-          label="Gerar Boleto"
-        ></p-button>
-        <p-button
-          severity="info"
-          styleClass="p-button-sm"
-          (onClick)="getRegisterPdf()"
-          label="Contrato de Registro"
-        ></p-button>
-        <p-button
-          severity="warn"
-          styleClass="p-button-sm"
-          (onClick)="getClientContractPermanantPdf()"
-          label="Contrato de Permanência"
-        ></p-button>
-      </div>
-    </div>
-    <div class="flex flex-col gap-2 justify-center py-1">
-      <div class="text-sm text-slate-600 dark:text-slate-300 mt-2">
-        <div>
-          <strong>Valor de Adesão:</strong>
-          {{
-            contract.parcels != null
-              ? (contract.parcels | currency : "BRL")
-              : (0 | currency : "BRL")
-          }}
-        </div>
-        <div>
-          <strong>Dia de Vencimento:</strong>
-          {{ contract.beginningCollection | date : "dd/MM/yyyy" }}
-        </div>
-        <div>
-          <strong>Endereço:</strong>
-          @if(contract.addressCobranca){
-          <ng-container>
-            {{ contract.addressCobranca.street }},
-            {{ contract.addressCobranca.number }}
-            {{ contract.addressCobranca.neighborhood }} -
-            {{ contract.addressCobranca.city }} <br />
-            <strong>CEP</strong>: {{ contract.addressCobranca.zipCode }}
-          </ng-container>
-          } @if(!contract.addressCobranca){
-          <ng-container>
-            <span class="text-red-500">Endereço não informado</span>
-          </ng-container>
-          }
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- <p-popover #rpdf>
-  <div class="w-[30rem]">
-    <span class="font-medium text-surface-900 dark:text-surface-0 block mb-2">
-      Registro de Cliente
-    </span>
-
-    <p-inputgroup>
-      <ng-container >
-        <p-progressSpinner styleClass="w-6 h-6" strokeWidth="4"></p-progressSpinner>
-        <span class="ml-2">Gerando PDF...</span>
-      </ng-container>
-
-      <ng-template #showRegisterPdf>
-<ng-container *ngIf="registerPdf; else noRegisterPdf">
-  <input
-    pInputText
-    [value]="registerPdf"
-    disabled
-    readonly
-    class="w-[10rem]"
-    fluid
-  />
-  <p-inputgroup-addon>
-    <a [href]="registerPdf" target="_blank">
-      <i class="pi pi-eye cursor-pointer"></i>
-    </a>
-  </p-inputgroup-addon>
-</ng-container> -->
-  <!-- 
-        <ng-template #noRegisterPdf>
-          <span class="text-sm text-gray-400">Nenhum registro disponível.</span>
-        </ng-template>
-      </ng-template>
-    </p-inputgroup>
-  </div>
-
-</p-popover> -->
-
-  <p-popover #op>
-    <div class="w-[30rem]">
-      <span class="font-medium text-surface-900 dark:text-surface-0 block mb-2">
-        Link de Pagamento
+    <!-- Validação de erro RBX -->
+    <div *ngIf="!contract.codePlan || !contract.beginningCollection || !contract.addressCobranca">
+      <span class="text-red-500 font-semibold">
+        Erro de RBX: Documento não encontrado ou informações incompletas no RBX.
       </span>
-
-      <p-inputgroup>
-        <ng-container *ngIf="isLoadingLink; else showLink">
-          <p-progressSpinner
-            styleClass="w-6 h-6"
-            strokeWidth="4"
-          ></p-progressSpinner>
-          <span class="ml-2">Gerando boleto...</span>
-        </ng-container>
-
-        <ng-template #showLink>
-          <ng-container *ngIf="link; else noLink">
-            <input
-              pInputText
-              [value]="link"
-              disabled
-              readonly
-              class="w-[10rem]"
-              fluid
-            />
-            <p-inputgroup-addon>
-              <i
-                class="pi pi-eye cursor-pointer"
-                (click)="copyToClipboard(link)"
-              ></i>
-            </p-inputgroup-addon>
-          </ng-container>
-
-          <ng-template #noLink>
-            <span class="text-sm text-gray-400">Nenhum link disponível.</span>
-          </ng-template>
-        </ng-template>
-      </p-inputgroup>
     </div>
-  </p-popover>
+
+    <!-- Conteúdo normal se não houver erro -->
+    <div *ngIf="contract.codePlan && contract.beginningCollection && contract.addressCobranca">
+      <div class="flex flex-wrap justify-between items-start gap-4">
+        <p class="text-lg font-semibold text-slate-800 dark:text-white">
+          {{ getPlanLabel(contract.codePlan) }}
+        </p>
+        <div class="flex gap-4 justify-between">
+          <p-button
+            severity="success"
+            styleClass="p-button-sm"
+            (onClick)="op.toggle($event); getPaymentByBillet(contract.id)"
+            label="Gerar Boleto"
+          ></p-button>
+          <p-button
+            severity="info"
+            styleClass="p-button-sm"
+            (onClick)="getRegisterPdf()"
+            label="Contrato de Registro"
+          ></p-button>
+          <p-button
+            severity="warn"
+            styleClass="p-button-sm"
+            (onClick)="getClientContractPermanantPdf()"
+            label="Contrato de Permanência"
+          ></p-button>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2 justify-center py-1">
+        <div class="text-sm text-slate-600 dark:text-slate-300 mt-2">
+          <div>
+            <strong>Valor de Adesão:</strong>
+            {{
+              contract.parcels != null
+                ? (contract.parcels | currency : "BRL")
+                : (0 | currency : "BRL")
+            }}
+          </div>
+          <div>
+            <strong>Dia de Vencimento:</strong>
+            {{ contract.beginningCollection | date : "dd/MM/yyyy" }}
+          </div>
+          <div>
+            <strong>Endereço:</strong>
+            <ng-container>
+              {{ contract.addressCobranca.street }},
+              {{ contract.addressCobranca.number }}
+              {{ contract.addressCobranca.neighborhood }} -
+              {{ contract.addressCobranca.city }} <br />
+              <strong>CEP</strong>: {{ contract.addressCobranca.zipCode }}
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Popover e demais conteúdos continuam iguais -->
+    <p-popover #op>
+      <div class="w-[30rem]">
+        <span class="font-medium text-surface-900 dark:text-surface-0 block mb-2">
+          Link de Pagamento
+        </span>
+        <p-inputgroup>
+          <ng-container *ngIf="isLoadingLink; else showLink">
+            <p-progressSpinner
+              styleClass="w-6 h-6"
+              strokeWidth="4"
+            ></p-progressSpinner>
+            <span class="ml-2">Gerando boleto...</span>
+          </ng-container>
+          <ng-template #showLink>
+            <ng-container *ngIf="link; else noLink">
+              <input
+                pInputText
+                [value]="link"
+                disabled
+                readonly
+                class="w-[10rem]"
+                fluid
+              />
+              <p-inputgroup-addon>
+                <i
+                  class="pi pi-eye cursor-pointer"
+                  (click)="copyToClipboard(link)"
+                ></i>
+              </p-inputgroup-addon>
+            </ng-container>
+            <ng-template #noLink>
+              <span class="text-sm text-gray-400">Nenhum link disponível.</span>
+            </ng-template>
+          </ng-template>
+        </p-inputgroup>
+      </div>
+    </p-popover>
+  </div>
 </div>
