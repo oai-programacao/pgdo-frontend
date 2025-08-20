@@ -376,9 +376,7 @@
                     type="button"
                     pButton
                     (click)="openObservationTechDialog(os)"
-                    [pTooltip]="
-                      os.observation ? os.observation : 'Sem Observação'
-                    "
+                    [pTooltip]="os.observation ? os.observation : 'Sem Observação'"
                     icon="pi pi-info-circle"
                     class="p-button-rounded p-button-text p-button-info"
                     [severity]="os.observation ?   'info' : 'warn' "
