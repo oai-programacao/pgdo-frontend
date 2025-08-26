@@ -1,3 +1,6 @@
+
+
+import { webSocket } from 'rxjs/webSocket';
 import {
   Component,
   HostListener,
@@ -8,12 +11,12 @@ import {
 import { RouterOutlet } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { Subscription } from "rxjs";
-import { SseService } from "./core/sse/sse.service";
 import { MessageService } from "primeng/api";
 import { Toast } from "primeng/toast";
 import { AuthService } from "./core/auth/auth.service";
 import { AdminOffersService } from "./features/offers/services/admin-offers.service";
 import { AudioUnlockService } from "./core/audio/audio-unlock.service";
+import { WsService } from './core/sse/sse.service';
 
 @Component({
   selector: "app-root",
@@ -24,7 +27,7 @@ import { AudioUnlockService } from "./core/audio/audio-unlock.service";
 })
 export class AppComponent implements OnInit {
   constructor(
-    private sseService: SseService,
+    private webSocket: WsService,
     private messageService: MessageService,
     private authService: AuthService,
     private audioUnlockService: AudioUnlockService,
@@ -37,7 +40,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.sseService.notificationEvents$.subscribe((notification: any) => {
+    this.webSocket.notificationEvents$.subscribe((notification: any) => {
       console.log(
         "DIAGNÓSTICO 1: Evento SSE recebido:",
         JSON.stringify(notification, null, 2)

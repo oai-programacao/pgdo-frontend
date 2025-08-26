@@ -1,3 +1,4 @@
+import { webSocket } from 'rxjs/webSocket';
 import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { OffersService } from "../../services/offers.service";
 import { City, Period, TypeOfOs } from "../../../../interfaces/enums.model";
@@ -7,7 +8,7 @@ import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { interval, Subject, Subscription } from "rxjs";
 import { MessageService } from "primeng/api";
-import { SseService } from "../../../../core/sse/sse.service";
+import { WsService } from '../../../../core/sse/sse.service';
 
 @Component({
   selector: "app-show-offers-list",
@@ -19,8 +20,8 @@ import { SseService } from "../../../../core/sse/sse.service";
 export class ShowOffersListComponent implements OnInit, OnDestroy {
   private offersService = inject(OffersService);
   private messageService = inject(MessageService);
-    private sseService = inject(SseService);
-
+    // private sseService = inject(SseService);
+  private webSocketService = inject(WsService);
   private notificationSubscription?: Subscription;
   isLoading = false;
   offers: any[] = [];
@@ -72,8 +73,8 @@ ngOnInit(): void {
   this.loadOffers();
 
   // Inscreva-se no SSE
-  if (this.sseService.notificationEvents$) {
-    this.sseSubscription = this.sseService.notificationEvents$.subscribe((data) => {
+  if (this.webSocketService.notificationEvents$) {
+    this.sseSubscription = this.webSocketService.notificationEvents$.subscribe((data) => {
       console.log("Notificação recebida no componente:", data);
       this.loadOffers();
       this.messageService.add({

@@ -19,4 +19,10 @@
     // Add other bootstrap parameters as needed, using camel case.
   });
 </script>
+
+ <script>
+    if (typeof window.global === 'undefined') {
+      window.global = window;
+    }
+  </script>
 </html>
