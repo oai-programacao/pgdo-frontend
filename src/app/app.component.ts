@@ -25,7 +25,7 @@ import { WsService } from './core/sse/sse.service';
   styleUrl: "./app.component.scss",
   providers: [MessageService],
 })
-export class AppComponent implements OnInit {
+export class AppComponent   {
   constructor(
     private webSocket: WsService,
     private messageService: MessageService,

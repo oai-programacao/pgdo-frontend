@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: "http://187.33.200.196:8080/api",
-  wsUrl: "ws://187.33.200.196:8080/ws-connect",
+  apiUrl: "http://localhost:8080/api",
+  wsUrl: "ws://localhost:8080/api/ws-connect",
   googleMapsApiKey: "AIzaSyCmavFR3WM6LhreBeGEBSKr5nKBAHcWVms",
 };
