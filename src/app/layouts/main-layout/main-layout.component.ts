@@ -4,8 +4,8 @@ import { SidebarComponent } from "../../shared/components/sidebar/sidebar.compon
 import { CommonModule } from "@angular/common";
 import { AuthService } from "../../core/auth/auth.service";
 import { MenuItem } from "../../interfaces/menu-item.model";
-import { SseService } from "../../core/sse/sse.service";
 import { distinctUntilChanged, Subscription, tap } from "rxjs";
+import { WsService } from "../../core/sse/sse.service";
 
 @Component({
   selector: "app-main-layout",
@@ -18,8 +18,8 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   isSidebarCollapsed = false;
 
   private authService = inject(AuthService);
-  private sseService = inject(SseService);
-
+  // private sseService = inject(SseService);
+  private webSocketService = inject(WsService);
   private authStateSubscription?: Subscription;
 
   menuItems: MenuItem[] = [
@@ -363,13 +363,13 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     this.authStateSubscription = this.authService.currentUser$.subscribe(
       (user) => {
         if (user) {
-          // Se há um usuário, conecta o SSE
-          console.log("User logged in, connecting to SSE...");
-           this.sseService.connect(this.authService.getAccessToken());
+          // Se há um usuário, conecta o WebSocket
+          console.log("User logged in, connecting to WebSocket...");
+          this.webSocketService.connect();
         } else {
-          // Se não há usuário (logout), desconecta o SSE
-          console.log("User logged out, disconnecting from SSE...");
-          this.sseService.disconnect();
+          // Se não há usuário (logout), desconecta o WebSocket
+          console.log("User logged out, disconnecting from WebSocket...");
+          this.webSocketService.disconnect();
         }
       }
     );

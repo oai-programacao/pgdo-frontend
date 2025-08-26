@@ -80,6 +80,8 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
   signaturePadComponent!: SignaturePadComponent;
   @ViewChild("fileUploadFront") fileUploadFront!: FileUpload;
   @ViewChild("fileUploadVerse") fileUploadVerse!: FileUpload;
+
+
   fb!: FormBuilder;
   form!: FormGroup;
   contractForm!: FormGroup;
@@ -159,7 +161,6 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
   ];
 
   ngOnDestroy(): void {
-    console.log("[RegisterNewClientComponent] ngOnDestroy");
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -318,6 +319,8 @@ export class RegisterNewClientComponent implements OnInit, OnDestroy {
       });
     }
   }
+
+  
   public clearContractAddress(): void {
     // Limpa todos os campos dentro do form group 'address' do contractForm
     this.contractForm.get("address")?.reset();

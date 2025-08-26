@@ -1,3 +1,4 @@
+import { webSocket } from 'rxjs/webSocket';
 import { CommonModule, DatePipe } from "@angular/common";
 import {
   ChangeDetectorRef,
@@ -25,7 +26,6 @@ import { DialogModule } from "primeng/dialog";
 import { ToastModule } from "primeng/toast";
 import { BadgeModule } from "primeng/badge";
 import { OverlayBadgeModule } from "primeng/overlaybadge";
-import { SseService } from "../../../../core/sse/sse.service";
 import { interval, Subscription } from "rxjs";
 import {
   City,
@@ -37,6 +37,7 @@ import { CreateManyAvailableOffersDto } from "../../../../interfaces/offers.mode
 import { TooltipModule } from "primeng/tooltip";
 import { AuthService } from "../../../../core/auth/auth.service";
 import { AudioUnlockService } from "../../../../core/audio/audio-unlock.service";
+import { WsService } from '../../../../core/sse/sse.service';
 
 @Component({
   selector: "app-offers-list",
@@ -65,7 +66,8 @@ export class OffersListComponent implements OnInit, OnDestroy {
   private adminOffersService = inject(AdminOffersService);
   private fb = inject(FormBuilder);
   private messageService = inject(MessageService);
-  private sseService = inject(SseService);
+  // private sseService = inject(SseService);
+  private webSocketService = inject(WsService);
   private datePipe = inject(DatePipe);
   private cdRef = inject(ChangeDetectorRef);
 private authService = inject(AuthService);
@@ -234,7 +236,7 @@ private authService = inject(AuthService);
   }
 
   private subscribeToRealtimeUpdates(): void {
-    this.sseSubscription = this.sseService.notificationEvents$.subscribe(
+    this.sseSubscription = this.webSocketService.notificationEvents$.subscribe(
       (notification) => {
         if (this.isAdmin()) {
 
