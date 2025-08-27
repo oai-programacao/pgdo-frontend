@@ -8,7 +8,7 @@
     <div>
       <label class="block text-xs text-slate-500">Técnico Responsável</label>
       <div class="font-semibold text-slate-700">
-        {{ serviceOrder?.technician?.name || " - " }}
+        {{ serviceOrder.technician?.name || " - " }}
       </div>
     </div>
 
@@ -16,7 +16,7 @@
     <div>
       <label class="block text-xs text-slate-500">Período</label>
       <div class="font-semibold text-slate-700">
-        {{ getPeriodLabel(serviceOrder?.period!) || " - " }}
+        {{ getPeriodLabel(serviceOrder.period!) || " - " }}
       </div>
     </div>
 
@@ -24,7 +24,7 @@
     <div>
       <label class="block text-xs text-slate-500">Início da OS</label>
       <div class="font-semibold text-slate-700">
-        {{ serviceOrder?.startOfOs || " - " }}
+        {{ serviceOrder.startOfOs || " - " }}
       </div>
     </div>
 
@@ -32,7 +32,7 @@
     <div>
       <label class="block text-xs text-slate-500">Término da OS</label>
       <div class="font-semibold text-slate-700">
-        {{ serviceOrder?.endOfOs || " - " }}
+        {{ serviceOrder.endOfOs || " - " }}
       </div>
     </div>
 
@@ -40,7 +40,7 @@
     <div>
       <label class="block text-xs text-slate-500">Status</label>
       <div class="font-semibold text-slate-700">
-        {{ getStatusLabel(serviceOrder?.status!) || " - " }}
+        {{ getStatusLabel(serviceOrder.status!) || " - " }}
       </div>
     </div>
 
@@ -48,7 +48,7 @@
     <div>
       <label class="block text-xs text-slate-500">Última Atualização por</label>
       <div class="font-semibold text-slate-700">
-        {{ serviceOrder?.updatedBy || " - " }}
+        {{ serviceOrder.updatedBy || " - " }}
       </div>
     </div>
 
@@ -56,7 +56,7 @@
     <div>
       <label class="block text-xs text-slate-500">Última Atualização</label>
       <div class="font-semibold text-slate-700">
-        {{ serviceOrder?.updatedAt || " - " }}
+        {{ serviceOrder.updatedAt || " - " }}
       </div>
     </div>
 
@@ -64,7 +64,7 @@
     <div>
       <label class="block text-xs text-slate-500">Criado em</label>
       <div class="font-semibold text-slate-700">
-        {{ serviceOrder?.createdAt || " - " }}
+        {{ serviceOrder.createdAt || " - " }}
       </div>
     </div>
 
@@ -72,7 +72,7 @@
     <div>
       <label class="block text-xs text-slate-500">Telefone de Contato</label>
       <div class="font-semibold text-slate-700">
-        {{ serviceOrder?.phone2! || " - " | phones }}
+        {{ serviceOrder.phone2! || " - " | phones }}
       </div>
     </div>
   </div>
