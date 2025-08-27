@@ -51,7 +51,7 @@ import { CreateRequestOfferComponent } from "../../../offers/components/create-r
     CpfCnpjPipe,
     FieldsetModule,
     TableModule,
-    ShowOffersListComponent,
+    // ShowOffersListComponent,
     CreateRequestOfferComponent,
   ],
   templateUrl: "./search-client.component.html",
