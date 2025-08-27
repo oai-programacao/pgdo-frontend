@@ -99,115 +99,234 @@
 //     }
 //   }
 // }
-
-import { Injectable, NgZone, inject } from "@angular/core";
+import { Injectable, NgZone, inject, OnDestroy } from "@angular/core";
 import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
-import { Subject, Observable } from "rxjs";
+import { Subject, Observable, BehaviorSubject, timer } from "rxjs";
 import { environment } from "../../../environments/environment";
 import SockJS from "sockjs-client";
 
+export enum ConnectionStatus {
+  DISCONNECTED = 'DISCONNECTED',
+  CONNECTING = 'CONNECTING',
+  CONNECTED = 'CONNECTED',
+  RECONNECTING = 'RECONNECTING',
+  ERROR = 'ERROR'
+}
+
 @Injectable({ providedIn: "root" })
-export class WsService {
+export class WsService implements OnDestroy {
   private ngZone = inject(NgZone);
   private client: Client | null = null;
   private subscriptions: StompSubscription[] = [];
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 5;
+  private reconnectInterval = 5000;
 
   private notificationSubject = new Subject<any>();
-  public notificationEvents$: Observable<any> =
-    this.notificationSubject.asObservable();
-
   private offerStatusSubject = new Subject<any>();
-  public offerStatusEvents$: Observable<any> =
-    this.offerStatusSubject.asObservable();
+  private connectionStatusSubject = new BehaviorSubject<ConnectionStatus>(ConnectionStatus.DISCONNECTED);
 
-  connect() {
+  public notificationEvents$: Observable<any> = this.notificationSubject.asObservable();
+  public offerStatusEvents$: Observable<any> = this.offerStatusSubject.asObservable();
+  public connectionStatus$: Observable<ConnectionStatus> = this.connectionStatusSubject.asObservable();
+
+  connect(): void {
     const token = localStorage.getItem("pgdo_access_token");
+    
     if (!token) {
-      console.error("WS Service: Token não encontrado.");
+      console.error("WS Service: Token de autenticação não encontrado.");
+      this.connectionStatusSubject.next(ConnectionStatus.ERROR);
       return;
     }
-    if (this.client?.connected) { 
+
+    if (this.client?.connected) {
+      console.log("WS Service: Já conectado.");
       return;
     }
+
+    this.connectionStatusSubject.next(ConnectionStatus.CONNECTING);
+    console.log("WS Service: Iniciando conexão...");
 
     this.client = new Client({
       webSocketFactory: () => {
-        // --- CORREÇÃO ---
-        // 1. A URL NÃO DEVE conter o token.
-        //    Use a wsUrl do ambiente e converta para http.
-        const sockjsUrl = environment.wsUrl
-          .replace("ws://", "http://")
-          .replace("wss://", "https://");
+        let sockjsUrl = environment.wsUrl;
+        
+        if (sockjsUrl.startsWith('ws://')) {
+          sockjsUrl = sockjsUrl.replace('ws://', 'http://');
+        } else if (sockjsUrl.startsWith('wss://')) {
+          sockjsUrl = sockjsUrl.replace('wss://', 'https://');
+        }
 
-        console.log(`[VALIDAÇÃO] URL para SockJS (SEM token): ${sockjsUrl}`);
+
+        console.log(` WS Service: Conectando via SockJS em: ${sockjsUrl}`);
         return new SockJS(sockjsUrl);
       },
 
-      // 2. O token DEVE ser enviado no cabeçalho.
-      //    O seu interceptor no backend (`JwtChannelInterceptor`) vai ler este cabeçalho.
       connectHeaders: {
         Authorization: `Bearer ${token}`,
+        
       },
 
       debug: (str) => {
         if (!str.includes("PING") && !str.includes("PONG")) {
-          console.log("STOMP Debug:", new Date(), str);
+          console.log("STOMP Debug:", new Date().toISOString(), str);
         }
       },
-      reconnectDelay: 5000,
+      
+      reconnectDelay: this.reconnectInterval,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
     });
 
     this.client.onConnect = (frame) => {
-      console.log(
-        "✅ ✅ ✅ WS Service: STOMP CONECTADO COM SUCESSO! ✅ ✅ ✅",
-        frame
-      );
       this.ngZone.run(() => {
-        const sub1 = this.client!.subscribe(
-          "/user/topic/notifications",
-          (message: IMessage) => {
-            this.notificationSubject.next(this.parseMessage(message.body));
-          }
-        );
-        const sub2 = this.client!.subscribe(
-          "/topic/offers.request",
-          (message: IMessage) => {
-            this.offerStatusSubject.next(this.parseMessage(message.body));
-          }
-        );
-        this.subscriptions.push(sub1, sub2);
+        console.log("WS Service: STOMP conectado com sucesso!", frame);
+        this.connectionStatusSubject.next(ConnectionStatus.CONNECTED);
+        this.reconnectAttempts = 0;
+        this.setupSubscriptions();
       });
     };
 
     this.client.onStompError = (frame) => {
-      console.error(
-        "❌ WS Service: Erro no protocolo STOMP.",
-        frame.headers["message"],
-        frame.body
-      );
+      this.ngZone.run(() => {
+        console.error("WS Service: Erro STOMP:", frame.headers["message"], frame.body);
+        this.connectionStatusSubject.next(ConnectionStatus.ERROR);
+        this.handleReconnection();
+      });
     };
 
     this.client.onWebSocketError = (event) => {
-      console.error("❌ WS Service: Erro na conexão WebSocket.", event);
+      this.ngZone.run(() => {
+        console.error("WS Service: Erro WebSocket:", event);
+        this.connectionStatusSubject.next(ConnectionStatus.ERROR);
+        this.handleReconnection();
+      });
     };
 
-    this.client.activate();
+    this.client.onDisconnect = () => {
+      this.ngZone.run(() => {
+        console.log("WS Service: Desconectado.");
+        this.connectionStatusSubject.next(ConnectionStatus.DISCONNECTED);
+        this.clearSubscriptions();
+      });
+    };
+
+    try {
+      this.client.activate();
+    } catch (error) {
+      console.error("WS Service: Erro ao ativar cliente:", error);
+      this.connectionStatusSubject.next(ConnectionStatus.ERROR);
+    }
   }
 
-  disconnect() {
+  private setupSubscriptions(): void {
+    if (!this.client?.connected) {
+      console.error("WS Service: Cliente não conectado para configurar inscrições.");
+      return;
+    }
+
+    try {
+      const userNotificationSub = this.client.subscribe(
+        "/user/topic/notifications",
+        (message: IMessage) => {
+          console.log("Notificação pessoal recebida:", message.body);
+          const parsedMessage = this.parseMessage(message.body);
+          this.notificationSubject.next(parsedMessage);
+        }
+      );
+
+      const globalOffersSub = this.client.subscribe(
+        "/topic/offers.request",
+        (message: IMessage) => {
+          console.log("Evento global de ofertas recebido:", message.body);
+          const parsedMessage = this.parseMessage(message.body);
+          this.offerStatusSubject.next(parsedMessage);
+        }
+      );
+
+      const offersUpdateSub = this.client.subscribe(
+        "/topic/offers.update",
+        (message: IMessage) => {
+          console.log(" Atualização de ofertas recebida:", message.body);
+          const parsedMessage = this.parseMessage(message.body);
+          this.notificationSubject.next(parsedMessage);
+        }
+      );
+
+      this.subscriptions.push(userNotificationSub, globalOffersSub, offersUpdateSub);
+      console.log(`WS Service: ${this.subscriptions.length} inscrições configuradas.`);
+
+    } catch (error) {
+      console.error("WS Service: Erro ao configurar inscrições:", error);
+    }
+  }
+
+  private clearSubscriptions(): void {
+    this.subscriptions.forEach(sub => {
+      try {
+        sub.unsubscribe();
+      } catch (error) {
+        console.error(" WS Service: Erro ao cancelar inscrição:", error);
+      }
+    });
+    this.subscriptions = [];
+  }
+
+  private handleReconnection(): void {
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.error(`WS Service: Máximo de tentativas de reconexão (${this.maxReconnectAttempts}) atingido.`);
+      this.connectionStatusSubject.next(ConnectionStatus.ERROR);
+      return;
+    }
+
+    this.reconnectAttempts++;
+    this.connectionStatusSubject.next(ConnectionStatus.RECONNECTING);
+    
+    console.log(`WS Service: Tentativa de reconexão ${this.reconnectAttempts}/${this.maxReconnectAttempts} em ${this.reconnectInterval}ms...`);
+    
+    timer(this.reconnectInterval).subscribe(() => {
+      if (this.client && !this.client.connected) {
+        this.disconnect();
+        this.connect();
+      }
+    });
+  }
+
+  disconnect(): void {
     if (this.client) {
+      this.clearSubscriptions();
       this.client.deactivate();
       this.client = null;
-      this.subscriptions = [];
-      console.log("WS Service: Desconectado.");
+      this.connectionStatusSubject.next(ConnectionStatus.DISCONNECTED);
+      console.log("WS Service: Desconectado manualmente.");
     }
+  }
+
+  isConnected(): boolean {
+    return this.client?.connected || false;
+  }
+
+  getConnectionStatus(): ConnectionStatus {
+    return this.connectionStatusSubject.value;
+  }
+
+  forceReconnect(): void {
+    console.log(" WS Service: Forçando reconexão...");
+    this.reconnectAttempts = 0;
+    this.disconnect();
+    setTimeout(() => this.connect(), 1000);
   }
 
   private parseMessage(body: string): any {
     try {
       return JSON.parse(body);
-    } catch (e) {
-      return body;
+    } catch (error) {
+      console.warn("⚠️ WS Service: Erro ao fazer parse da mensagem, retornando como string:", error);
+      return { message: body, timestamp: new Date().toISOString() };
     }
+  }
+
+  ngOnDestroy(): void {
+    this.disconnect();
   }
 }

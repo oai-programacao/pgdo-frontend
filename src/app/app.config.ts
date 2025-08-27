@@ -12,6 +12,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
   
     provideAnimationsAsync(),
+    provideAnimations(),
     providePrimeNG({
       theme: {
         preset: Aura,

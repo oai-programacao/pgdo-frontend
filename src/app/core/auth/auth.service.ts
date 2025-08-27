@@ -25,7 +25,6 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
   private apiUrl = environment.apiUrl + '/auth';
-
   public currentUserSubject = new BehaviorSubject<AuthenticatedUser | null>(
     this.getUserFromToken()
   );
@@ -37,6 +36,7 @@ export class AuthService {
   private isRefreshingToken = false;
   private tokenRefreshed$ = new BehaviorSubject<boolean | null>(null);
   private tokenExpirationTimer: any = null; // Para nosso "despertador"
+   public isAuthenticated$!: Observable<boolean>;
 
   constructor() {
      // Ao iniciar o serviço, verifica se há um token válido e agenda o refresh

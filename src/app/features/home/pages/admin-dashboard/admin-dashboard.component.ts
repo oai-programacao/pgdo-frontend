@@ -7,6 +7,7 @@ import { DashboardChartComponent } from '../../../../shared/chart/dashboard-char
 import { DashboardService } from '../../services/dashboard.service';
 import { TypeOfOs } from '../../../../interfaces/enums.model';
 import { HomeBodyComponent } from "../../components/home-body/home-body.component";
+import { ToastModule } from 'primeng/toast';
 interface DashboardData {
   actualMonthValue: number;
   previousMonthValue: number;
@@ -23,7 +24,8 @@ interface DashboardData {
     ContentPanelComponent,
     CommonModule,
     DashboardChartComponent,
-    HomeBodyComponent
+    HomeBodyComponent,
+    
 ],
   templateUrl: "./admin-dashboard.component.html",
   styleUrl: "./admin-dashboard.component.scss",
@@ -33,7 +35,6 @@ export class AdminDashboardComponent implements OnInit {
   widgetDataMap: Map<string, DashboardData | null> = new Map();
   widgetLoadingMap: Map<string, boolean> = new Map();
 
-  
 
   // Definir chaves para os widgets para facilitar o acesso no template e no TS
   readonly WIDGET_KEYS = {
