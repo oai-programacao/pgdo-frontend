@@ -109,7 +109,6 @@ import SockJS from "sockjs-client";
 @Injectable({ providedIn: "root" })
 export class WsService {
   private ngZone = inject(NgZone);
-
   private client: Client | null = null;
   private subscriptions: StompSubscription[] = [];
 
@@ -124,32 +123,32 @@ export class WsService {
   connect() {
     const token = localStorage.getItem("pgdo_access_token");
     if (!token) {
-      console.error("WS Service: Token de acesso não encontrado.");
+      console.error("WS Service: Token não encontrado.");
       return;
     }
-
-    if (this.client?.connected) {
+    if (this.client?.connected) { 
       return;
     }
-
-    // --- ABORDAGEM MODERNA E ROBUSTA (DEVE FUNCIONAR AGORA) ---
 
     this.client = new Client({
-      // 1. A URL HTTP/HTTPS para o SockJS.
       webSocketFactory: () => {
-        // Se environment.apiUrl = 'http://localhost:8080'
-        // Então a linha abaixo criará a URL CORRETA: 'http://localhost:8080/ws-connect'
-        const sockjsUrl = `${environment.wsUrl}`;
-        console.log(`WS Service: Criando conexão SockJS para: ${sockjsUrl}`);
+        // --- CORREÇÃO ---
+        // 1. A URL NÃO DEVE conter o token.
+        //    Use a wsUrl do ambiente e converta para http.
+        const sockjsUrl = environment.wsUrl
+          .replace("ws://", "http://")
+          .replace("wss://", "https://");
+
+        console.log(`[VALIDAÇÃO] URL para SockJS (SEM token): ${sockjsUrl}`);
         return new SockJS(sockjsUrl);
       },
 
-      // 2. Cabeçalhos para autenticação. Serão usados na conexão STOMP.
+      // 2. O token DEVE ser enviado no cabeçalho.
+      //    O seu interceptor no backend (`JwtChannelInterceptor`) vai ler este cabeçalho.
       connectHeaders: {
         Authorization: `Bearer ${token}`,
       },
 
-      // 3. Configurações de depuração e reconexão.
       debug: (str) => {
         if (!str.includes("PING") && !str.includes("PONG")) {
           console.log("STOMP Debug:", new Date(), str);
@@ -158,10 +157,11 @@ export class WsService {
       reconnectDelay: 5000,
     });
 
-    // --- FIM DA ABORDAGEM ---
-
     this.client.onConnect = (frame) => {
-      console.log("WS Service: STOMP conectado com sucesso!", frame);
+      console.log(
+        "✅ ✅ ✅ WS Service: STOMP CONECTADO COM SUCESSO! ✅ ✅ ✅",
+        frame
+      );
       this.ngZone.run(() => {
         const sub1 = this.client!.subscribe(
           "/user/topic/notifications",
@@ -170,7 +170,7 @@ export class WsService {
           }
         );
         const sub2 = this.client!.subscribe(
-          "/topic/offers",
+          "/topic/offers.request",
           (message: IMessage) => {
             this.offerStatusSubject.next(this.parseMessage(message.body));
           }
@@ -181,14 +181,14 @@ export class WsService {
 
     this.client.onStompError = (frame) => {
       console.error(
-        "WS Service: Erro no protocolo STOMP.",
+        "❌ WS Service: Erro no protocolo STOMP.",
         frame.headers["message"],
         frame.body
       );
     };
 
     this.client.onWebSocketError = (event) => {
-      console.error("WS Service: Erro na conexão WebSocket.", event);
+      console.error("❌ WS Service: Erro na conexão WebSocket.", event);
     };
 
     this.client.activate();

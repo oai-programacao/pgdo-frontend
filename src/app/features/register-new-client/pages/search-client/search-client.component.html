@@ -14,6 +14,7 @@
       class="w-full sm:w-3/4 md:w-2/3 lg:w-1/2"
     />
 
+    <!-- CPF -->
     @if(clientType === 'PF'){
     <input
       type="text"
@@ -26,7 +27,24 @@
       [disabled]="!clientType"
       class="w-full sm:w-3/4 md:w-2/3 lg:w-1/2 py-3 px-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
     />
-    } @if(clientType === 'PJ'){
+    @if(cpfCnpj && !cpfCnpjValido){
+
+     <div class="flex items-start gap-1 text-xs">
+      <span
+        class="inline-flex items-center gap-1 px-2 py-1 rounded-md
+               bg-red-50 dark:bg-red-900/30
+               text-red-700 dark:text-red-300
+               border border-red-200 dark:border-red-800 font-medium tracking-wide"
+        role="alert" aria-live="polite"
+      >
+        <i class="pi pi-exclamation-triangle text-red-500 text-sm"></i>
+        CPF inválido
+      </span>
+    </div>
+    } }
+
+    <!-- CNPJ -->
+    @if(clientType === 'PJ'){
     <input
       type="text"
       pInputText
@@ -38,16 +56,29 @@
       [disabled]="!clientType"
       class="w-full sm:w-3/4 md:w-2/3 lg:w-1/2 py-3 px-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
     />
-    }
+    @if(cpfCnpj && !cpfCnpjValido){
+    <div class="flex items-start gap-1 text-xs">
+      <span
+        class="inline-flex items-center gap-1 rounded-md
+               bg-red-50 dark:bg-red-900/30
+               text-red-700 dark:text-red-300
+               border border-red-200 dark:border-red-800 font-medium tracking-wide"
+        role="alert" aria-live="polite"
+      >
+        <i class="pi pi-exclamation-triangle text-red-500 text-sm"></i>
+        CNPJ inválido
+      </span>
+    </div>
+    } }
 
     <!-- Botão de consulta -->
     <div class="w-full sm:w-3/4 md:w-2/3 lg:w-1/2 flex justify-center">
       <p-button
         icon="pi pi-search"
-        (onClick)="consultClient(); registerNewClient()"
+        (onClick)="consultClient()"
         label="Consultar Cliente"
         severity="info"
-        [disabled]="!cpfCnpj || !clientType"
+        [disabled]="!clientType || !cpfCnpjValido"
         class="w-full sm:w-auto"
       />
     </div>
@@ -92,7 +123,7 @@
           </span>
         </div>
 
-        <!-- Tipo do Plano -->
+        <!-- CPF/CNPJ -->
         <div class="min-w-[8rem] text-center text-left lg:text-center">
           <span
             class="text-[11px] text-center text-gray-400 uppercase tracking-wider mb-1 block"
@@ -224,7 +255,6 @@
   [style]="{ width: '40rem', height: '70vh' }"
 >
   @if(viewContractsDialog){
-
   <ng-container>
     <app-view-contracts
       [clientData]="dataClient"
@@ -277,8 +307,8 @@
           >
             {{
               clientType === "PJ"
-                ? dataClient[0]?.cnpj
-                : (dataClient[0]?.cpf | cpfCnpj)
+                ? dataClient[0]?.cnpj || " - "
+                : (dataClient[0]?.cpf || " - " | cpfCnpj)
             }}
           </span>
         </div>
@@ -291,7 +321,7 @@
           <span
             class="text-base text-slate-900 font-medium md:text-left text-center truncate"
           >
-            {{ dataClient[0]?.mobilePhone | phones }}
+            {{ dataClient[0]?.mobilePhone || " - " | phones }}
           </span>
         </div>
         <!-- Endereço -->
