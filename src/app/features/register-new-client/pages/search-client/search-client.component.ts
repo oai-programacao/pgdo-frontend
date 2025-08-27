@@ -298,5 +298,4 @@ export class SearchClientComponent implements OnInit, OnDestroy {
     if (this.clientType === 'PJ') return this.validarCnpj(this.cpfCnpj);
     return false;
   }
-   
 }
