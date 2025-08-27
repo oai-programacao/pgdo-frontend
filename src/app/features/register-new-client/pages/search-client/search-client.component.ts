@@ -51,7 +51,7 @@ import { CreateRequestOfferComponent } from "../../../offers/components/create-r
     CpfCnpjPipe,
     FieldsetModule,
     TableModule,
-    ShowOffersListComponent,
+    // ShowOffersListComponent,
     CreateRequestOfferComponent,
   ],
   templateUrl: "./search-client.component.html",
@@ -256,5 +256,46 @@ export class SearchClientComponent implements OnInit, OnDestroy {
           console.error(e);
         },
       });
+  }
+
+  validarCPF(cpf: string): boolean {
+    if (!cpf) return false;
+    cpf = cpf.replace(/\D/g, '');
+
+    // tamanho e todos dígitos iguais
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+
+    let soma = 0, peso = 10;
+    for (let i = 0; i < 9; i++) soma += parseInt(cpf[i], 10) * peso--;
+    const digito1 = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+
+    soma = 0; peso = 11;
+    for (let i = 0; i < 10; i++) soma += parseInt(cpf[i], 10) * peso--;
+    const digito2 = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+
+    return cpf[9] === String(digito1) && cpf[10] === String(digito2);
+  }
+
+  validarCnpj(cnpj: string): boolean {
+    if (!cnpj) return false;
+    cnpj = cnpj.replace(/\D/g, '');
+    if (cnpj.length !== 14 || /^(\d)\1+$/.test(cnpj)) return false;
+
+    const peso1 = [5,4,3,2,9,8,7,6,5,4,3,2];
+    const peso2 = [6,5,4,3,2,9,8,7,6,5,4,3,2];
+
+    let soma = peso1.reduce((acc, val, i) => acc + parseInt(cnpj[i],10) * val, 0);
+    const digito1 = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+
+    soma = peso2.reduce((acc, val, i) => acc + parseInt(cnpj[i],10) * val, 0);
+    const digito2 = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+
+    return cnpj[12] === String(digito1) && cnpj[13] === String(digito2);
+  }
+
+  get cpfCnpjValido(): boolean {
+    if (this.clientType === 'PF') return this.validarCPF(this.cpfCnpj);
+    if (this.clientType === 'PJ') return this.validarCnpj(this.cpfCnpj);
+    return false;
   }
 }
