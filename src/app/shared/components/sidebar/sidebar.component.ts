@@ -24,11 +24,14 @@ import {
 } from "@angular/animations"; // Para animações
 import { MenuItem } from "../../../interfaces/menu-item.model";
 import { AuthenticatedUser } from "../../../core/auth/auth.model";
+import { BadgeModule } from 'primeng/badge';
+import { TooltipModule } from 'primeng/tooltip';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: "app-sidebar",
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, BadgeModule, TooltipModule, DialogModule],
   templateUrl: "./sidebar.component.html",
   styleUrls: ["./sidebar.component.scss"],
   animations: [
@@ -67,8 +70,17 @@ export class SidebarComponent implements OnInit {
   public authService = inject(AuthService);
   public visibleMenuItems$!: Observable<MenuItem[]>;
 
+  updateDialogVisible: boolean = false;
+
   // Rastreia o estado de expansão dos submenus pelo ID do item pai
   public submenuExpandedState: { [itemId: string]: boolean } = {};
+
+updates = [
+  { title: 'Nova funcionalidade', description: 'Adicionamos suporte a Dark Mode.', date: new Date('2025-09-01'), type: 'feature' },
+  { title: 'Correção de bug', description: 'Login com usuários externos corrigido.', date: new Date('2025-08-30'), type: 'bug' },
+  { title: 'Melhoria de performance', description: 'Dashboard carregando 30% mais rápido.', date: new Date('2025-08-28'), type: 'improvement' },
+  { title: 'Atualização de design', description: 'Nova paleta de cores e fontes.', date: new Date('2025-08-25'), type: 'feature' }
+];
 
   ngOnInit(): void {
     this.visibleMenuItems$ = this.authService.currentUser$.pipe(
@@ -192,5 +204,9 @@ export class SidebarComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  openUpdateDialog(): void {
+    this.updateDialogVisible = true;
   }
 }

@@ -197,7 +197,7 @@ ngOnInit(): void {
       distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
       takeUntil(this.destroy$)
     ).subscribe(() => {
-      this.first = 0; // Reseta para a primeira página ao filtrar
+      this.first = 0; 
       this.updateUrl();
     });
   }
