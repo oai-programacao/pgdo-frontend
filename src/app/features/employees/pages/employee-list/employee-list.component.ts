@@ -72,6 +72,7 @@ export class EmployeeListComponent implements OnInit {
     { label: "CDS", value: EmployeeRole.CDS },
     { label: "Call Center", value: EmployeeRole.CALL_CENTER },
     { label: "Manutenção", value: EmployeeRole.MAINTENANCE },
+    { label: "Torre", value: EmployeeRole.TOWER }
   ];
   selectedRole: EmployeeRole | null = null;
 

@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { CreateManyAvailableOffersDto, ViewOfferDto } from '../../../interfaces/offers.model';
 import { City, Period, TypeOfOs } from '../../../interfaces/enums.model';
 import { environment } from '../../../../environments/environment';
@@ -11,7 +11,8 @@ import { environment } from '../../../../environments/environment';
 export class AdminOffersService {
   private http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl + '/admin/offers';
-
+  private refreshOffersSubject = new Subject<void>();
+  public refreshOffers$ = this.refreshOffersSubject.asObservable();
   createAvailableOffer(offer: CreateManyAvailableOffersDto): Observable<ViewOfferDto> {
     return this.http.post<ViewOfferDto>(`${this.apiUrl}`, offer);
   }
@@ -40,5 +41,9 @@ export class AdminOffersService {
       .set('date', date);
 
     return this.http.delete<void>(this.apiUrl, { params });
+  }
+    refreshOffers(): void {
+    console.log("[AdminOffersService] Disparando evento de refresh das ofertas");
+    this.refreshOffersSubject.next();
   }
 }

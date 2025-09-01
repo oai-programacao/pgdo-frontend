@@ -1,6 +1,6 @@
-import { webSocket } from 'rxjs/webSocket';
 import { CommonModule, DatePipe } from "@angular/common";
 import {
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   inject,
@@ -36,8 +36,9 @@ import {
 import { CreateManyAvailableOffersDto } from "../../../../interfaces/offers.model";
 import { TooltipModule } from "primeng/tooltip";
 import { AuthService } from "../../../../core/auth/auth.service";
-import { AudioUnlockService } from "../../../../core/audio/audio-unlock.service";
-import { WsService } from '../../../../core/sse/sse.service';
+import { WsService } from "../../../../core/websocket/ws.service";
+
+
 
 @Component({
   selector: "app-offers-list",
@@ -49,7 +50,6 @@ import { WsService } from '../../../../core/sse/sse.service';
     FormsModule,
     ReactiveFormsModule,
     DatePickerModule,
-    SelectModule,
     InputNumberModule,
     DialogModule,
     ToastModule,
@@ -59,23 +59,20 @@ import { WsService } from '../../../../core/sse/sse.service';
   ],
   templateUrl: "./offers-list.component.html",
   styleUrl: "./offers-list.component.scss",
-   providers: [ MessageService,ConfirmationService, DatePipe],
+  providers: [MessageService, ConfirmationService, DatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush, // Otimização de performance
 })
 export class OffersListComponent implements OnInit, OnDestroy {
   private offersService = inject(OffersService);
   private adminOffersService = inject(AdminOffersService);
   private fb = inject(FormBuilder);
   private messageService = inject(MessageService);
-  // private sseService = inject(SseService);
-  private webSocketService = inject(WsService);
-  private datePipe = inject(DatePipe);
   private cdRef = inject(ChangeDetectorRef);
-private authService = inject(AuthService);
-  private audioUnlockService = inject(AudioUnlockService);
-  private sseSubscription?: Subscription;
-  private notificationSubscription?: Subscription;
+  private authService = inject(AuthService);
+  private wsService = inject(WsService);
+
+  private subscriptions = new Subscription();
   private pollingSubscription?: Subscription;
-  private lastOffersSnapshot: any[] = [];
 
   cities = [
     { label: "Todas as Cidades", value: null },
@@ -131,60 +128,24 @@ private authService = inject(AuthService);
     this.loadRequestedOffers();
     this.initCreateOfferForm();
 
-    this.subscribeToRealtimeUpdates();
-
-    this.notificationSubscription = this.offersService.notification$.subscribe(
-      (event) => {
-        if (event) {
-          this.messageService.add({
-            severity: "info",
-            summary: "Nova Solicitação",
-           detail: `Nova oferta: ${this.formattedTypeOfOs(event.typeOfOs)} em ${this.formattedCity(event.city)} (${this.formattedPeriod(event.period)}) - ${event.date ?? ""}`,
-            life: 5000,
-          });
-          this.loadRequestedOffers();
-          this.cdRef.detectChanges();
-        }
-      }
+    this.subscriptions.add(
+      this.adminOffersService.refreshOffers$.subscribe(() => {
+        console.log(
+          "[OffersListComponent] Evento de refresh recebido. Recarregando ofertas..."
+        );
+        this.loadOffers();
+        this.loadRequestedOffers();
+        this.cdRef.detectChanges();
+      })
     );
-
-  this.pollingSubscription = interval(5000).subscribe(() => {
-      this.loadRequestedOffers();
-      this.loadOffers();
-    });
-    this.subscribeToRealtimeUpdates();
+    this.pollingSubscription = interval(1500).subscribe(() => { this.loadRequestedOffers(); this.loadOffers(); });
   }
 
   ngOnDestroy(): void {
-    if (this.sseSubscription) this.sseSubscription.unsubscribe();
-    if (this.pollingSubscription) this.pollingSubscription.unsubscribe();
-    if (this.notificationSubscription)
-      this.notificationSubscription.unsubscribe();
-  }
-
-   private checkForNewOffers() {
-    this.offersService
-      .getSummaryOffers(
-        this.selectedCity === null ? undefined : this.selectedCity,
-        this.selectedTypeOfOs === null ? undefined : this.selectedTypeOfOs,
-        this.selectedPeriod === null ? undefined : this.selectedPeriod
-      )
-      .subscribe({
-        next: (offers) => {
-          if (
-            offers.length > this.lastResquestedOffersCount &&
-            this.audioUnlockService.canPlayAudio()
-          ) {
-            if (this.isAdmin()) {
-              this.playNotificationSound();
-            }
-          }
-
-        },
-        error: (e) => {
-          console.log(e);
-        },
-      });
+    console.log(
+      "[OffersListComponent] ngOnDestroy: Limpando subscriptions específicas do componente."
+    );
+    this.subscriptions.unsubscribe();
   }
 
   notifyAllPendingRequests(): void {
@@ -225,6 +186,7 @@ private authService = inject(AuthService);
         },
       });
   }
+
   private initCreateOfferForm() {
     this.createOffersForm = this.fb.group({
       typeOfOs: [null, Validators.required],
@@ -235,26 +197,15 @@ private authService = inject(AuthService);
     });
   }
 
-  private subscribeToRealtimeUpdates(): void {
-    this.sseSubscription = this.webSocketService.notificationEvents$.subscribe(
-      (notification) => {
-        if (this.isAdmin()) {
-
-             }
-        this.loadRequestedOffers();
-        this.loadOffers();
-      }
-    );
-  }
-
-    isAdmin(): boolean {
-    // Ajuste conforme sua estrutura de usuário
+  isAdmin(): boolean {
+    const user = this.authService.currentUserSubject.value;
     return (
       this.authService.isAuthenticated() &&
-      Array.isArray(this.authService.currentUserSubject.value?.roles) &&
-      this.authService.currentUserSubject.value?.roles.includes("ROLE_ADMIN")
+      Array.isArray(user?.roles) &&
+      user.roles.includes("ROLE_ADMIN")
     );
   }
+
   loadOffers() {
     this.isLoading = true;
     this.offersService
@@ -266,12 +217,13 @@ private authService = inject(AuthService);
       .subscribe({
         next: (offers) => {
           this.offers = offers;
-          this.lastOffersSnapshot = offers;
           this.isLoading = false;
+          this.cdRef.detectChanges(); // Força a detecção de mudanças
         },
         error: (error) => {
           console.error("Erro ao carregar ofertas:", error);
           this.isLoading = false;
+          this.cdRef.detectChanges(); // Força a detecção de mudanças
         },
       });
   }
@@ -283,25 +235,25 @@ private authService = inject(AuthService);
         next: (offers) => {
           if (
             offers.length > this.lastResquestedOffersCount &&
-            !this.isInitialLoad
+            !this.isInitialLoad &&
+            this.isAdmin()
           ) {
-            if (this.isAdmin()) {
-               this.messageService.add({
+            this.messageService.add({
               severity: "info",
               summary: "Nova Solicitação",
               detail: "Uma nova oferta foi criada!",
-                life: 3000
+              life: 3000,
             });
-              this.playNotificationSound();
-            }
+            this.playNotificationSound();
           }
           this.requestedOffers = offers;
           this.lastResquestedOffersCount = offers.length;
           this.isInitialLoad = false;
-        
+          this.cdRef.detectChanges(); // Força a detecção de mudanças
         },
         error: (error) => {
           console.error("Erro ao carregar ofertas solicitadas:", error);
+          this.cdRef.detectChanges(); // Força a detecção de mudanças
         },
       });
   }
@@ -367,55 +319,39 @@ private authService = inject(AuthService);
       });
   }
 
-  acceptOffer(offerId: string): void {
-     this.adminOffersService.acceptOffer(offerId).subscribe({
-      next: (updatedOffer) => {
-        this.messageService.add({
-          severity: "success",
-          summary: "Sucesso",
-          detail: "Oferta aceita com sucesso!",
-          life: 4000,
-        });
-        this.playNotificationSound();
-        this.loadRequestedOffers(); // Recarrega a lista de ofertas solicitadas
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: "error",
-          summary: "Erro",
-          detail: "Falha ao aceitar oferta.",
-          life: 4000,
-        });
-        console.error(err);
-      },
+  acceptOffer(offerId: string) {
+    
+    this.wsService.acceptOffer(offerId);
+
+    this.messageService.add({
+      severity: "success",
+      summary: "Sucesso",
+      detail: "Oferta aceita com sucesso!",
+      life: 4000,
     });
+
+    this.playNotificationSound();
+    this.loadRequestedOffers();
   }
- playNotificationSound() {
-    const audio = new Audio("/livechat-129007.mp3"); // ajuste o caminho conforme seu arquivo
+
+  rejectOffer(offerId: string) {
+    this.wsService.rejectOffer(offerId);
+
+    this.messageService.add({
+      severity: "info",
+      summary: "Sucesso",
+      detail: "Oferta rejeitada com sucesso!",
+      life: 4000,
+    });
+
+    this.loadRequestedOffers();
+  }
+
+  playNotificationSound() {
+    const audio = new Audio("/closeoff.mp3");
     audio
       .play()
-      .then()
       .catch((e) => console.error("Erro ao reproduzir notificação sonora", e));
-  }
-  rejectOffer(offerId: string): void {
-    this.adminOffersService.rejectOffer(offerId).subscribe({
-      next: (updatedOffer) => {
-        this.messageService.add({
-          severity: "info",
-          summary: "Sucesso",
-          detail: "Oferta rejeitada com sucesso!",
-        });
-        this.loadRequestedOffers();
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: "error",
-          summary: "Erro",
-          detail: "Falha ao rejeitar oferta.",
-        });
-        console.error(err);
-      },
-    });
   }
 
   showCreateDialog(): void {
@@ -442,7 +378,9 @@ private authService = inject(AuthService);
         this.messageService.add({
           severity: "success",
           summary: "Sucesso",
-          detail: `${createdOffers.length} ofertas foram criadas!`,
+          detail: `${
+            Array.isArray(createdOffers) ? createdOffers.length : "Ofertas"
+          } ofertas foram criadas!`,
         });
         this.isSubmitting = false;
         this.displayCreateDialog = false;
@@ -460,69 +398,22 @@ private authService = inject(AuthService);
     });
   }
 
-  get formattedPeriod() {
-    return (period: Period | null) => {
-      if (!period) return "Todos os Períodos";
-      switch (period) {
-        case "MORNING":
-          return "Manhã";
-        case "AFTERNOON":
-          return "Tarde";
-        case "NIGHT":
-          return "Noite";
-        default:
-          return period;
-      }
-    };
+  // ✅ Métodos de formatação corrigidos (métodos normais, não getters)
+  formattedPeriod(period: Period | null): string {
+    if (!period) return "Todos os Períodos";
+    const found = this.periods.find((p) => p.value === period);
+    return found ? found.label : period;
   }
 
-  get formattedTypeOfOs() {
-    return (typeOfOs: TypeOfOs | null) => {
-      if (!typeOfOs) return "Todos os Tipos de OS";
-      switch (typeOfOs) {
-        case TypeOfOs.INSTALLATION:
-          return "Instalação";
-        case TypeOfOs.CHANGE_OF_ADDRESS:
-          return "Mudança de Endereço";
-        case TypeOfOs.TECHNICAL_VISIT:
-          return "Visita Técnica";
-        case TypeOfOs.MAINTENANCE:
-          return "Manutenção";
-        case TypeOfOs.KIT_REMOVAL:
-          return "Retirada de Kit";
-        case TypeOfOs.CHANGE_OF_TECHNOLOGY:
-          return "Mudança de Tecnologia";
-        case TypeOfOs.TECHNICAL_VIABILITY:
-          return "Viabilidade Técnica";
-        case TypeOfOs.PROJECTS:
-          return "Projetos";
-        case TypeOfOs.INTERNAL:
-          return "Interno";
-        default:
-          return typeOfOs;
-      }
-    };
+  formattedTypeOfOs(typeOfOs: TypeOfOs | null): string {
+    if (!typeOfOs) return "Todos os Tipos de OS";
+    const found = this.typesOfOs.find((t) => t.value === typeOfOs);
+    return found ? found.label : typeOfOs;
   }
 
-  get formattedCity() {
-    return (city: City | null) => {
-      if (!city) return "Todas as Cidades";
-      switch (city) {
-        case City.ASSIS:
-          return "Assis";
-        case City.CANDIDO_MOTA:
-          return "Cândido Mota";
-        case City.PALMITAL:
-          return "Palmital";
-        case City.ECHAPORA:
-          return "Echaporã";
-        case City.IBIRAREMA:
-          return "Ibirarema";
-        case City.OSCAR_BRESSANE:
-          return "Oscar Bressane";
-        default:
-          return city;
-      }
-    };
+  formattedCity(city: City | null): string {
+    if (!city) return "Todas as Cidades";
+    const found = this.cities.find((c) => c.value === city);
+    return found ? found.label : city;
   }
 }

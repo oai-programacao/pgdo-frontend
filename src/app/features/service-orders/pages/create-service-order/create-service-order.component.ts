@@ -24,7 +24,7 @@ import { City, ClientTypeLabels, CommandAreaLabels, OfferStatus, PeriodLabels, T
 import { CreateServiceOrderDto } from '../../../../interfaces/service-order.model';
 import { ViewOfferDto } from '../../../../interfaces/offers.model';
 import { OffersService } from '../../../offers/services/offers.service';
-import { catchError, combineLatest, debounceTime, distinctUntilChanged, filter, map, Observable, of, shareReplay, startWith, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { Subject} from 'rxjs';
 import { ShowOffersListComponent } from "../../../offers/components/show-offers-list/show-offers-list.component";
 
 @Component({
@@ -312,11 +312,6 @@ export class CreateServiceOrderComponent implements OnInit, OnDestroy {
 
     this.serviceOrderService.create(dto).subscribe({
       next: (newOs) => {
-        this.messageService.add({
-          severity: "success",
-          summary: "Sucesso",
-          detail: `Ordem de Serviço #${ newOs.identificationNumber || newOs.id } criada!`, // Assumindo que newOs tem id ou identificationNumber
-        });
         this.isSubmitting = false;
         this.createOsForm.reset(); // Reseta o formulário após o sucesso
         this.resetDropdownOptions(); // Reseta os dropdowns após o sucesso
@@ -344,11 +339,6 @@ export class CreateServiceOrderComponent implements OnInit, OnDestroy {
   }
 
   onOfferCreated(createdOffer: ViewOfferDto): void {
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Oferta Criada',
-      detail: `Oferta para ${TypeOfOsLabels[createdOffer.typeOfOs]} em ${createdOffer.city} no período da ${PeriodLabels[createdOffer.period]} foi solicitada.`,
-    });
     this.displayCreateOfferModal = false;
   }
 

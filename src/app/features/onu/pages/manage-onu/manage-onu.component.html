@@ -113,6 +113,7 @@
       <tr>
         <th>Serial Number</th>
         <th>Modelo</th>
+        <th>Data de Criação</th>
         <th class="text-center">Sinal</th>
         <th class="text-center">Cor</th>
         <th class="text-center">Certificado</th>
@@ -123,6 +124,7 @@
       <tr>
         <td class="font-mono">{{ onu.serialNumber }}</td>
         <td>{{ onu.model }}</td>
+        <td>{{ onu.createdAt }}</td>
         <td class="text-center">
           <p-tag
             [value]="getSignalLabel(onu.signal)"
@@ -602,7 +604,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
             <div>
               <span class="text-slate-500">Responsável:</span>
-              {{ m.employee?.name || "-" }}
+              {{ m.employee.name || "-" }}
             </div>
             <div>
               <span class="text-slate-500">Problema:</span>

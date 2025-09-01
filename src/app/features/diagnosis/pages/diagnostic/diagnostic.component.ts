@@ -1,5 +1,4 @@
 import { Component, ElementRef, inject, ViewChild } from "@angular/core";
-import { UIChart } from "primeng/chart";
 import { DashboardChartComponent } from "../../../../shared/chart/dashboard-chart/dashboard-chart.component";
 import { DatePickerModule } from "primeng/datepicker";
 import { CommonModule } from "@angular/common";
@@ -24,7 +23,6 @@ import { ChartData, ChartOptions } from "chart.js";
 @Component({
   selector: "app-diagnostic",
   imports: [
-    UIChart,
     DashboardChartComponent,
     DatePickerModule,
     CommonModule,

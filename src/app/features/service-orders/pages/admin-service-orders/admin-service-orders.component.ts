@@ -108,8 +108,9 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
 
   technicians: ViewTechnicianDto[] = [];
   technicianOptions: { label: string; value: string | null }[] = [];
-  os: ViewServiceOrderDto[] = [];
-  expiredOs: ViewServiceOrderDto[] = [];
+  // os: ViewServiceOrderDto[] = [];
+  // expiredOs: ViewServiceOrderDto[] = [];
+  dataSource: ViewServiceOrderDto[] = [];
   expiredOsCount = 0;
   showingExpired = false;
   osGroup!: FormGroup;
@@ -118,6 +119,8 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   rows = 20;
   first = 0;
   hasObservation: boolean = false;
+  osExpired!: boolean;
+  
 
   selectedServiceOrder: ViewServiceOrderDto | null = null;
 
@@ -216,8 +219,9 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.initForms();
     this.initializeStateFromUrl();
     this.initTechnicians();
-    this.loadServiceOrders();
     this.loadExpiredOsCount();
+    this.loadServiceOrders();
+    
   }
 
   get orders(): FormArray {
@@ -227,6 +231,8 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   trackById(index: number, item: ViewServiceOrderDto): string {
     return item.id;
   }
+
+ 
 
   applyFilters(): void {
     this.first = 0;
@@ -261,8 +267,8 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
         if (!statuses || statuses.length === 0 || !statuses.includes(ServiceOrderStatus.EXECUTED)) {
           orders = orders.filter((os) => os.status !== ServiceOrderStatus.EXECUTED);
         }
-        this.os = orders;
-        this.totalRecords = this.os.length;
+        this.dataSource = orders; 
+        this.totalRecords = dataPage.page.totalElements;
         this.populateOrdersArray();
       },
       error: () =>
@@ -274,42 +280,68 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     });
 }
 
+  onTableLazyLoad(event: TableLazyLoadEvent) {
+  if (this.showingExpired) {
+    this.showExpiredOs(event);
+  } else {
+    this.loadServiceOrders(event);
+  }
+}
+
   private loadExpiredOsCount(): void {
-    this.serviceOrderService.getExpiredCliente().subscribe({
-      next: (result) => {
-        this.expiredOsCount = result?.page?.totalElements ?? 0;
-      },
-      error: (e) => {
-        console.log(e);
-      }
-    });
+    this.serviceOrderService.getExpiredCount().subscribe({
+      next: (response) => {
+      const countValue = response.Count;
+      this.expiredOsCount = countValue ?? 0;
+      this.cdr.detectChanges(); 
+    },
+    error: (e) => {
+      this.expiredOsCount = 0;
+      this.cdr.detectChanges();
+    }
+  });
   }
 
-  showExpiredOs(): void {
-    this.isLoading = true;
-    this.serviceOrderService.getExpiredCliente().subscribe({
-      next: (result) => {
-        this.os = result.content ?? [];
-        this.totalRecords = this.os.length;
-        this.populateOrdersArray();
-        this.showingExpired = true;
-        this.isLoading = false;
-      },
-      error: () => {
-        this.messageService.add({
-          severity: "error",
-          summary: "Erro",
-          detail: "Falha ao carregar OS expiradas.",
-        });
-        this.isLoading = false;
-      }
-    });
+showExpiredOs(event?: TableLazyLoadEvent): void {
+   if (!event) {
+    this.first = 0;
   }
+
+  this.isLoading = true;
+  this.showingExpired = true;
+
+  if (event) {
+    this.first = event.first ?? 0;
+    this.rows = event.rows ?? 20;
+  }
+
+  const page = Math.floor(this.first / this.rows);
+  this.updateUrlQueryParams();
+  this.pendingFirstValue = this.first;
+
+  this.serviceOrderService.getExpiredCliente(page, this.rows).subscribe({
+    next: (dataPage) => {
+      let expiredOrders = dataPage.content ?? [];
+      this.dataSource = dataPage.content ?? [];
+      this.totalRecords = dataPage.page.totalElements ?? 0;
+      this.populateOrdersArray();
+    },
+    error: () => {
+      this.isLoading = false;
+      this.messageService.add({
+        severity: "error",
+        summary: "Erro",
+        detail: "Falha ao carregar Ordens de Serviço Expiradas.",
+      });
+    }
+  });
+}
 
   showAllOs(): void {
-    this.showingExpired = false;
-    this.loadServiceOrders();
-  }
+  this.showingExpired = false;
+  this.first = 0;
+  this.loadServiceOrders();  
+}
 
 updateServiceOrder(index: number): void {
   const formGroup = this.orders.at(index) as FormGroup;
@@ -485,7 +517,7 @@ updateServiceOrder(index: number): void {
 
   private populateOrdersArray() {
     setTimeout(() => {
-      const serviceOrderGroups = this.os.map((order) =>
+      const serviceOrderGroups = this.dataSource.map((order) =>
         this.createServiceOrderGroup(order)
       );
       const newOrdersArray = this.fb.array(serviceOrderGroups);

@@ -8,6 +8,7 @@ export enum EmployeeRole {
     CALL_CENTER = "CALL_CENTER",
     MAINTENANCE = "MAINTENANCE",
     TECHNICIAN = "TECHNICIAN",
+    TOWER = "TOWER",
 }
 
 export interface ViewEmployeeDto {

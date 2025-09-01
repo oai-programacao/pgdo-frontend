@@ -10,9 +10,7 @@ import {
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
-import {
-  AuthService,
-} from "../../../core/auth/auth.service";
+import { AuthService } from "../../../core/auth/auth.service";
 import { Observable } from "rxjs";
 import { map, startWith } from "rxjs/operators";
 import {
@@ -24,11 +22,23 @@ import {
 } from "@angular/animations"; // Para animações
 import { MenuItem } from "../../../interfaces/menu-item.model";
 import { AuthenticatedUser } from "../../../core/auth/auth.model";
+import { BadgeModule } from "primeng/badge";
+import { TooltipModule } from "primeng/tooltip";
+import { DialogModule } from "primeng/dialog";
+import { SystemWarningService } from "../../../features/system-warnings/services/system-warning.service";
+import { ViewSystemWarningDto } from "../../../interfaces/system-warnings.model";
+import { ChangeDetectorRef } from "@angular/core";
 
 @Component({
   selector: "app-sidebar",
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    BadgeModule,
+    TooltipModule,
+    DialogModule,
+  ],
   templateUrl: "./sidebar.component.html",
   styleUrls: ["./sidebar.component.scss"],
   animations: [
@@ -63,30 +73,70 @@ export class SidebarComponent implements OnInit {
   @Input() appName: string = "Sua Aplicação";
 
   @Output() toggleCollapse = new EventEmitter<void>();
-
+  public systemWarning = inject(SystemWarningService);
   public authService = inject(AuthService);
+  public cdRef = inject(ChangeDetectorRef);
   public visibleMenuItems$!: Observable<MenuItem[]>;
+
+  updateDialogVisible: boolean = false;
 
   // Rastreia o estado de expansão dos submenus pelo ID do item pai
   public submenuExpandedState: { [itemId: string]: boolean } = {};
 
-  ngOnInit(): void {
-    this.visibleMenuItems$ = this.authService.currentUser$.pipe(
-      startWith(this.authService.currentUserSubject.getValue()),
-      map((user) => {
-        const filtered = this.filterAndPrepareMenuItems(
-          this.allMenuItems,
-          user
-        );
-        // Inicializa o estado de expansão para os itens filtrados que são pais
-        this.initializeSubmenuState(filtered);
-        return filtered;
-      })
-    );
+  updates: ViewSystemWarningDto[] = [];
+  newUpdatesCount = 0;
+
+ngOnInit(): void {
+  this.visibleMenuItems$ = this.authService.currentUser$.pipe(
+    startWith(this.authService.currentUserSubject.getValue()),
+    map((user) => {
+      const filtered = this.filterAndPrepareMenuItems(this.allMenuItems, user);
+      this.initializeSubmenuState(filtered);
+      return filtered;
+    })
+  );
+
+  this.systemWarning.getWarnings().subscribe({
+    next: (response) => {
+      this.updates = response.filter(u => u.isActive);
+
+      this.newUpdatesCount = this.calculateNewUpdates(this.updates);
+
+      this.cdRef.detectChanges(); 
+    },
+    error: (e) => console.log(e),
+  });
+}
+
+  private calculateNewUpdates(updates: ViewSystemWarningDto[]): number {
+    const now = Date.now();
+    const twoDaysInMs = 1000 * 60 * 60 * 48;
+
+    return updates.filter((u) => {
+      if (!u.createdAt) return false;
+
+      const createdAtStr = String(u.createdAt);
+      const [datePart, timePart] = createdAtStr.split(" ");
+      if (!datePart || !timePart) return false;
+
+      const [day, month, year] = datePart.split("/").map(Number);
+      const [hour, minute, second] = timePart.split(":").map(Number);
+
+      const createdAt = new Date(
+        year,
+        month - 1,
+        day,
+        hour,
+        minute,
+        second
+      ).getTime();
+
+      return now - createdAt <= twoDaysInMs;
+    }).length;
   }
-
-  trackById(index: number, item: MenuItem) { return item.id; }
-
+  trackById(index: number, item: MenuItem) {
+    return item.id;
+  }
 
   private initializeSubmenuState(items: MenuItem[]): void {
     items.forEach((item) => {
@@ -192,5 +242,9 @@ export class SidebarComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  openUpdateDialog(): void {
+    this.updateDialogVisible = true;
   }
 }

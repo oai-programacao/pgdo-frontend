@@ -217,19 +217,20 @@
     </form>
   </p-fieldset>
 
+
   <div *ngIf="!isLoading; else loadingTemplate">
     <form [formGroup]="osGroup" class="p-fluid">
       <p-table
         #dt
         [rowTrackBy]="trackById"
         dataKey="id"
-        [value]="os"
+        [value]="dataSource"
         [loading]="isLoading"
         styleClass="text-sm"
         [paginator]="true"
         [rows]="rows"
         [totalRecords]="totalRecords"
-        (onPage)="loadServiceOrders($event)"
+        (onPage)="onTableLazyLoad($event)"
         [lazy]="true"
         [rowsPerPageOptions]="[1, 20, 30, 50, 100]"
         stripedRows
@@ -399,7 +400,6 @@
     </form>
   </div>
 </div>
-
 <p-toast />
 
 <ng-template #loadingTemplate>
