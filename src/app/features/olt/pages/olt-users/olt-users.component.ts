@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ViewOltUserDto, OLTsLabels, CreateOltUserDto } from '../../../../interfaces/olt.model';
 import { OltService } from '../../services/olt.service';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule} from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
@@ -31,7 +31,6 @@ import { TagModule } from 'primeng/tag';
     TooltipModule,
     PasswordModule, 
     ConfirmDialogModule, 
-    DatePipe,
     TagModule
   ],
   templateUrl: './olt-users.component.html',

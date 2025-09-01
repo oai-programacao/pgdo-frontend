@@ -16,13 +16,12 @@ import {
   ValidatorFn,
   Validators,
 } from "@angular/forms";
-import { Observable, Subject, takeUntil } from "rxjs";
+import { Subject, takeUntil } from "rxjs";
 
 // PrimeNG Modules
 import { ButtonModule } from "primeng/button";
 import { MessagesModule } from "primeng/messages";
 import { MessageModule } from "primeng/message";
-import { ToastModule } from "primeng/toast"; // Para notificações
 import { MessageService } from "primeng/api";
 
 import { OffersService } from "../../services/offers.service"; // Ajuste o caminho
@@ -46,6 +45,7 @@ import {
 } from "../../../../interfaces/block-offers-request.model";
 import { DatePickerModule } from "primeng/datepicker";
 import { SelectModule } from "primeng/select";
+import { WsService } from "../../../../core/websocket/ws.service";
 
 interface DropdownOption<T> {
   label: string;
@@ -63,7 +63,6 @@ interface DropdownOption<T> {
     ButtonModule,
     MessagesModule,
     MessageModule,
-    ToastModule,
   ],
   templateUrl: "./create-request-offer.component.html",
   styleUrl: "./create-request-offer.component.scss",
@@ -71,9 +70,9 @@ interface DropdownOption<T> {
 })
 export class CreateRequestOfferComponent implements OnInit {
   private fb = inject(FormBuilder);
-  private offersService = inject(OffersService);
   private messageService = inject(MessageService);
   private blockOffersRequestService = inject(BlockOffersRequestService);
+  private wsService = inject(WsService);
 
   private destroy$ = new Subject<void>();
 
@@ -250,7 +249,6 @@ export class CreateRequestOfferComponent implements OnInit {
       return;
     }
 
-    this.isSubmitting = true;
     const formValues = this.createOfferForm.value;
 
     const dto: CreateOfferRequestDto = {
@@ -260,35 +258,9 @@ export class CreateRequestOfferComponent implements OnInit {
       date: formValues.date,
     };
 
-    this.offersService.createRequestOffer(dto).subscribe({
-      next: (createdOffer) => {
-        const audio = new Audio("/mixkit-software-interface-start-2574.wav");
-        audio.play();
-        this.messageService.add({
-          severity: "success",
-          summary: "Sucesso",
-          detail: "Oferta solicitada com sucesso!",
-        });
-        this.offerCreated.emit(createdOffer);
-        this.createOfferForm.reset();
-        // Você pode querer resetar para valores padrão específicos em vez de tudo para null
-        // this.initForm(); // Ou re-inicializar para limpar e aplicar defaults se houver
-        this.isSubmitting = false;
-      },
-      error: (err) => {
-        console.error("Erro ao criar oferta:", err);
-        const errorMessage =
-          err.error?.message ||
-          err.message ||
-          "Falha ao solicitar oferta. Tente novamente.";
-        this.messageService.add({
-          severity: "error",
-          summary: "Erro",
-          detail: errorMessage,
-        });
-        this.isSubmitting = false;
-      },
-    });
+    this.wsService.sendOfferRequest(dto);
+    this.isSubmitting = false;
+    this.offerCreated.emit();
   }
 
   onCancel(): void {

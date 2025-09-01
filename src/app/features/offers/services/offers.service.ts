@@ -1,20 +1,25 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { TypeOfOs, City, Period, OfferStatus } from '../../../interfaces/enums.model';
-import { CreateOfferRequestDto, ViewOfferDto } from '../../../interfaces/offers.model';
-import { environment } from '../../../../environments/environment';
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { inject, Injectable } from "@angular/core";
+import { BehaviorSubject, Observable } from "rxjs";
+import {
+  TypeOfOs,
+  City,
+  Period,
+  OfferStatus,
+} from "../../../interfaces/enums.model";
+import {
+  CreateOfferRequestDto,
+  ViewOfferDto,
+} from "../../../interfaces/offers.model";
+import { environment } from "../../../../environments/environment";
 
 @Injectable({
   providedIn: "root",
 })
 export class OffersService {
   private http = inject(HttpClient);
-  private readonly apiUrl = environment.apiUrl + "/offers";
 
-  createRequestOffer(offer: CreateOfferRequestDto): Observable<ViewOfferDto> {
-    return this.http.post<ViewOfferDto>(`${this.apiUrl}`, offer);
-  }
+  private readonly apiUrl = environment.apiUrl + "/offers";
 
   /**
    * Lista todas as ofertas com filtros opcionais.
@@ -58,9 +63,9 @@ export class OffersService {
   getSummaryOffers(
     city?: City,
     typeOfOs?: TypeOfOs,
-    period?: Period,
+    period?: Period
   ): Observable<any[]> {
-     let params = new HttpParams();
+    let params = new HttpParams();
 
     // Correção: Enviar o valor da chave do enum, não o índice numérico se TypeOfOs for um enum string.
     // Se TypeOfOs[typeOfOs] estiver funcionando, significa que o backend espera o nome da string do enum.
@@ -76,11 +81,4 @@ export class OffersService {
     return this.http.get<any[]>(`${this.apiUrl}/summary`, { params });
   }
 
-
-  private notificationSubject = new BehaviorSubject<any | null>(null);
-notification$ = this.notificationSubject.asObservable();
-
-emitNotification(event: any) {
-  this.notificationSubject.next(event);
-}
 }

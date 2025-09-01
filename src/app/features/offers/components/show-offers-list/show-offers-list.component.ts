@@ -1,4 +1,3 @@
-import { webSocket } from 'rxjs/webSocket';
 import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { OffersService } from "../../services/offers.service";
 import { City, Period, TypeOfOs } from "../../../../interfaces/enums.model";
@@ -6,9 +5,8 @@ import { TableModule } from "primeng/table";
 import { SelectModule } from "primeng/select";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { interval, Subject, Subscription } from "rxjs";
+import { Subject, Subscription } from "rxjs";
 import { MessageService } from "primeng/api";
-import { WsService } from '../../../../core/sse/sse.service';
 
 @Component({
   selector: "app-show-offers-list",
@@ -17,12 +15,8 @@ import { WsService } from '../../../../core/sse/sse.service';
   styleUrl: "./show-offers-list.component.scss",
   providers: [MessageService]
 })
-export class ShowOffersListComponent implements OnInit, OnDestroy {
+export class ShowOffersListComponent implements OnInit {
   private offersService = inject(OffersService);
-  private messageService = inject(MessageService);
-    // private sseService = inject(SseService);
-  private webSocketService = inject(WsService);
-  private notificationSubscription?: Subscription;
   isLoading = false;
   offers: any[] = [];
 
@@ -66,34 +60,10 @@ export class ShowOffersListComponent implements OnInit, OnDestroy {
   showDialogRequestedOffers$ = new Subject<boolean>();
   requestedOffers: any[] = [];
   private offersSubscription: any;
-  private pollingSubscription?: Subscription;
 
 
 ngOnInit(): void {
   this.loadOffers();
-
-  // Inscreva-se no SSE
-  if (this.webSocketService.notificationEvents$) {
-    this.sseSubscription = this.webSocketService.notificationEvents$.subscribe((data) => {
-      console.log("Notificação recebida no componente:", data);
-      this.loadOffers();
-      this.messageService.add({
-        severity: "info",
-        summary: "Nova oferta",
-        detail: `Nova oferta: ${this.formattedTypeOfOs(data.typeOfOs as TypeOfOs)} em ${this.formattedCity(data.city as City)} (${this.formattedPeriod(data.period as Period)}) - ${data.date}`,
-        life: 4000,
-      });
-    });
-  }
-
-  // Atualização periódica das ofertas
-  this.pollingSubscription = interval(5000).subscribe(() => {
-    this.loadOffers();
-  });
-}
-ngOnDestroy(): void {
-  this.sseSubscription?.unsubscribe();
-  this.pollingSubscription?.unsubscribe();
 }
 
   private loadOffers() {

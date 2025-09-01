@@ -10,8 +10,8 @@ export interface ViewSystemWarningDto {
     isActive: boolean;
     createdBy: string;
     updatedBy: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface UpdateSystemWarningDto {

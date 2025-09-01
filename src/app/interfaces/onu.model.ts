@@ -13,13 +13,11 @@ export const OnuSignalLabels: Record<OnuSignal, string> = {
 };
 
 export enum OnuColor {
-    YELLOW = 'YELLOW',
     WHITE = 'WHITE',
     BLACK = 'BLACK',
 }
 
 export const OnuColorLabels: Record<OnuColor, string> = {
-    [OnuColor.YELLOW]: 'Amarelada',
     [OnuColor.WHITE]: 'Branca',
     [OnuColor.BLACK]: 'Preta',
 };

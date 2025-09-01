@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import {
+  CountResponse,
   CreateServiceOrderDto,
   CreateServiceOrderHelperDto,
   CreateServiceOrderUnproductiveVisitDto,
@@ -14,7 +15,6 @@ import {
   ViewUnproductiveVisits,
 } from "../../../interfaces/service-order.model";
 import { environment } from "../../../../environments/environment";
-import { ViewEmployeeDto } from "../../../interfaces/employee.model";
 
 @Injectable({
   providedIn: "root",
@@ -150,15 +150,27 @@ export class ServiceOrderService {
     );
   }
 
-getExpiredCliente(): Observable<ServiceOrderPage> {
-  return this.http.get<ServiceOrderPage>(`${this.apiUrl}/status/expired`);
-}
-  patchTechnicianHelper(helperId: string, dto: CreateServiceOrderHelperDto): Observable<ViewTechnicalHelpDto> {
-    return this.http.patch<ViewTechnicalHelpDto>(`${this.apiUrl}/orderHelper/${helperId}`, dto);
+  patchTechnicianHelper(
+    helperId: string,
+    dto: CreateServiceOrderHelperDto
+  ): Observable<ViewTechnicalHelpDto> {
+    return this.http.patch<ViewTechnicalHelpDto>(
+      `${this.apiUrl}/orderHelper/${helperId}`,
+      dto
+    );
   }
 
-deleteTechnicianHelper(helperId: string): Observable<void> {
-  return this.http.delete<void>(`${this.apiUrl}/orderHelper/${helperId}`);
-}
+  deleteTechnicianHelper(helperId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/orderHelper/${helperId}`);
+  }
 
+  getExpiredCliente(page: number, size: number): Observable<ServiceOrderPage> {
+    return this.http.get<ServiceOrderPage>(
+      `${this.apiUrl}/status/expired?page=${page}&size=${size}`
+    );
+  }
+
+  getExpiredCount(): Observable<CountResponse> {
+    return this.http.get<CountResponse>(`${this.apiUrl}/status/expired/count`);
+  }
 }

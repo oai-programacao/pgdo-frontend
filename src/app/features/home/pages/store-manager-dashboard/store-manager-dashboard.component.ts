@@ -1,18 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ChartData, ChartOptions } from 'chart.js';
-import { CardWidgetComponent, WidgetTrend } from '../../../../shared/components/card-widget/card-widget.component';
+import { WidgetTrend } from '../../../../shared/components/card-widget/card-widget.component';
 import { CommonModule } from '@angular/common';
-import { DashboardChartComponent } from '../../../../shared/chart/dashboard-chart/dashboard-chart.component';
-import { ContentPanelComponent } from '../../../../shared/components/content-panel/content-panel.component';
 import { HomeBodyComponent } from "../../components/home-body/home-body.component";
 
 @Component({
   selector: "app-store-manager-dashboard",
   imports: [
-    CardWidgetComponent,
-    ContentPanelComponent,
+
     CommonModule,
-    DashboardChartComponent,
     HomeBodyComponent
 ],
   templateUrl: "./store-manager-dashboard.component.html",

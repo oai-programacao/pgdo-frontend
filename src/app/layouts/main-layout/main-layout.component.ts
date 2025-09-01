@@ -4,8 +4,7 @@ import { SidebarComponent } from "../../shared/components/sidebar/sidebar.compon
 import { CommonModule } from "@angular/common";
 import { AuthService } from "../../core/auth/auth.service";
 import { MenuItem } from "../../interfaces/menu-item.model";
-import { distinctUntilChanged, Subscription, tap } from "rxjs";
-import { WsService } from "../../core/sse/sse.service";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: "app-main-layout",
@@ -14,14 +13,11 @@ import { WsService } from "../../core/sse/sse.service";
   templateUrl: "./main-layout.component.html",
   styleUrls: ["./main-layout.component.scss"],
 })
-export class MainLayoutComponent implements OnInit, OnDestroy {
+export class MainLayoutComponent implements OnDestroy {
   isSidebarCollapsed = false;
 
   private authService = inject(AuthService);
-  // private sseService = inject(SseService);
-  private webSocketService = inject(WsService);
   private authStateSubscription?: Subscription;
-
   menuItems: MenuItem[] = [
     {
       id: "home",
@@ -40,6 +36,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         "ROLE_USER",
         "ROLE_STORE_EMPLOYEE",
         "ROLE_CDS",
+        "ROLE_TOWER"
       ],
       expanded: false, // Estado inicial do submenu (opcional)
       children: [
@@ -87,6 +84,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
             "ROLE_ADMIN",
             "ROLE_STORE_MANAGER",
             "ROLE_STORE_EMPLOYEE",
+            "ROLE_TOWER"
           ],
         },
       ],
@@ -101,6 +99,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         "ROLE_STORE_MANAGER",
         "ROLE_STORE_EMPLOYEE",
         "ROLE_CDS",
+        "ROLE_TOWER"
       ],
       expanded: false,
       children: [
@@ -109,7 +108,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           label: "Colaboradores",
           icon: "pi pi-users",
           route: "/app/colaboradores",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_ANALYST"], // Papéis para ver o item "Colaboradores"
+          allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_ANALYST","ROLE_TOWER"],
           exactMatch: true,
         },
         {
@@ -122,6 +121,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
             "ROLE_STORE_MANAGER",
             "ROLE_ANALYST",
             "ROLE_CDS",
+            "ROLE_TOWER"
           ],
           exactMatch: true,
         },
@@ -136,6 +136,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
             "ROLE_STORE_MANAGER",
             "ROLE_ANALYST",
             "ROLE_CDS",
+            "ROLE_TOWER"
           ],
         },
       ],
@@ -151,6 +152,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         "ROLE_STORE_MANAGER",
         "ROLE_STORE_EMPLOYEE",
         "ROLE_CDS",
+        "ROLE_TOWER"
       ], // Papéis para ver o item "Ordens de Serviço"
       expanded: false, // Estado inicial do submenu (opcional)
       children: [
@@ -173,7 +175,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           label: "Gerenciar OS",
           icon: "pi pi-calendar",
           route: "/app/ordens-de-servico/gerenciar",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST", "ROLE_CDS"],
+          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST", "ROLE_CDS","ROLE_TOWER"],
           exactMatch: true,
         },
         {
@@ -181,7 +183,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           label: "Gerenciar Ofertas",
           icon: "pi pi-envelope",
           route: "/app/ordens-de-servico/ofertas",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST"],
+          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST","ROLE_TOWER"],
           exactMatch: true,
         },
         {
@@ -189,7 +191,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           label: "Bloqueio de Ofertas",
           icon: "pi pi-ban",
           route: "/app/ordens-de-servico/bloqueio-ofertas",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST"],
+          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST","ROLE_TOWER"],
           exactMatch: true,
         },
         {
@@ -197,7 +199,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           label: "Automação de Ofertas",
           icon: "pi pi-lightbulb",
           route: "/app/ordens-de-servico/automacao",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST"],
+          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST","ROLE_TOWER"],
           exactMatch: true,
         },
         {
@@ -210,6 +212,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
             "ROLE_STORE_MANAGER",
             "ROLE_ANALYST",
             "ROLE_CDS",
+            "ROLE_TOWER"
           ],
         },
       ],
@@ -265,6 +268,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         "ROLE_MAINTENANCE",
         "ROLE_CDS",
         "ROLE_CALL_CENTER",
+        "ROLE_TOWER"
       ],
       expanded: false,
       children: [
@@ -287,7 +291,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           label: "Usuários de OLT",
           icon: "pi pi-users",
           route: "/app/olt/usuarios",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST"],
+          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST","ROLE_TOWER"],
           exactMatch: true,
         },
       ],
@@ -302,6 +306,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         "ROLE_MAINTENANCE",
         "ROLE_ANALYST",
         "ROLE_CDS",
+        "ROLE_TOWER"
       ],
     },
     {
@@ -322,7 +327,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
           label: "Gerenciar Chamados",
           icon: "pi pi-sliders-h",
           route: "/app/chamados/gerenciar",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST", "ROLE_MAINTENANCE"],
+          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST", "ROLE_MAINTENANCE", "ROLE_TOWER"],
           exactMatch: true,
         },
       ],
@@ -337,10 +342,10 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     // },
     {
       id: "system-warnings",
-      label: "Avisos do Sistema",
+      label: "Atualizações do Sistema",
       icon: "pi pi-exclamation-triangle",
       route: "/app/avisos",
-      allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_ANALYST"],
+      allowedRoles: ["ROLE_ADMIN"],
     },
     // Diagnósticos
     {
@@ -348,7 +353,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       label: "Diagnósticos",
       icon: "pi pi-chart-bar",
       route: "/app/diagnosticos",
-      allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_ANALYST"],
+      allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_ANALYST", "ROLE_TOWER"],
     },
     {
       id: "settings",
@@ -357,23 +362,6 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       route: "/app/configuracoes",
     },
   ];
-
-  ngOnInit(): void {
-    // Ouve as mudanças no estado do usuário
-    this.authStateSubscription = this.authService.currentUser$.subscribe(
-      (user) => {
-        if (user) {
-          // Se há um usuário, conecta o WebSocket
-          console.log("User logged in, connecting to WebSocket...");
-          this.webSocketService.connect();
-        } else {
-          // Se não há usuário (logout), desconecta o WebSocket
-          console.log("User logged out, disconnecting from WebSocket...");
-          this.webSocketService.disconnect();
-        }
-      }
-    );
-  }
 
   ngOnDestroy(): void {
     // Limpa a inscrição para evitar memory leaks

@@ -69,6 +69,10 @@ export interface CreateServiceOrderDto {
   technology?: Technology;
 }
 
+export interface CountResponse {
+  Count: number;
+}
+
 export interface UpdateServiceOrderDto {
   period?: Period;
   scheduleDate?: string | undefined;

@@ -18,19 +18,16 @@ import {
 } from "@angular/forms";
 import { DatePickerModule } from "primeng/datepicker";
 import { TextareaModule } from "primeng/textarea";
-import { FloatLabel } from "primeng/floatlabel";
 import { SignaturePadComponent } from "../../../../shared/components/signature-pad/signature-pad.component";
 import { InputNumberModule } from "primeng/inputnumber";
 import { ViaCepService } from "../../../../service/viacep.service";
 import { RegisterClientService } from "../../services/register-client.service";
 import { NgxMaskDirective, provideNgxMask } from "ngx-mask";
 import { ToastModule } from "primeng/toast";
-import { GoogleMapsComponent } from "../../../../shared/components/google-maps/google-maps.component";
 import { IconFieldModule } from "primeng/iconfield";
 import { InputIconModule } from "primeng/inputicon";
 import { FileUpload } from "primeng/fileupload"; // Importe o FileUpload
 import { FileUploadModule } from "primeng/fileupload";
-import { SearchClientComponent } from "../search-client/search-client.component";
 import { ClientSharedService } from "../../services/client-shared.service";
 import { Router } from "@angular/router";
 import { ConfirmPopupModule } from "primeng/confirmpopup";
@@ -51,16 +48,12 @@ import { Subject } from "rxjs";
     SelectModule,
     DatePickerModule,
     TextareaModule,
-    FloatLabel,
-    SignaturePadComponent,
     InputNumberModule,
     NgxMaskDirective,
     ToastModule,
-    GoogleMapsComponent,
     IconFieldModule,
     InputIconModule,
     FileUploadModule,
-    SearchClientComponent,
     ConfirmPopupModule,
     DialogModule,
   ],

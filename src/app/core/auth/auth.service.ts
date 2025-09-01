@@ -11,9 +11,15 @@ import {
   take,
 } from "rxjs/operators";
 import { Router } from "@angular/router";
-import { jwtDecode, JwtPayload } from "jwt-decode";
-import { AuthenticatedUser, CustomJwtPayload, LoginDto, LoginResponseDto } from "./auth.model";
+import { jwtDecode } from "jwt-decode";
+import {
+  AuthenticatedUser,
+  CustomJwtPayload,
+  LoginDto,
+  LoginResponseDto,
+} from "./auth.model";
 import { environment } from "../../../environments/environment";
+import { WsService } from "../websocket/ws.service";
 
 const ACCESS_TOKEN_KEY = "pgdo_access_token";
 const REFRESH_TOKEN_KEY = "pgdo_refresh_token";
@@ -24,7 +30,7 @@ const REFRESH_TOKEN_KEY = "pgdo_refresh_token";
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private apiUrl = environment.apiUrl + '/auth';
+  private apiUrl = environment.apiUrl + "/auth";
 
   public currentUserSubject = new BehaviorSubject<AuthenticatedUser | null>(
     this.getUserFromToken()
@@ -38,8 +44,8 @@ export class AuthService {
   private tokenRefreshed$ = new BehaviorSubject<boolean | null>(null);
   private tokenExpirationTimer: any = null; // Para nosso "despertador"
 
-  constructor() {
-     // Ao iniciar o serviço, verifica se há um token válido e agenda o refresh
+  constructor(private wsService: WsService) {
+    // Ao iniciar o serviço, verifica se há um token válido e agenda o refresh
     const initialUser = this.currentUserSubject.getValue();
     if (initialUser) {
       this.scheduleProactiveRefresh(this.getAccessToken()!);
@@ -93,13 +99,16 @@ export class AuthService {
       .pipe(
         tap((response) => {
           this.storeTokensAndScheduleRefresh(response);
-          this.currentUserSubject.next(this.getUserFromToken()); // Atualiza com o usuário decodificado
+          this.currentUserSubject.next(this.getUserFromToken());
+
+          // Ativar WebSocket após login bem-sucedido
+          this.wsService.initWebSocket();
         }),
-        catchError(this.handleError) // handleError precisa ser ajustado para não deslogar em erro de login
+        catchError(this.handleError)
       );
   }
 
-   refreshToken(): Observable<LoginResponseDto> {
+  refreshToken(): Observable<LoginResponseDto> {
     const currentRefreshToken = this.getRefreshToken();
     if (!currentRefreshToken) {
       this.logout();
@@ -108,28 +117,37 @@ export class AuthService {
 
     if (this.isRefreshingToken) {
       return this.tokenRefreshed$.pipe(
-        filter(result => result !== null),
+        filter((result) => result !== null),
         take(1),
-        switchMap(success => success ? this.createTokenResponseFromStorage() : throwError(() => new Error("Failed refresh attempt.")))
+        switchMap((success) =>
+          success
+            ? this.createTokenResponseFromStorage()
+            : throwError(() => new Error("Failed refresh attempt."))
+        )
       );
     }
 
     this.isRefreshingToken = true;
     this.tokenRefreshed$.next(null);
 
-    return this.http.post<LoginResponseDto>(`${this.apiUrl}/refresh`, { refreshToken: currentRefreshToken })
+    return this.http
+      .post<LoginResponseDto>(`${this.apiUrl}/refresh`, {
+        refreshToken: currentRefreshToken,
+      })
       .pipe(
-        tap(response => {
+        tap((response) => {
           this.storeTokensAndScheduleRefresh(response);
           this.currentUserSubject.next(this.getUserFromToken());
           this.isRefreshingToken = false;
           this.tokenRefreshed$.next(true);
         }),
-        catchError(err => {
+        catchError((err) => {
           this.isRefreshingToken = false;
           this.tokenRefreshed$.next(false);
           this.logout();
-          return throwError(() => new Error("Session expired. Please login again."));
+          return throwError(
+            () => new Error("Session expired. Please login again.")
+          );
         }),
         shareReplay()
       );
@@ -142,7 +160,8 @@ export class AuthService {
     }
     this.clearTokens();
     this.currentUserSubject.next(null);
-    this.router.navigate(["/login"]); // Ajuste para sua rota de login, se '' não for ela
+    this.router.navigate(["/login"]);
+    // Ajuste para sua rota de login, se '' não for ela
   }
 
   getAccessToken(): string | null {
@@ -157,7 +176,6 @@ export class AuthService {
     // Agora esta verificação é mais robusta pois getUserFromToken() já checa a expiração
     return !!this.getUserFromToken();
   }
-
 
   private storeTokensAndScheduleRefresh(response: LoginResponseDto): void {
     // 1. Limpa qualquer timer antigo
@@ -179,37 +197,47 @@ export class AuthService {
       const expiresAtMs = (decodedToken.exp ?? 0) * 1000;
       const nowMs = Date.now();
       const expiresInMs = expiresAtMs - nowMs;
-      
+
       // Renova 1 minuto (60000 ms) antes de expirar. Ajuste o buffer se necessário.
       // Apenas agenda se o token for válido por mais de 1 minuto.
       const proactiveRefreshDelay = expiresInMs - 60000;
 
       if (proactiveRefreshDelay > 0) {
         this.tokenExpirationTimer = setTimeout(() => {
-          console.log('Proactively refreshing token now...');
+          console.log("Proactively refreshing token now...");
           this.refreshToken().subscribe({
-            next: () => console.log('Proactive token refresh successful.'),
-            error: err => console.error('Proactive token refresh failed:', err)
+            next: () => console.log("Proactive token refresh successful."),
+            error: (err) =>
+              console.error("Proactive token refresh failed:", err),
           });
         }, proactiveRefreshDelay);
-        console.log(`Token refresh scheduled in ${(proactiveRefreshDelay / 1000 / 60).toFixed(2)} minutes.`);
+        console.log(
+          `Token refresh scheduled in ${(
+            proactiveRefreshDelay /
+            1000 /
+            60
+          ).toFixed(2)} minutes.`
+        );
       } else {
-        console.warn('Token is about to expire, not scheduling proactive refresh.');
+        console.warn(
+          "Token is about to expire, not scheduling proactive refresh."
+        );
       }
     } catch (error) {
       console.error("Failed to decode token for scheduling refresh:", error);
     }
   }
 
-   private createTokenResponseFromStorage(): Observable<LoginResponseDto> {
+  private createTokenResponseFromStorage(): Observable<LoginResponseDto> {
     const accessToken = this.getAccessToken();
     const refreshToken = this.getRefreshToken();
     if (accessToken && refreshToken) {
       return of({ accessToken, refreshToken });
     }
-    return throwError(() => new Error('Could not create token response from storage.'));
+    return throwError(
+      () => new Error("Could not create token response from storage.")
+    );
   }
-
 
   private storeTokens(response: LoginResponseDto): void {
     localStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken);
@@ -254,4 +282,11 @@ export class AuthService {
     console.error(errorMessage, error);
     return throwError(() => new Error(errorMessage));
   }
+
+  public isAdmin$ = this.currentUser$.pipe(
+    map(
+      (user) =>
+        !!user && Array.isArray(user.roles) && user.roles.includes("ROLE_ADMIN")
+    )
+  );
 }

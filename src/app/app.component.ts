@@ -1,75 +1,60 @@
-
-
-import { webSocket } from 'rxjs/webSocket';
-import {
-  Component,
-  HostListener,
-  inject,
-  OnDestroy,
-  OnInit,
-} from "@angular/core";
+import { Component, HostListener, OnDestroy, OnInit } from "@angular/core";
 import { RouterOutlet } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { Subscription } from "rxjs";
-import { MessageService } from "primeng/api";
-import { Toast } from "primeng/toast";
+import { ToastComponent } from './core/toast/toast/toast.component'; 
 import { AuthService } from "./core/auth/auth.service";
-import { AdminOffersService } from "./features/offers/services/admin-offers.service";
 import { AudioUnlockService } from "./core/audio/audio-unlock.service";
-import { WsService } from './core/sse/sse.service';
+import { WsService } from "./core/websocket/ws.service";
 
 @Component({
   selector: "app-root",
-  imports: [RouterOutlet, CommonModule, Toast],
+  imports: [RouterOutlet, CommonModule, ToastComponent],
   templateUrl: "./app.component.html",
   styleUrl: "./app.component.scss",
-  providers: [MessageService],
+  providers: [],
 })
-export class AppComponent   {
+export class AppComponent implements OnInit, OnDestroy {
   constructor(
-    private webSocket: WsService,
-    private messageService: MessageService,
     private authService: AuthService,
     private audioUnlockService: AudioUnlockService,
-    private offersAdmin: AdminOffersService
+    private wsService: WsService
   ) {}
+
+  ngOnInit() {
+    const token = localStorage.getItem("pgdo_access_token");
+    if (token) {
+      this.wsService.initWebSocket();
+    }
+    this.wsService.notifications$.subscribe((msg) => {
+      console.log("Evento recebido globalmente:", msg);
+    });
+  }
+
+  private subs: Subscription[] = [];
 
   @HostListener("window:click")
   onFirstClick() {
     this.audioUnlockService.unlockAudio();
   }
 
-  ngOnInit(): void {
-    this.webSocket.notificationEvents$.subscribe((notification: any) => {
-      console.log(
-        "DIAGNÓSTICO 1: Evento SSE recebido:",
-        JSON.stringify(notification, null, 2)
-      );
-      const status = notification.status;
-      if (status === "ACCEPTED") {
-        this.messageService.add({
-          severity: "success",
-          summary: "Oferta Aceita!",
-          detail: "Uma solicitação de oferta foi aceita por um administrador.",
-          life: 7000,
-        });
-        if (this.audioUnlockService.canPlayAudio()) {
-          const audio = new Audio("/livechat-129007.mp3");
-          audio
-            .play()
-            .catch((e) => console.error("Falha ao tocar o áudio.", e));
-        }
-      } else {
-        console.log(
-          "DIAGNÓSTICO 4: Evento não é de aceitação. Nenhuma notificação será exibida."
-        );
-      }
-    });
+  ngOnDestroy(): void {
+    console.log(
+      "[AppComponent] ngOnDestroy: Limpando subscriptions e desconectando WebSocket..."
+    );
+    this.subs.forEach((sub) => sub.unsubscribe());
+  }
+
+  private isAdmin(): boolean {
+    const user = this.authService.currentUserSubject.value;
+    return (
+      this.authService.isAuthenticated() &&
+      Array.isArray(user?.roles) &&
+      user.roles.includes("ROLE_ADMIN")
+    );
   }
 
   getCurrentUserId(): string | null {
-    // Ajuste aqui se o identificador for o e-mail:
-    // return this.authService.currentUserSubject.value?.email ?? null;
     return this.authService.currentUserSubject.value?.employeeId ?? null;
   }
 }
