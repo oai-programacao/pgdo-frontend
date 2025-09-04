@@ -132,7 +132,7 @@ export enum ServiceOrderStatus {
 }
 
 export const ServiceOrderStatusLabels: Record<ServiceOrderStatus, string> = {
-  [ServiceOrderStatus.EXECUTED]: 'Executado',
+  [ServiceOrderStatus.EXECUTED]: 'Executado', 
   [ServiceOrderStatus.IN_PRODUCTION]: 'Em Produção',
   [ServiceOrderStatus.CANCELED]: 'Cancelado',
   [ServiceOrderStatus.RESCHEDULED]: 'Reagendado',
@@ -142,6 +142,7 @@ export const ServiceOrderStatusLabels: Record<ServiceOrderStatus, string> = {
   [ServiceOrderStatus.TECHNICAL_INFEASIBILITY]: 'Inviabilidade Técnica',
   [ServiceOrderStatus.NORMALIZED]: 'Normalizado',
 }
+
 
 export enum TicketTopics {
   IT_SUPPORT = 'IT_SUPPORT',

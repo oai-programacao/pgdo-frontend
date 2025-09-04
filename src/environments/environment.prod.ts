@@ -1,5 +1,5 @@
 export const environment = {
-    production: true,
+    production: false,
     apiUrl: 'https://apipgdo.oai.com.br/api',
     wsUrl: "wss://apipgdo.oai.com.br/api/ws-connect",
     logLevel: 'error', // Define o nível de log para produção

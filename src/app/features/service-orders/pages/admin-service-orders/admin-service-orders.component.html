@@ -261,6 +261,9 @@
               <div class="text-s text-slate-500 truncate w-fit">
                 {{ os.address }}
               </div>
+               <div class="text-s text-slate-500 truncate w-fit">
+                Tipo - {{ getClientTypeLabel (os.clientType) }}
+              </div>
               <div class="text-s text-slate-500 truncate w-fit">
                 Cidade - {{ getCitiesLabel(os.city) }}
               </div>

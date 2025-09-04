@@ -57,7 +57,7 @@ import { EditComponent } from "../../components/edit/edit.component";
 import { ObservationComponent } from "../../components/observation/observation.component";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { BadgeModule } from 'primeng/badge';
-
+import { ClientType, ClientTypeLabels } from "../../../../interfaces/enums.model";
 @Component({
   selector: "app-admin-service-orders",
   imports: [
@@ -145,11 +145,13 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   isEditingTechDialogVisible = false;
   isPostingObeservationTechDialogVisible = false;
   isDeleteTechDialogVisible = false;
+  clientTypeOptions: any[];
 
   constructor() {
     this.serviceOrderTypeOptions = this.mapLabelsToOptions(TypeOfOsLabels);
     this.cityOptions = this.mapLabelsToOptions(CitiesLabels);
     this.periodOptions = this.mapLabelsToOptions(PeriodLabels);
+    this.clientTypeOptions = this.mapLabelsToOptions(ClientTypeLabels);
     this.osGroup = this.fb.group({
       orders: this.fb.array([]),
     });
@@ -578,6 +580,7 @@ updateServiceOrder(index: number): void {
     Object.entries(labels).map(([value, label]) => ({ label, value }));
   getStatusLabel = (status: ServiceOrderStatus) =>
     ServiceOrderStatusLabels[status] || status;
+  getClientTypeLabel = (type: ClientType) => ClientTypeLabels[type] || type;
   getCitiesLabel = (city: City) => CitiesLabels[city] || city;
   getTypeOfOsLabel = (type: TypeOfOs) => TypeOfOsLabels[type] || type;
   getPeriodLabel = (period: Period) => PeriodLabels[period] || period;
