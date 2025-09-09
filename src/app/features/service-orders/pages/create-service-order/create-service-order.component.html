@@ -368,40 +368,6 @@
               >
             </div>
           </div>
-          
-          <div>
-            <label 
-                for="criterio-observation" 
-                class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Critério
-            </label>
-
-            <!-- TROCA: Substituído <textarea> por <input pInputText> -->
-            <input 
-              id="criterio-observation"
-              type="text"
-              pInputText 
-              formControlName="observation"
-              placeholder="Digite detalhes ou critérios..."
-              class="w-full"
-              [ngClass]="{
-                  'ng-dirty': createOsForm.get('observation')?.touched,
-                  'ng-invalid': 
-                      createOsForm.get('observation')?.invalid &&
-                      createOsForm.get('observation')?.touched
-                }">
-
-            <div class="h-5 mt-1">
-                <small 
-                    *ngIf="
-                        createOsForm.get('observation')?.invalid &&
-                        createOsForm.get('observation')?.touched
-                    "
-                    class="p-error block mt-1 text-xs">
-                    Critério inválido.
-                </small>
-            </div>
-          </div>
 
           <div>
             <label

@@ -47,18 +47,24 @@
             optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full" />
         </div>
         <div>
-          <label for="statuses" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Status da
-            OS</label>
-          <p-multiSelect inputId="statuses" [options]="statusOptions" formControlName="statuses" placeholder="Todos"
-            optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full" />
-        </div>
-        <div>
           <label for="typesOfOS" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Tipo de
             OS</label>
-          <p-multiSelect inputId="typesOfOS" [options]="serviceOrderTypeOptions" formControlName="typesOfOS"
+            <p-multiSelect inputId="typesOfOS" [options]="serviceOrderTypeOptions" formControlName="typesOfOS"
             placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" class="w-full"
             panelStyleClass="w-full" />
-        </div>
+          </div>
+          <div>
+            <label for="subTypeOs" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Sub Tipo da
+              OS</label>
+              <p-multiSelect inputId="subTypeOs" [options]="subStatusOptions" formControlName="subTypeOs" placeholder="Todos"
+              optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full" />
+            </div>
+            <div>
+              <label for="statuses" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Status da
+                OS</label>
+              <p-multiSelect inputId="statuses" [options]="statusOptions" formControlName="statuses" placeholder="Todos"
+                optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full" />
+            </div>
         <div>
           <label for="cities"
             class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Cidades</label>
@@ -154,7 +160,7 @@
               </div>
             </td>
             <td>{{ getTypeOfOsLabel(os.typeOfOs) }}</td>
-            <td>{{ getTypeOfOsLabel(os.subTypeServiceOrder) }}</td>
+            <td>{{ getSubTypeOsLabel(os.subTypeOs) }}</td>
             <td>
               <p-datepicker formControlName="scheduleDate" dateFormat="dd/mm/yy" dataType="string" appendTo="body"
                 styleClass="min-w-[7rem]" fluid [disabledDays]="[0]" id="scheduleDate-{{ i }}" />

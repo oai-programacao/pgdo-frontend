@@ -42,6 +42,7 @@ import {
   ServiceOrderStatus,
   ServiceOrderStatusLabels,
   SubTypeServiceOrder,
+  SubTypeServiceOrderLabels,
   TypeOfOs,
   TypeOfOsLabels,
 } from "../../../../interfaces/enums.model";
@@ -137,6 +138,13 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     })),
   ];
 
+  subStatusOptions: any[] = [
+    ...Object.entries(SubTypeServiceOrderLabels).map(([key, value]) =>({
+      label: value,
+      value: SubTypeServiceOrder[key as keyof typeof SubTypeServiceOrder],
+    }))
+  ];
+
   serviceOrderTypeOptions: any[];
   cityOptions: any[];
   periodOptions: any[];
@@ -155,9 +163,11 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.serviceOrderTypeOptions = this.mapLabelsToOptions(TypeOfOsLabels);
+    // this.serviceOrderTypeOptions = this.mapLabelsToOptions(SubTypeServiceOrderLabels);
     this.cityOptions = this.mapLabelsToOptions(CitiesLabels);
     this.periodOptions = this.mapLabelsToOptions(PeriodLabels);
     this.clientTypeOptions = this.mapLabelsToOptions(ClientTypeLabels);
+
     this.osGroup = this.fb.group({
       orders: this.fb.array([]),
     });
@@ -281,6 +291,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
           this.dataSource = orders;
           this.totalRecords = dataPage.page.totalElements;
           this.populateOrdersArray();
+          this.isLoading = false;
         },
         error: () =>
           this.messageService.add({
@@ -479,6 +490,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: params,
+      queryParamsHandling: '',
       replaceUrl: true,
     });
   }
@@ -488,10 +500,11 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       contractNumber: [null],
       clientName: [""],
       technicianId: [null],
-      statuses: [[]],
-      typesOfOS: [[]],
-      cities: [[]],
-      periods: [[]],
+      statuses: [],
+      subTypeOs: [],
+      typesOfOS: [],
+      cities: [],
+      periods: [],
       startDate: [null],
       endDate: [null],
     });
@@ -594,7 +607,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   getClientTypeLabel = (type: ClientType) => ClientTypeLabels[type] || type;
   getCitiesLabel = (city: City) => CitiesLabels[city] || city;
   getTypeOfOsLabel = (type: TypeOfOs) => TypeOfOsLabels[type] || type;
-  getSubTypeOsLabel = (type: SubTypeServiceOrder) => SubTypeServiceOrder[type] || type;
+  getSubTypeOsLabel = (type: SubTypeServiceOrder) => SubTypeServiceOrderLabels[type] || type;
   getPeriodLabel = (period: Period) => PeriodLabels[period] || period;
 
   confirmDeleteServiceOrder(event: Event, os: ViewServiceOrderDto) {

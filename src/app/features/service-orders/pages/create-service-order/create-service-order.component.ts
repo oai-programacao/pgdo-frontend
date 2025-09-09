@@ -132,8 +132,7 @@ export class CreateServiceOrderComponent implements OnInit, OnDestroy {
       subTypeServiceOrder: [{value: null, disabled: true}, Validators.required],
       scheduleDate: [{value: null, disabled: true}, Validators.required],
       period: [{value: null, disabled: true}, Validators.required],
-      technology: [Technology.FIBER_OPTIC, Validators.required],
-      observation: [null]
+      technology: [Technology.FIBER_OPTIC, Validators.required]
     });
   }
 
@@ -345,6 +344,11 @@ export class CreateServiceOrderComponent implements OnInit, OnDestroy {
         this.isSubmitting = false;
         this.createOsForm.reset(); // Reseta o formulário após o sucesso
         this.resetDropdownOptions(); // Reseta os dropdowns após o sucesso
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Ordem de Serviço Criada com Sucesso!'
+        })
       },
       error: (err) => {
         this.messageService.add({
