@@ -172,9 +172,9 @@
       </div>
 
       <div
-       class="flex justify-between items-center gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700"
+        class="flex justify-between items-center gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700"
       >
-       <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2">
           <p-button
             label="OS Expiradas"
             icon="pi pi-exclamation-triangle"
@@ -213,10 +213,9 @@
             (click)="applyFilters()"
           ></button>
         </div>
-        </div>
+      </div>
     </form>
   </p-fieldset>
-
 
   <div *ngIf="!isLoading; else loadingTemplate">
     <form [formGroup]="osGroup" class="p-fluid">
@@ -261,8 +260,8 @@
               <div class="text-s text-slate-500 truncate w-fit">
                 {{ os.address }}
               </div>
-               <div class="text-s text-slate-500 truncate w-fit">
-                Tipo - {{ getClientTypeLabel (os.clientType) }}
+              <div class="text-s text-slate-500 truncate w-fit">
+                Tipo - {{ getClientTypeLabel(os.clientType) }}
               </div>
               <div class="text-s text-slate-500 truncate w-fit">
                 Cidade - {{ getCitiesLabel(os.city) }}
@@ -338,8 +337,37 @@
                 optionLabel="label"
                 optionValue="value"
                 appendTo="body"
-                styleClass="min-w-full"
-              />
+                [styleClass]="
+                  'min-w-full ' +
+                  (orders.controls[i]?.get('status')?.value ===
+                  ServiceOrderStatus.EXECUTED
+                    ? 'status-executado'
+                    : orders.controls[i]?.get('status')?.value ===
+                      ServiceOrderStatus.IN_PRODUCTION
+                    ? 'status-andamento'
+                    : orders.controls[i]?.get('status')?.value ===
+                      ServiceOrderStatus.CANCELED
+                    ? 'status-cancelado'
+                    : orders.controls[i]?.get('status')?.value ===
+                      ServiceOrderStatus.RESCHEDULED
+                    ? 'status-reagendado'
+                    : '')
+                "
+              >
+                <ng-template let-option pTemplate="item">
+                  <div
+                    class="status-option"
+                    [ngClass]="{
+                      'status-executado': option.label === 'Executado',
+                      'status-andamento': option.label === 'Em Produção',
+                      'status-cancelado': option.label === 'Cancelado',
+                      'status-reagendado': option.label === 'Reagendado',
+                    }"
+                  >
+                    {{ option.label }}
+                  </div>
+                </ng-template>
+              </p-select>
             </td>
             <td>
               <div class="flex flex-col items-center justify-center gap-2">
@@ -380,10 +408,12 @@
                     type="button"
                     pButton
                     (click)="openObservationTechDialog(os)"
-                    [pTooltip]="os.observation ? os.observation : 'Sem Observação'"
+                    [pTooltip]="
+                      os.observation ? os.observation : 'Sem Observação'
+                    "
                     icon="pi pi-info-circle"
                     class="p-button-rounded p-button-text p-button-info"
-                    [severity]="os.observation ?   'info' : 'warn' "
+                    [severity]="os.observation ? 'info' : 'warn'"
                   ></button>
                   <button
                     type="button"
@@ -481,6 +511,5 @@
   ></app-observation>
   }
 </p-dialog>
-
 
 <p-confirmdialog />

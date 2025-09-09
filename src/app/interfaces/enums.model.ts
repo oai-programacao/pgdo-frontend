@@ -143,6 +143,17 @@ export const ServiceOrderStatusLabels: Record<ServiceOrderStatus, string> = {
   [ServiceOrderStatus.NORMALIZED]: 'Normalizado',
 }
 
+export const ServiceOrderStatusSeverity: Record<ServiceOrderStatus, 'success' | 'info' | 'warn' | 'danger' | 'secondary'> = {
+  [ServiceOrderStatus.EXECUTED]: 'success',
+  [ServiceOrderStatus.IN_PRODUCTION]: 'info',
+  [ServiceOrderStatus.CANCELED]: 'danger',
+  [ServiceOrderStatus.RESCHEDULED]: 'warn',
+  [ServiceOrderStatus.TARGETED]: 'info',
+  [ServiceOrderStatus.PARTIALLY_EXECUTED]: 'warn',
+  [ServiceOrderStatus.RESCHEDULED_PENDING]: 'warn',
+  [ServiceOrderStatus.TECHNICAL_INFEASIBILITY]: 'danger',
+  [ServiceOrderStatus.NORMALIZED]: 'success',
+};
 
 export enum TicketTopics {
   IT_SUPPORT = 'IT_SUPPORT',
