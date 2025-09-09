@@ -1,4 +1,4 @@
-import { TypeOfOs, City, Period } from "./enums.model";
+import { TypeOfOs, City, Period, SubTypeServiceOrder } from "./enums.model";
 
 
 export interface CreateOfferRequestDto {
@@ -11,6 +11,7 @@ export interface CreateOfferRequestDto {
 export interface ViewOfferDto {
     id: number;
     typeOfOs: TypeOfOs;
+    subTypeOfOs: SubTypeServiceOrder;
     city: string;
     period: Period;
     date: string;

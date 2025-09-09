@@ -22,6 +22,133 @@ export const TypeOfOsLabels: Record<TypeOfOs, string> = {
   [TypeOfOs.INTERNAL]: 'Interno',
 };
 
+export enum SubTypeServiceOrder {
+    // --- Problemas/Sintomas Comuns ---
+    SEM_CONEXAO = 'SEM_CONEXAO',
+    LENTIDAO = 'LENTIDAO',
+    OSCILACAO = 'OSCILACAO',
+    PROBLEMA_WIFI = 'PROBLEMA_WIFI',
+    FIBRA_ROMPIDA = 'FIBRA_ROMPIDA',
+    PROBLEMA_NAO_IDENTIFICADO_NOC = 'PROBLEMA_NAO_IDENTIFICADO_NOC',
+    CORRECAO_SINAL_ONU = 'CORRECAO_SINAL_ONU',
+
+    // --- Ações / Solicitações do Cliente ---
+    REDE_INTERNA = 'REDE_INTERNA',
+    MUDANCA_DE_COMODO = 'MUDANCA_DE_COMODO',
+    TROCA_DE_EQUIPAMENTO = 'TROCA_DE_EQUIPAMENTO',
+    CONFIGURAR_ROTEADOR = 'CONFIGURAR_ROTEADOR',
+    SUPORTE_PREVENTIVO = 'SUPORTE_PREVENTIVO',
+
+    // --- Processos de Negócio ---
+    INSTALACAO_CLIENTE_NOVO = 'INSTALACAO_CLIENTE_NOVO',
+    INSTALACAO_CLIENTE_BASE = 'INSTALACAO_CLIENTE_BASE',
+    MUDANCA_DE_ENDERECO = 'MUDANCA_DE_ENDERECO',
+    MIGRACAO_TECNOLOGIA = 'MIGRACAO_TECNOLOGIA',
+    RECOLHIMENTO_EQUIPAMENTO = 'RECOLHIMENTO_EQUIPAMENTO',
+    RECOLHIMENTO_URGENTE = 'RECOLHIMENTO_URGENTE',
+    REATIVACAO_CONEXAO = 'REATIVACAO_CONEXAO',
+    VIABILIDADE_TECNICA = 'VIABILIDADE_TECNICA',
+    CLIENTE_RECUPERADO = 'CLIENTE_RECUPERADO',
+    CLIENTE_DOWNCHURN = 'CLIENTE_DOWNCHURN',
+    AMEACA_CANCELAMENTO = 'AMEACA_CANCELAMENTO',
+
+    // --- Processos Internos / Projetos ---
+    SERVICOS_INTERNOS_OAI = 'SERVICOS_INTERNOS_OAI',
+    MAPEAMENTO_CTO = 'MAPEAMENTO_CTO',
+    TROCA_SPLITTER = 'TROCA_SPLITTER',
+    LANCAMENTO_CABO = 'LANCAMENTO_CABO',
+    SLA_CORPORATIVO = 'SLA_CORPORATIVO',
+
+    // --- Outros ---
+    PRIMEIRO_CHAMADO = 'PRIMEIRO_CHAMADO',
+    RECLAMACAO_RECORRENTE = 'RECLAMACAO_RECORRENTE',
+    REABERTURA_OS = 'REABERTURA_OS',
+}
+
+// E adicione este objeto de Labels correspondente
+export const SubTypeServiceOrderLabels: Record<SubTypeServiceOrder, string> = {
+    [SubTypeServiceOrder.SEM_CONEXAO]: 'Sem Conexão',
+    [SubTypeServiceOrder.LENTIDAO]: 'Lentidão',
+    [SubTypeServiceOrder.OSCILACAO]: 'Oscilação',
+    [SubTypeServiceOrder.PROBLEMA_WIFI]: 'Problema com Wi-Fi',
+    [SubTypeServiceOrder.FIBRA_ROMPIDA]: 'Fibra Rompida',
+    [SubTypeServiceOrder.PROBLEMA_NAO_IDENTIFICADO_NOC]: 'Problema não Identificado pelo NOC',
+    [SubTypeServiceOrder.CORRECAO_SINAL_ONU]: 'Correção de Sinal ONU',
+    [SubTypeServiceOrder.REDE_INTERNA]: 'Rede Interna',
+    [SubTypeServiceOrder.MUDANCA_DE_COMODO]: 'Mudança de Cômodo',
+    [SubTypeServiceOrder.TROCA_DE_EQUIPAMENTO]: 'Troca de Equipamento',
+    [SubTypeServiceOrder.CONFIGURAR_ROTEADOR]: 'Configurar Roteador',
+    [SubTypeServiceOrder.SUPORTE_PREVENTIVO]: 'Suporte Preventivo',
+    [SubTypeServiceOrder.INSTALACAO_CLIENTE_NOVO]: 'Instalação Cliente Novo',
+    [SubTypeServiceOrder.INSTALACAO_CLIENTE_BASE]: 'Instalação Cliente da Base',
+    [SubTypeServiceOrder.MUDANCA_DE_ENDERECO]: 'Mudança de Endereço',
+    [SubTypeServiceOrder.MIGRACAO_TECNOLOGIA]: 'Migração de Tecnologia',
+    [SubTypeServiceOrder.RECOLHIMENTO_EQUIPAMENTO]: 'Recolhimento de Equipamento',
+    [SubTypeServiceOrder.RECOLHIMENTO_URGENTE]: 'Recolhimento Urgente',
+    [SubTypeServiceOrder.REATIVACAO_CONEXAO]: 'Reativação de Conexão',
+    [SubTypeServiceOrder.VIABILIDADE_TECNICA]: 'Viabilidade Técnica',
+    [SubTypeServiceOrder.CLIENTE_RECUPERADO]: 'Cliente Recuperado',
+    [SubTypeServiceOrder.CLIENTE_DOWNCHURN]: 'Cliente Downchurn',
+    [SubTypeServiceOrder.AMEACA_CANCELAMENTO]: 'Ameaça de Cancelamento',
+    [SubTypeServiceOrder.SERVICOS_INTERNOS_OAI]: 'Serviços Internos OAI',
+    [SubTypeServiceOrder.MAPEAMENTO_CTO]: 'Mapeamento de CTO',
+    [SubTypeServiceOrder.TROCA_SPLITTER]: 'Troca de Splitter',
+    [SubTypeServiceOrder.LANCAMENTO_CABO]: 'Lançamento de Cabo',
+    [SubTypeServiceOrder.SLA_CORPORATIVO]: 'SLA Corporativo',
+    [SubTypeServiceOrder.PRIMEIRO_CHAMADO]: 'Primeiro Chamado',
+    [SubTypeServiceOrder.RECLAMACAO_RECORRENTE]: 'Reclamação Recorrente',
+    [SubTypeServiceOrder.REABERTURA_OS]: 'Reabertura de OS',
+};
+
+export const TypeToSubTypeMap: Record<TypeOfOs, SubTypeServiceOrder[]> = {
+    [TypeOfOs.INSTALLATION]: [
+        SubTypeServiceOrder.INSTALACAO_CLIENTE_NOVO,
+        SubTypeServiceOrder.INSTALACAO_CLIENTE_BASE,
+    ],
+    [TypeOfOs.MAINTENANCE]: [
+        SubTypeServiceOrder.SEM_CONEXAO,
+        SubTypeServiceOrder.LENTIDAO,
+        SubTypeServiceOrder.OSCILACAO,
+        SubTypeServiceOrder.PROBLEMA_WIFI,
+        SubTypeServiceOrder.FIBRA_ROMPIDA,
+        SubTypeServiceOrder.PROBLEMA_NAO_IDENTIFICADO_NOC,
+        SubTypeServiceOrder.CORRECAO_SINAL_ONU,
+        SubTypeServiceOrder.REDE_INTERNA,
+        SubTypeServiceOrder.RECLAMACAO_RECORRENTE,
+        SubTypeServiceOrder.REABERTURA_OS,
+    ],
+    [TypeOfOs.CHANGE_OF_ADDRESS]: [
+        SubTypeServiceOrder.MUDANCA_DE_ENDERECO,
+    ],
+    [TypeOfOs.CHANGE_OF_TECHNOLOGY]: [
+        SubTypeServiceOrder.MIGRACAO_TECNOLOGIA,
+    ],
+    [TypeOfOs.PROJECTS]: [
+        SubTypeServiceOrder.MAPEAMENTO_CTO,
+        SubTypeServiceOrder.TROCA_SPLITTER,
+        SubTypeServiceOrder.LANCAMENTO_CABO,
+        SubTypeServiceOrder.SLA_CORPORATIVO,
+    ],
+    [TypeOfOs.KIT_REMOVAL]: [
+        SubTypeServiceOrder.RECOLHIMENTO_EQUIPAMENTO,
+        SubTypeServiceOrder.RECOLHIMENTO_URGENTE,
+    ],
+    [TypeOfOs.TECHNICAL_VIABILITY]: [
+        SubTypeServiceOrder.VIABILIDADE_TECNICA,
+    ],
+    [TypeOfOs.TECHNICAL_VISIT]: [
+        SubTypeServiceOrder.MUDANCA_DE_COMODO,
+        SubTypeServiceOrder.TROCA_DE_EQUIPAMENTO,
+        SubTypeServiceOrder.CONFIGURAR_ROTEADOR,
+        SubTypeServiceOrder.SUPORTE_PREVENTIVO,
+        SubTypeServiceOrder.PRIMEIRO_CHAMADO,
+    ],
+    [TypeOfOs.INTERNAL]: [
+        SubTypeServiceOrder.SERVICOS_INTERNOS_OAI,
+    ],
+};
+
+
 export enum CommandArea {
   CONTROL_TOWER = "CONTROL_TOWER",
   NOC = "NOC",
@@ -119,6 +246,7 @@ export const OfferStatusLabels: Record<OfferStatus, string> = {
 };
 
 export enum ServiceOrderStatus {
+  UNDEFINED = 'UNDEFINED',
   EXECUTED = 'EXECUTED',
   IN_PRODUCTION = 'IN_PRODUCTION',
   CANCELED = 'CANCELED',
@@ -132,6 +260,7 @@ export enum ServiceOrderStatus {
 }
 
 export const ServiceOrderStatusLabels: Record<ServiceOrderStatus, string> = {
+  [ServiceOrderStatus.UNDEFINED]: 'Em Branco',
   [ServiceOrderStatus.EXECUTED]: 'Executado',
   [ServiceOrderStatus.IN_PRODUCTION]: 'Em Produção',
   [ServiceOrderStatus.CANCELED]: 'Cancelado',

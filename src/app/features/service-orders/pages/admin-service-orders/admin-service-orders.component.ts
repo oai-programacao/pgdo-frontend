@@ -40,6 +40,7 @@ import {
   PeriodLabels,
   ServiceOrderStatus,
   ServiceOrderStatusLabels,
+  SubTypeServiceOrder,
   TypeOfOs,
   TypeOfOsLabels,
 } from "../../../../interfaces/enums.model";
@@ -125,7 +126,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   selectedServiceOrder: ViewServiceOrderDto | null = null;
 
   statusOptions: any[] = [
-    { label: "Em Branco", value: null },
     ...Object.entries(ServiceOrderStatusLabels).map(([key, value]) => ({
       label: value,
       value: ServiceOrderStatus[key as keyof typeof ServiceOrderStatus],
@@ -580,6 +580,7 @@ updateServiceOrder(index: number): void {
     ServiceOrderStatusLabels[status] || status;
   getCitiesLabel = (city: City) => CitiesLabels[city] || city;
   getTypeOfOsLabel = (type: TypeOfOs) => TypeOfOsLabels[type] || type;
+  getSubTypeOsLabel = (type: SubTypeServiceOrder) => SubTypeServiceOrder[type] || type;
   getPeriodLabel = (period: Period) => PeriodLabels[period] || period;
 
   confirmDeleteServiceOrder(event: Event, os: ViewServiceOrderDto) {
