@@ -67,23 +67,51 @@
         </div>
       </div>
 
-      <div class="flex justify-between items-center gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+      <div
+        class="flex justify-between items-center gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700"
+      >
         <div class="flex items-center gap-2">
-          <p-button label="OS Expiradas" icon="pi pi-exclamation-triangle" outlined text severity="danger"
-            [badge]="expiredOsCount.toString()" [badgeSeverity]="'danger'" (click)="showExpiredOs()" />
-          <p-button label="Todas OS" icon="pi pi-list" outlined text severity="info" class="ml-2"
-            (click)="showAllOs()" />
+          <p-button
+            label="OS Expiradas"
+            icon="pi pi-exclamation-triangle"
+            outlined
+            text
+            severity="danger"
+            [badge]="expiredOsCount.toString()"
+            [badgeSeverity]="'danger'"
+            (click)="showExpiredOs()"
+          />
+          <p-button
+            label="Todas OS"
+            icon="pi pi-list"
+            outlined
+            text
+            severity="info"
+            class="ml-2"
+            (click)="showAllOs()"
+          />
         </div>
         <div class="flex items-center gap-3">
-          <button pButton type="button" label="Limpar Filtros" icon="pi pi-filter-slash"
-            class="p-button-outlined p-button-secondary" (click)="clearFilters()"></button>
-          <button pButton type="button" label="Pesquisar" icon="pi pi-search" class="p-button-outlined p-button-primary"
-            (click)="applyFilters()"></button>
+          <button
+            pButton
+            type="button"
+            label="Limpar Filtros"
+            icon="pi pi-filter-slash"
+            class="p-button-outlined p-button-secondary"
+            (click)="clearFilters()"
+          ></button>
+          <button
+            pButton
+            type="button"
+            label="Pesquisar"
+            icon="pi pi-search"
+            class="p-button-outlined p-button-primary"
+            (click)="applyFilters()"
+          ></button>
         </div>
       </div>
     </form>
   </p-fieldset>
-
 
   <div *ngIf="!isLoading; else loadingTemplate">
     <form [formGroup]="osGroup" class="p-fluid">
@@ -114,6 +142,9 @@
               <div class="font-medium truncate w-fit">{{ os.clientName }}</div>
               <div class="text-s text-slate-500 truncate w-fit">
                 {{ os.address }}
+              </div>
+              <div class="text-s text-slate-500 truncate w-fit">
+                Tipo - {{ getClientTypeLabel(os.clientType) }}
               </div>
               <div class="text-s text-slate-500 truncate w-fit">
                 Cidade - {{ getCitiesLabel(os.city) }}
@@ -149,8 +180,43 @@
               {{ os.durationOfOs | formatDuration }}
             </td>
             <td>
-              <p-select [options]="statusOptions" formControlName="status" optionLabel="label" optionValue="value"
-                appendTo="body" styleClass="min-w-full" />
+              <p-select
+                [options]="statusOptions"
+                formControlName="status"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+                [styleClass]="
+                  'min-w-full ' +
+                  (orders.controls[i]?.get('status')?.value ===
+                  ServiceOrderStatus.EXECUTED
+                    ? 'status-executado'
+                    : orders.controls[i]?.get('status')?.value ===
+                      ServiceOrderStatus.IN_PRODUCTION
+                    ? 'status-andamento'
+                    : orders.controls[i]?.get('status')?.value ===
+                      ServiceOrderStatus.CANCELED
+                    ? 'status-cancelado'
+                    : orders.controls[i]?.get('status')?.value ===
+                      ServiceOrderStatus.RESCHEDULED
+                    ? 'status-reagendado'
+                    : '')
+                "
+              >
+                <ng-template let-option pTemplate="item">
+                  <div
+                    class="status-option"
+                    [ngClass]="{
+                      'status-executado': option.label === 'Executado',
+                      'status-andamento': option.label === 'Em Produção',
+                      'status-cancelado': option.label === 'Cancelado',
+                      'status-reagendado': option.label === 'Reagendado',
+                    }"
+                  >
+                    {{ option.label }}
+                  </div>
+                </ng-template>
+              </p-select>
             </td>
             <td>
               <div class="flex flex-col items-center justify-center gap-2">
@@ -162,16 +228,35 @@
                 </div>
 
                 <div>
-                  <button type="button" pButton icon="pi pi-pencil"
-                    class="p-button-rounded p-button-text p-button-warning" pTooltip="Editar OS"
-                    (click)="openEditTechDialog(os)" tooltipPosition="left"></button>
-                  <button type="button" pButton (click)="openObservationTechDialog(os)"
-                    [pTooltip]="os.observation ? os.observation : 'Sem Observação'" icon="pi pi-info-circle"
+                  <button
+                    type="button"
+                    pButton
+                    icon="pi pi-pencil"
+                    class="p-button-rounded p-button-text p-button-warning"
+                    pTooltip="Editar OS"
+                    (click)="openEditTechDialog(os)"
+                    tooltipPosition="left"
+                  ></button>
+                  <button
+                    type="button"
+                    pButton
+                    (click)="openObservationTechDialog(os)"
+                    [pTooltip]="
+                      os.observation ? os.observation : 'Sem Observação'
+                    "
+                    icon="pi pi-info-circle"
                     class="p-button-rounded p-button-text p-button-info"
-                    [severity]="os.observation ?   'info' : 'warn' "></button>
-                  <button type="button" pButton icon="pi pi-trash"
-                    class="p-button-rounded p-button-text p-button-danger" pTooltip="Excluir OS"
-                    (click)="confirmDeleteServiceOrder($event, os)" tooltipPosition="left"></button>
+                    [severity]="os.observation ? 'info' : 'warn'"
+                  ></button>
+                  <button
+                    type="button"
+                    pButton
+                    icon="pi pi-trash"
+                    class="p-button-rounded p-button-text p-button-danger"
+                    pTooltip="Excluir OS"
+                    (click)="confirmDeleteServiceOrder($event, os)"
+                    tooltipPosition="left"
+                  ></button>
                 </div>
               </div>
             </td>
@@ -220,6 +305,5 @@
   <app-observation (eventObservation)="onObservationSuccess()" [serviceOrder]="selectedServiceOrder"></app-observation>
   }
 </p-dialog>
-
 
 <p-confirmdialog />
