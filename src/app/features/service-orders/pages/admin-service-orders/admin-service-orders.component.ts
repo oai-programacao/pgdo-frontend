@@ -276,45 +276,35 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.first = page * this.rows;
   }
 
-  loadServiceOrders(event?: TableLazyLoadEvent): void {
-    this.isLoading = true;
-    if (event) {
-      this.first = event.first ?? 0;
-      this.rows = event.rows ?? 10;
-    }
-    const page = Math.floor(this.first / this.rows);
+loadServiceOrders(event?: TableLazyLoadEvent): void {
+  this.isLoading = true;
 
-    this.updateUrlQueryParams();
-    this.pendingFirstValue = this.first;
-
-    this.serviceOrderService
-      .findAll(this.filterForm.value, page, this.rows)
-      .subscribe({
-        next: (dataPage) => {
-          let orders = dataPage.content ?? [];
-          const statuses = this.filterForm.value.statuses;
-          if (
-            !statuses ||
-            statuses.length === 0 ||
-            !statuses.includes(ServiceOrderStatus.EXECUTED)
-          ) {
-            orders = orders.filter(
-              (os) => os.status !== ServiceOrderStatus.EXECUTED
-            );
-          }
-          this.dataSource = orders;
-          this.totalRecords = dataPage.page.totalElements;
-          this.populateOrdersArray();
-          // this.isLoading = false;
-        },
-        error: () =>
-          this.messageService.add({
-            severity: "error",
-            summary: "Erro",
-            detail: "Falha ao carregar Ordens de Serviço.",
-          }),
-      });
+  if (event) {
+    this.first = event.first ?? 0;
+    this.rows = event.rows ?? 10;
   }
+
+  const page = Math.floor(this.first / this.rows);
+
+  this.updateUrlQueryParams();
+  this.pendingFirstValue = this.first;
+
+  this.serviceOrderService
+    .findAll(this.filterForm.value, page, this.rows)
+    .subscribe({
+      next: (dataPage) => {
+        this.dataSource = dataPage.content ?? [];
+        this.totalRecords = dataPage.page.totalElements;
+        this.populateOrdersArray();
+      },
+      error: () =>
+        this.messageService.add({
+          severity: "error",
+          summary: "Erro",
+          detail: "Falha ao carregar Ordens de Serviço.",
+        }),
+    });
+}
 
   onTableLazyLoad(event: TableLazyLoadEvent) {
     if (this.showingExpired) {
@@ -373,11 +363,35 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     });
   }
 
-  showAllOs(): void {
-    this.showingExpired = false;
-    this.first = 0;
-    this.loadServiceOrders();
+  showAllOs(event?: TableLazyLoadEvent): void {
+  this.isLoading = true;
+  this.showingExpired = false;
+
+  if (event) {
+    this.first = event.first ?? 0;
+    this.rows = event.rows ?? 10;
   }
+
+  const page = Math.floor(this.first / this.rows);
+
+  this.pendingFirstValue = this.first;
+
+  this.serviceOrderService
+    .findByOsActive(page, this.rows)
+    .subscribe({
+      next: (dataPage) => {
+        this.dataSource = dataPage.content ?? [];
+        this.totalRecords = dataPage.page.totalElements;
+        this.populateOrdersArray();
+      },
+      error: () =>
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar Ordens de Serviço ativas.',
+        }),
+    });
+}
 
   updateServiceOrder(index: number): void {
     const formGroup = this.orders.at(index) as FormGroup;
@@ -682,41 +696,41 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     });
   }
 
-restoreFiltersFromUrl(): void {
-  this.route.queryParams.subscribe((params) => {
-    this.filterForm.patchValue({
-      contractNumber: params["contractNumber"] ? Number(params["contractNumber"]) : null,
-      clientName: params["clientName"] || "",
-      technicianId: params["technicianId"] || null,
-      statuses: params["statuses"]
-        ? Array.isArray(params["statuses"])
-          ? params["statuses"]
-          : [params["statuses"]]
-        : [],
-      typesOfOS: params["typesOfOS"]
-        ? Array.isArray(params["typesOfOS"])
-          ? params["typesOfOS"]
-          : [params["typesOfOS"]]
-        : [],
-      subTypeOs: params["subTypeOs"]
-        ? Array.isArray(params["subTypeOs"])
-          ? params["subTypeOs"]
-          : [params["subTypeOs"]]
-        : [],
-      cities: params["cities"]
-        ? Array.isArray(params["cities"])
-          ? params["cities"]
-          : [params["cities"]]
-        : [],
-      periods: params["periods"]
-        ? Array.isArray(params["periods"])
-          ? params["periods"]
-          : [params["periods"]]
-        : [],
-      startDate: params["startDate"] ? new Date(params["startDate"]) : null,
-      endDate: params["endDate"] ? new Date(params["endDate"]) : null,
+  restoreFiltersFromUrl(): void {
+    this.route.queryParams.subscribe((params) => {
+      this.filterForm.patchValue({
+        contractNumber: params["contractNumber"] ? Number(params["contractNumber"]) : null,
+        clientName: params["clientName"] || "",
+        technicianId: params["technicianId"] || null,
+        statuses: params["statuses"]
+          ? Array.isArray(params["statuses"])
+            ? params["statuses"]
+            : [params["statuses"]]
+          : [],
+        typesOfOS: params["typesOfOS"]
+          ? Array.isArray(params["typesOfOS"])
+            ? params["typesOfOS"]
+            : [params["typesOfOS"]]
+          : [],
+        subTypeOs: params["subTypeOs"]
+          ? Array.isArray(params["subTypeOs"])
+            ? params["subTypeOs"]
+            : [params["subTypeOs"]]
+          : [],
+        cities: params["cities"]
+          ? Array.isArray(params["cities"])
+            ? params["cities"]
+            : [params["cities"]]
+          : [],
+        periods: params["periods"]
+          ? Array.isArray(params["periods"])
+            ? params["periods"]
+            : [params["periods"]]
+          : [],
+        startDate: params["startDate"] ? new Date(params["startDate"]) : null,
+        endDate: params["endDate"] ? new Date(params["endDate"]) : null,
+      });
     });
-  });
-}
+  }
 
 }

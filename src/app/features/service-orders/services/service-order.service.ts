@@ -103,6 +103,20 @@ export class ServiceOrderService {
     return this.http.get<ViewServiceOrderDto>(`${this.apiUrl}/${id}`);
   }
 
+  findByOsActive(
+    page: number,
+    size: number
+  ): Observable<CustomPageResponse<ViewServiceOrderDto>> {
+    let params = new HttpParams()
+      .set("page", page.toString())
+      .set("size", size.toString());
+
+    return this.http.get<CustomPageResponse<ViewServiceOrderDto>>(
+      `${this.apiUrl}/osActive`,
+      { params }
+    );
+  }
+
   update(
     id: string,
     dto: UpdateServiceOrderDto
