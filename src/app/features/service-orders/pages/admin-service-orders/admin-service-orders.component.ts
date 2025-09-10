@@ -139,7 +139,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   ];
 
   subStatusOptions: any[] = [
-    ...Object.entries(SubTypeServiceOrderLabels).map(([key, value]) =>({
+    ...Object.entries(SubTypeServiceOrderLabels).map(([key, value]) => ({
       label: value,
       value: SubTypeServiceOrder[key as keyof typeof SubTypeServiceOrder],
     }))
@@ -238,6 +238,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.initializeStateFromUrl();
     this.initTechnicians();
     this.loadExpiredOsCount();
+    this.restoreFiltersFromUrl();
     this.loadServiceOrders();
   }
 
@@ -252,6 +253,19 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   applyFilters(): void {
     this.first = 0;
     this.loadServiceOrders();
+
+    this.filterForm.reset({
+      contractNumber: null,
+      clientName: "",
+      technicianId: null,
+      statuses: [],
+      subTypeOs: [],
+      typesOfOS: [],
+      cities: [],
+      periods: [],
+      startDate: null,
+      endDate: null,
+    });
   }
 
   private initializeStateFromUrl(): void {
@@ -291,7 +305,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
           this.dataSource = orders;
           this.totalRecords = dataPage.page.totalElements;
           this.populateOrdersArray();
-          this.isLoading = false;
+          // this.isLoading = false;
         },
         error: () =>
           this.messageService.add({
@@ -667,4 +681,42 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       },
     });
   }
+
+restoreFiltersFromUrl(): void {
+  this.route.queryParams.subscribe((params) => {
+    this.filterForm.patchValue({
+      contractNumber: params["contractNumber"] ? Number(params["contractNumber"]) : null,
+      clientName: params["clientName"] || "",
+      technicianId: params["technicianId"] || null,
+      statuses: params["statuses"]
+        ? Array.isArray(params["statuses"])
+          ? params["statuses"]
+          : [params["statuses"]]
+        : [],
+      typesOfOS: params["typesOfOS"]
+        ? Array.isArray(params["typesOfOS"])
+          ? params["typesOfOS"]
+          : [params["typesOfOS"]]
+        : [],
+      subTypeOs: params["subTypeOs"]
+        ? Array.isArray(params["subTypeOs"])
+          ? params["subTypeOs"]
+          : [params["subTypeOs"]]
+        : [],
+      cities: params["cities"]
+        ? Array.isArray(params["cities"])
+          ? params["cities"]
+          : [params["cities"]]
+        : [],
+      periods: params["periods"]
+        ? Array.isArray(params["periods"])
+          ? params["periods"]
+          : [params["periods"]]
+        : [],
+      startDate: params["startDate"] ? new Date(params["startDate"]) : null,
+      endDate: params["endDate"] ? new Date(params["endDate"]) : null,
+    });
+  });
+}
+
 }
