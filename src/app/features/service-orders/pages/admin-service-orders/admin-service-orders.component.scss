@@ -5,3 +5,21 @@
 nav {
   scrollbar-gutter: stable;
 }
+.status-option {
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.status-executado {
+  background-color: rgb(59, 231, 122, 0.5)
+}
+.status-andamento{
+  background-color: rgb(70, 149, 253, 0.5);
+}
+.status-cancelado{
+  background-color: rgb(231, 9, 53, 0.5);
+}
+.status-reagendado{
+  background-color: rgb(252, 248, 48, 0.5);
+}
+

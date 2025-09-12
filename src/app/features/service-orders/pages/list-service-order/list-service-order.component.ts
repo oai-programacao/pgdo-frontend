@@ -27,7 +27,7 @@ import { TechnicianService } from '../../../technicians/services/technician.serv
 
 // Modelos
 import { ViewServiceOrderDto, ServiceOrderFilters, CustomPageResponse } from '../../../../interfaces/service-order.model';
-import { City, ClientType, Period, ServiceOrderStatus, TypeOfOsLabels, ServiceOrderStatusLabels, CitiesLabels, PeriodLabels, TypeOfOs } from '../../../../interfaces/enums.model';
+import { City, ClientType, Period, ServiceOrderStatus, TypeOfOsLabels, ServiceOrderStatusLabels, CitiesLabels, PeriodLabels, TypeOfOs, SubTypeServiceOrderLabels, SubTypeServiceOrder } from '../../../../interfaces/enums.model';
 import { EmployeeRole, ViewEmployeeDto } from '../../../../interfaces/employee.model';
 import { ViewTechnicianDto } from '../../../../interfaces/technician.model';
 import { FieldsetModule } from 'primeng/fieldset';
@@ -295,6 +295,7 @@ ngOnInit(): void {
   }
   
   getStatusLabel(status: ServiceOrderStatus): any { return ServiceOrderStatusLabels[status] || status; }
+  getSubTypeOsLabel(status: SubTypeServiceOrder): any { return SubTypeServiceOrderLabels[status] || status; }
   getTypeOfOsLabel(type: TypeOfOs): string { return TypeOfOsLabels[type] || type; }
   getPeriodLabel(period: Period): string { return PeriodLabels[period] || period; }
   getCityLabel(city: City): string { return CitiesLabels[city] || city; }

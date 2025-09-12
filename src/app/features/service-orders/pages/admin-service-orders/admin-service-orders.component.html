@@ -1,9 +1,5 @@
 <div class="md:p-4 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
-  <p-fieldset
-    [toggleable]="true"
-    [collapsed]="true"
-    styleClass="mb-6 filter-fieldset"
-  >
+  <p-fieldset [toggleable]="true" [collapsed]="true" styleClass="mb-6 filter-fieldset">
     <ng-template pTemplate="header">
       <div class="flex items-center gap-2">
         <i class="pi pi-filter"></i>
@@ -12,169 +8,75 @@
     </ng-template>
 
     <form [formGroup]="filterForm">
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-6 p-fluid"
-      >
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-6 p-fluid">
         <div>
-          <label
-            for="contractNumber"
-            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
-            >Nº Contrato</label
-          >
-          <p-inputNumber
-            inputId="contractNumber"
-            formControlName="contractNumber"
-            mode="decimal"
-            [useGrouping]="false"
-            placeholder="Digite o número"
-          ></p-inputNumber>
+          <label for="contractNumber" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Nº
+            Contrato</label>
+          <p-inputNumber inputId="contractNumber" formControlName="contractNumber" mode="decimal" [useGrouping]="false"
+            placeholder="Digite o número"></p-inputNumber>
         </div>
         <div>
-          <label
-            for="clientName"
-            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
-            >Nome do Cliente</label
-          >
-          <input
-            id="clientName"
-            type="text"
-            pInputText
-            formControlName="clientName"
-            placeholder="Busque por nome"
-          />
+          <label for="clientName" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Nome do
+            Cliente</label>
+          <input id="clientName" type="text" pInputText formControlName="clientName" placeholder="Busque por nome" />
         </div>
         <div>
-          <label
-            for="technicianId"
-            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
-            >Técnico</label
-          >
-          <p-select
-            inputId="technicianId"
-            [options]="technicianOptions"
-            formControlName="technicianId"
-            placeholder="Todos"
-            optionLabel="label"
-            optionValue="value"
-            [showClear]="true"
-            class="w-full"
-            panelStyleClass="w-full"
-            appendTo="body"
-          />
+          <label for="technicianId"
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Técnico</label>
+          <p-select inputId="technicianId" [options]="technicianOptions" formControlName="technicianId"
+            placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" class="w-full"
+            panelStyleClass="w-full" appendTo="body" />
         </div>
 
         <div>
-          <label
-            for="startDate"
-            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
-            >Agendado De</label
-          >
-          <p-datepicker
-            inputId="startDate"
-            formControlName="startDate"
-            dateFormat="dd/mm/yy"
-            dataType="string"
-            [showIcon]="true"
-            placeholder="dd/mm/aaaa"
-            showClear
-            appendTo="body"
-          />
+          <label for="startDate" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Agendado
+            De</label>
+          <p-datepicker inputId="startDate" formControlName="startDate" dateFormat="dd/mm/yy" dataType="string"
+            [showIcon]="true" placeholder="dd/mm/aaaa" showClear appendTo="body" />
         </div>
         <div>
-          <label
-            for="endDate"
-            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
-            >Agendado Até</label
-          >
-          <p-datepicker
-            inputId="endDate"
-            formControlName="endDate"
-            dateFormat="dd/mm/yy"
-            dataType="string"
-            [showIcon]="true"
-            placeholder="dd/mm/aaaa"
-            showClear
-            appendTo="body"
-          />
+          <label for="endDate" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Agendado
+            Até</label>
+          <p-datepicker inputId="endDate" formControlName="endDate" dateFormat="dd/mm/yy" dataType="string"
+            [showIcon]="true" placeholder="dd/mm/aaaa" showClear appendTo="body" />
         </div>
         <div>
-          <label
-            for="periods"
-            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
-            >Períodos</label
-          >
-          <p-multiSelect
-            inputId="periods"
-            [options]="periodOptions"
-            formControlName="periods"
-            placeholder="Todos"
-            optionLabel="label"
-            optionValue="value"
-            [showClear]="true"
-            class="w-full"
-            panelStyleClass="w-full"
-          />
+          <label for="periods"
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Períodos</label>
+          <p-multiSelect inputId="periods" [options]="periodOptions" formControlName="periods" placeholder="Todos"
+            optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full" />
         </div>
         <div>
-          <label
-            for="statuses"
-            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
-            >Status da OS</label
-          >
-          <p-multiSelect
-            inputId="statuses"
-            [options]="statusOptions"
-            formControlName="statuses"
-            placeholder="Todos"
-            optionLabel="label"
-            optionValue="value"
-            [showClear]="true"
-            class="w-full"
-            panelStyleClass="w-full"
-          />
-        </div>
+          <label for="typesOfOS" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Tipo de
+            OS</label>
+            <p-multiSelect inputId="typesOfOS" [options]="serviceOrderTypeOptions" formControlName="typesOfOS"
+            placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" class="w-full"
+            panelStyleClass="w-full" />
+          </div>
+          <div>
+            <label for="subTypeOs" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Sub Tipo da
+              OS</label>
+              <p-multiSelect inputId="subTypeOs" [options]="subStatusOptions" formControlName="subTypeOs" placeholder="Todos"
+              optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full" />
+            </div>
+            <div>
+              <label for="statuses" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Status da
+                OS</label>
+              <p-multiSelect inputId="statuses" [options]="statusOptions" formControlName="statuses" placeholder="Todos"
+                optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full" />
+            </div>
         <div>
-          <label
-            for="typesOfOS"
-            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
-            >Tipo de OS</label
-          >
-          <p-multiSelect
-            inputId="typesOfOS"
-            [options]="serviceOrderTypeOptions"
-            formControlName="typesOfOS"
-            placeholder="Todos"
-            optionLabel="label"
-            optionValue="value"
-            [showClear]="true"
-            class="w-full"
-            panelStyleClass="w-full"
-          />
-        </div>
-        <div>
-          <label
-            for="cities"
-            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
-            >Cidades</label
-          >
-          <p-multiSelect
-            inputId="cities"
-            [options]="cityOptions"
-            formControlName="cities"
-            placeholder="Todas"
-            optionLabel="label"
-            optionValue="value"
-            [showClear]="true"
-            class="w-full"
-            panelStyleClass="w-full"
-          />
+          <label for="cities"
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Cidades</label>
+          <p-multiSelect inputId="cities" [options]="cityOptions" formControlName="cities" placeholder="Todas"
+            optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full" />
         </div>
       </div>
 
       <div
-       class="flex justify-between items-center gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700"
+        class="flex justify-between items-center gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700"
       >
-       <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2">
           <p-button
             label="OS Expiradas"
             icon="pi pi-exclamation-triangle"
@@ -186,7 +88,7 @@
             (click)="showExpiredOs()"
           />
           <p-button
-            label="Todas OS"
+            label="Os Em Produção"
             icon="pi pi-list"
             outlined
             text
@@ -213,36 +115,22 @@
             (click)="applyFilters()"
           ></button>
         </div>
-        </div>
+      </div>
     </form>
   </p-fieldset>
 
-
   <div *ngIf="!isLoading; else loadingTemplate">
     <form [formGroup]="osGroup" class="p-fluid">
-      <p-table
-        #dt
-        [rowTrackBy]="trackById"
-        dataKey="id"
-        [value]="dataSource"
-        [loading]="isLoading"
-        styleClass="text-sm"
-        [paginator]="true"
-        [rows]="rows"
-        [totalRecords]="totalRecords"
-        (onPage)="onTableLazyLoad($event)"
-        [lazy]="true"
-        [rowsPerPageOptions]="[1, 20, 30, 50, 100]"
-        stripedRows
-        [showCurrentPageReport]="true"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} OS"
-        formArrayName="orders"
-      >
+      <p-table #dt [rowTrackBy]="trackById" dataKey="id" [value]="dataSource" [loading]="isLoading" styleClass="text-sm"
+        [paginator]="true" [rows]="rows" [totalRecords]="totalRecords" (onPage)="onTableLazyLoad($event)" [lazy]="true"
+        [rowsPerPageOptions]="[1, 20, 30, 50, 100]" stripedRows [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} OS" formArrayName="orders">
         <ng-template #header>
           <tr>
             <th>Contrato</th>
             <th>Cliente / Endereço</th>
             <th>Tipo OS</th>
+            <th>Sub Tipo</th>
             <th class="w-46">Data Agend.</th>
             <th class="w-24">Período</th>
             <th class="w-48">Técnico</th>
@@ -262,6 +150,9 @@
                 {{ os.address }}
               </div>
               <div class="text-s text-slate-500 truncate w-fit">
+                Tipo - {{ getClientTypeLabel(os.clientType) }}
+              </div>
+              <div class="text-s text-slate-500 truncate w-fit">
                 Cidade - {{ getCitiesLabel(os.city) }}
               </div>
               <div class="text-s text-slate-500 truncate w-fit">
@@ -269,61 +160,27 @@
               </div>
             </td>
             <td>{{ getTypeOfOsLabel(os.typeOfOs) }}</td>
+            <td>{{ getSubTypeOsLabel(os.subTypeOs) }}</td>
             <td>
-              <p-datepicker
-                formControlName="scheduleDate"
-                dateFormat="dd/mm/yy"
-                dataType="string"
-                appendTo="body"
-                styleClass="min-w-[7rem]"
-                fluid
-                [disabledDays]="[0]"
-                id="scheduleDate-{{ i }}"
-              />
+              <p-datepicker formControlName="scheduleDate" dateFormat="dd/mm/yy" dataType="string" appendTo="body"
+                styleClass="min-w-[7rem]" fluid [disabledDays]="[0]" id="scheduleDate-{{ i }}" />
             </td>
             <td>
-              <p-select
-                [options]="periodOptions"
-                formControlName="period"
-                appendTo="body"
-                styleClass="min-w-full max-w-[100%]"
-              />
+              <p-select [options]="periodOptions" formControlName="period" appendTo="body"
+                styleClass="min-w-full max-w-[100%]" />
             </td>
             <td>
-              <p-select
-                [options]="technicianOptions"
-                formControlName="technician"
-                optionLabel="label"
-                optionValue="value"
-                appendTo="body"
-                styleClass="min-w-[170px] max-w-[170px]"
-                id="technician"
-                showClear
-              />
+              <p-select [options]="technicianOptions" formControlName="technician" optionLabel="label"
+                optionValue="value" appendTo="body" styleClass="min-w-[170px] max-w-[170px]" id="technician"
+                showClear />
             </td>
             <td>
-              <p-datepicker
-                formControlName="startOfOs"
-                styleClass="min-w-[5rem]"
-                [timeOnly]="true"
-                dataType="string"
-                dateFormat="HH:mm"
-                hourFormat="24"
-                appendTo="body"
-                showClear
-              />
+              <p-datepicker formControlName="startOfOs" styleClass="min-w-[5rem]" [timeOnly]="true" dataType="string"
+                dateFormat="HH:mm" hourFormat="24" appendTo="body" showClear />
             </td>
             <td>
-              <p-datepicker
-                formControlName="endOfOs"
-                styleClass="min-w-[5rem]"
-                [timeOnly]="true"
-                dataType="string"
-                dateFormat="HH:mm"
-                hourFormat="24"
-                appendTo="body"
-                showClear
-              />
+              <p-datepicker formControlName="endOfOs" styleClass="min-w-[5rem]" [timeOnly]="true" dataType="string"
+                dateFormat="HH:mm" hourFormat="24" appendTo="body" showClear />
             </td>
             <td>
               {{ os.durationOfOs | formatDuration }}
@@ -335,32 +192,45 @@
                 optionLabel="label"
                 optionValue="value"
                 appendTo="body"
-                styleClass="min-w-full"
-              />
+                [styleClass]="
+                  'min-w-full ' +
+                  (orders.controls[i]?.get('status')?.value ===
+                  ServiceOrderStatus.EXECUTED
+                    ? 'status-executado'
+                    : orders.controls[i]?.get('status')?.value ===
+                      ServiceOrderStatus.IN_PRODUCTION
+                    ? 'status-andamento'
+                    : orders.controls[i]?.get('status')?.value ===
+                      ServiceOrderStatus.CANCELED
+                    ? 'status-cancelado'
+                    : orders.controls[i]?.get('status')?.value ===
+                      ServiceOrderStatus.RESCHEDULED
+                    ? 'status-reagendado'
+                    : '')
+                "
+              >
+                <ng-template let-option pTemplate="item">
+                  <div
+                    class="status-option"
+                    [ngClass]="{
+                      'status-executado': option.label === 'Executado',
+                      'status-andamento': option.label === 'Em Produção',
+                      'status-cancelado': option.label === 'Cancelado',
+                      'status-reagendado': option.label === 'Reagendado',
+                    }"
+                  >
+                    {{ option.label }}
+                  </div>
+                </ng-template>
+              </p-select>
             </td>
             <td>
               <div class="flex flex-col items-center justify-center gap-2">
                 <div>
-                  <button
-                    type="button"
-                    rounded
-                    pButton
-                    (click)="openUnproductiveVisitDialog(os)"
-                    icon="pi pi-flag"
-                    text
-                    pTooltip="Visita Improdutiva"
-                    tooltipPosition="left"
-                  ></button>
-                  <button
-                    type="button"
-                    pButton
-                    (click)="openHelperTechDialog(os)"
-                    icon="pi pi-calendar-plus"
-                    rounded
-                    text
-                    pTooltip="Ajuda Técnica"
-                    tooltipPosition="left"
-                  ></button>
+                  <button type="button" rounded pButton (click)="openUnproductiveVisitDialog(os)" icon="pi pi-flag" text
+                    pTooltip="Visita Improdutiva" tooltipPosition="left"></button>
+                  <button type="button" pButton (click)="openHelperTechDialog(os)" icon="pi pi-calendar-plus" rounded
+                    text pTooltip="Ajuda Técnica" tooltipPosition="left"></button>
                 </div>
 
                 <div>
@@ -377,10 +247,12 @@
                     type="button"
                     pButton
                     (click)="openObservationTechDialog(os)"
-                    [pTooltip]="os.observation ? os.observation : 'Sem Observação'"
+                    [pTooltip]="
+                      os.observation ? os.observation : 'Sem Observação'
+                    "
                     icon="pi pi-info-circle"
                     class="p-button-rounded p-button-text p-button-info"
-                    [severity]="os.observation ?   'info' : 'warn' "
+                    [severity]="os.observation ? 'info' : 'warn'"
                   ></button>
                   <button
                     type="button"
@@ -409,75 +281,35 @@
   </div>
 </ng-template>
 
-<p-dialog
-  dismissableMask="true"
-  draggable="false"
-  header="Visita Improdutiva"
-  [modal]="true"
-  [(visible)]="isUnproductiveVisitDialogVisible"
-  [style]="{ width: '35rem' }"
->
-  <ng-container
-    *ngIf="isUnproductiveVisitDialogVisible && selectedServiceOrder"
-  >
-    <app-unproductive-visits
-      [technicians]="technicianOptions"
-      [serviceOrder]="selectedServiceOrder"
-    ></app-unproductive-visits>
+<p-dialog dismissableMask="true" draggable="false" header="Visita Improdutiva" [modal]="true"
+  [(visible)]="isUnproductiveVisitDialogVisible" [style]="{ width: '35rem' }">
+  <ng-container *ngIf="isUnproductiveVisitDialogVisible && selectedServiceOrder">
+    <app-unproductive-visits [technicians]="technicianOptions"
+      [serviceOrder]="selectedServiceOrder"></app-unproductive-visits>
   </ng-container>
 </p-dialog>
 
-<p-dialog
-  dismissableMask="true"
-  draggable="false"
-  header="Ajuda Técnica"
-  [modal]="true"
-  [(visible)]="isHelperTechDialogVisible"
-  [style]="{ width: '30rem' }"
->
+<p-dialog dismissableMask="true" draggable="false" header="Ajuda Técnica" [modal]="true"
+  [(visible)]="isHelperTechDialogVisible" [style]="{ width: '30rem' }">
   @if(isHelperTechDialogVisible && selectedServiceOrder){
-  <app-helper-tech
-    #helperTechDialog
-    (eventHelper)="onHelperSuccess()"
-    [technicians]="technicianOptions"
-    [serviceOrder]="selectedServiceOrder"
-  ></app-helper-tech>
+  <app-helper-tech #helperTechDialog (eventHelper)="onHelperSuccess()" [technicians]="technicianOptions"
+    [serviceOrder]="selectedServiceOrder"></app-helper-tech>
   }
 </p-dialog>
 
-<p-dialog
-  dismissableMask="true"
-  draggable="false"
-  header="Editar OS"
-  [modal]="true"
-  [(visible)]="isEditingTechDialogVisible"
-  [style]="{ width: '50rem' }"
->
+<p-dialog dismissableMask="true" draggable="false" header="Editar OS" [modal]="true"
+  [(visible)]="isEditingTechDialogVisible" [style]="{ width: '50rem' }">
   @if(selectedServiceOrder && isEditingTechDialogVisible){
-  <app-edit
-    #editOS
-    (eventEdit)="onEditSuccess()"
-    [serviceOrder]="selectedServiceOrder"
-  ></app-edit>
+  <app-edit #editOS (eventEdit)="onEditSuccess()" [serviceOrder]="selectedServiceOrder"></app-edit>
   }
 </p-dialog>
 
-<p-dialog
-  dismissableMask="true"
-  draggable="false"
-  header="Editar OS"
-  [modal]="true"
-  [(visible)]="isPostingObeservationTechDialogVisible"
-  [style]="{ width: '30rem' }"
->
+<p-dialog dismissableMask="true" draggable="false" header="Editar OS" [modal]="true"
+  [(visible)]="isPostingObeservationTechDialogVisible" [style]="{ width: '30rem' }">
   @if(selectedServiceOrder && isPostingObeservationTechDialogVisible){
 
-  <app-observation
-    (eventObservation)="onObservationSuccess()"
-    [serviceOrder]="selectedServiceOrder"
-  ></app-observation>
+  <app-observation (eventObservation)="onObservationSuccess()" [serviceOrder]="selectedServiceOrder"></app-observation>
   }
 </p-dialog>
-
 
 <p-confirmdialog />

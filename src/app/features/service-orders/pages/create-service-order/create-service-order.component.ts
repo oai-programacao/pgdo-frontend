@@ -20,7 +20,7 @@ import { KeyFilterModule } from 'primeng/keyfilter'; // Para pKeyFilter
 
 // Importar o componente de criação de oferta
 import { CreateRequestOfferComponent } from "../../../offers/components/create-request-offer/create-request-offer.component";
-import { City, ClientTypeLabels, CommandAreaLabels, OfferStatus, PeriodLabels, Technology, TechnologyLabels, TypeOfOs, TypeOfOsLabels } from '../../../../interfaces/enums.model';
+import { City, ClientTypeLabels, CommandAreaLabels, OfferStatus, PeriodLabels, SubTypeServiceOrderLabels, Technology, TechnologyLabels, TypeOfOs, TypeOfOsLabels, TypeToSubTypeMap } from '../../../../interfaces/enums.model';
 import { CreateServiceOrderDto } from '../../../../interfaces/service-order.model';
 import { ViewOfferDto } from '../../../../interfaces/offers.model';
 import { OffersService } from '../../../offers/services/offers.service';
@@ -79,6 +79,8 @@ export class CreateServiceOrderComponent implements OnInit, OnDestroy {
   technologyOptions: any[];
   //dropdowns dinâmicos
   typeOfOsOptions!: any[];
+  subTypeOptions: any[] = [];
+
   // typeOfOsOptions: { label: string; value: TypeOfOs }[] = [
   //   {label: 'Instalação' , value: TypeOfOs.INSTALLATION},
   //   {label: 'Manutenção', value: TypeOfOs.MAINTENANCE},
@@ -127,9 +129,10 @@ export class CreateServiceOrderComponent implements OnInit, OnDestroy {
       address: [null, Validators.required],
       clientType: [null, Validators.required],
       serviceOrderType: [{value: null, disabled: true}, Validators.required],
+      subTypeServiceOrder: [{value: null, disabled: true}, Validators.required],
       scheduleDate: [{value: null, disabled: true}, Validators.required],
       period: [{value: null, disabled: true}, Validators.required],
-      technology: [Technology.FIBER_OPTIC, Validators.required],
+      technology: [Technology.FIBER_OPTIC, Validators.required]
     });
   }
 
@@ -208,21 +211,47 @@ export class CreateServiceOrderComponent implements OnInit, OnDestroy {
 
   observerChanges(): void {
     const typeOfOsControl = this.createOsForm.get('serviceOrderType')!;
+    const subTypeControl = this.createOsForm.get('subTypeServiceOrder')!;
     const scheduleDateControl = this.createOsForm.get('scheduleDate')!;
     const periodControl = this.createOsForm.get('period')!;
 
     // Observa mudanças no tipo de OS e na data agendada
-    typeOfOsControl.valueChanges.subscribe((value) => {
-      this.scheduleDateOptions = []; // Limpa as datas disponíveis
-      this.periodOptions = []; // Limpa os períodos disponíveis
-      if (value) {
-        scheduleDateControl.enable(); // Habilita o campo de data agendada
-      }
-      this.scheduleDateOptions = this.offersOptions
-        .filter(offer => offer.typeOfOs === value)
-        .map(offer => offer.date)
-        .filter((date, index, self) => self.indexOf(date) === index)
-    })
+    typeOfOsControl.valueChanges.subscribe((selectedType: TypeOfOs) => {
+    const subTypeControl = this.createOsForm.get('subTypeServiceOrder')!;
+    const scheduleDateControl = this.createOsForm.get('scheduleDate')!;
+
+    // 1. Limpa e reseta tudo que depende do Tipo de OS
+    subTypeControl.setValue(null, { emitEvent: false });
+    this.subTypeOptions = [];
+    this.scheduleDateOptions = [];
+    this.periodOptions = []; // Limpa os períodos também
+
+    if (selectedType) {
+        // --- LÓGICA NOVA PARA O SUBTIPO ---
+        // Pega a lista de subtipos válidos do nosso mapa
+        const validSubTypes = TypeToSubTypeMap[selectedType] || []; 
+        
+        // Popula as opções do dropdown de subtipo com base na lista filtrada
+        this.subTypeOptions = validSubTypes.map(subType => ({
+            label: SubTypeServiceOrderLabels[subType],
+            value: subType
+        }));
+        subTypeControl.enable();
+
+
+        // --- SUA LÓGICA EXISTENTE PARA A DATA (continua correta) ---
+        scheduleDateControl.enable();
+        this.scheduleDateOptions = this.offersOptions
+            .filter(offer => offer.typeOfOs === selectedType)
+            .map(offer => offer.date)
+            .filter((date, index, self) => self.indexOf(date) === index);
+            
+    } else {
+        // Se nenhum tipo for selecionado, desabilita os campos dependentes
+        subTypeControl.disable();
+        scheduleDateControl.disable();
+    }
+});
 
     scheduleDateControl.valueChanges.subscribe((selectedDate) => {
       this.periodOptions = [];
@@ -315,6 +344,11 @@ export class CreateServiceOrderComponent implements OnInit, OnDestroy {
         this.isSubmitting = false;
         this.createOsForm.reset(); // Reseta o formulário após o sucesso
         this.resetDropdownOptions(); // Reseta os dropdowns após o sucesso
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Ordem de Serviço Criada com Sucesso!'
+        })
       },
       error: (err) => {
         this.messageService.add({

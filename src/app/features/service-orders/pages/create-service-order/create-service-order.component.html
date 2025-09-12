@@ -337,6 +337,40 @@
 
           <div>
             <label
+              for="cs-subTypeServiceOrder"
+              class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+              >Sub tipo de OS
+              <span class="text-red-500 dark:text-red-400">*</span></label
+            >
+            <p-select
+              inputId="cs-subTypeServiceOrder"
+              [options]="subTypeOptions"
+              formControlName="subTypeServiceOrder"
+              placeholder="Selecione"
+              optionLabel="label"
+              optionValue="value"
+              styleClass="w-full"
+              [ngClass]="{
+                'ng-dirty': createOsForm.get('subTypeServiceOrder')?.touched,
+                'ng-invalid':
+                  createOsForm.get('subTypeServiceOrder')?.invalid &&
+                  createOsForm.get('subTypeServiceOrder')?.touched
+              }"
+            ></p-select>
+            <div class="h-5 mt-1">
+              <small
+                *ngIf="
+                  createOsForm.get('subTypeServiceOrder')?.invalid &&
+                  createOsForm.get('subTypeServiceOrder')?.touched
+                "
+                class="p-error block mt-1 text-xs"
+                >Tipo de Sub OS é obrigatório.</small
+              >
+            </div>
+          </div>
+
+          <div>
+            <label
               for="cs-commandArea"
               class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
               >Área de Comando

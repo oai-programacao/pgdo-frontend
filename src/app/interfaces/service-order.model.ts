@@ -1,5 +1,5 @@
 import { ViewEmployeeDto } from "./employee.model";
-import { CommandArea, City, ClientType, TypeOfOs, Period, Technology, ServiceOrderStatus } from "./enums.model";
+import { CommandArea, City, ClientType, TypeOfOs, Period, Technology, ServiceOrderStatus, SubTypeServiceOrder } from "./enums.model";
 import { ViewTechnicianDto } from "./technician.model";
 
 
@@ -15,8 +15,6 @@ export interface CustomPageResponse<T> {
   page: PageInfo;
 }
 
-
-// Para seu ViewServiceOrderDto (você já deve ter algo similar)
 export interface ViewServiceOrderDto {
   helpers: never[];
   id: string; // UUID
@@ -36,7 +34,8 @@ export interface ViewServiceOrderDto {
   period?: Period;
   technology?: Technology;
   technician?: ViewTechnicianDto;
-  status?: string; // Ou um enum ServiceOrderStatus
+  status?: string; 
+  subTypeOs?: SubTypeServiceOrder;
   technicalHelp?: ViewTechnicalHelpDto[];
   unproductiveVisits?: ViewUnproductiveVisits[];
   startOfOs: string;
@@ -134,6 +133,7 @@ export interface ServiceOrderFilters {
   endDate?: string | null; 
   cities?: City[] | null;
   typesOfOS?: TypeOfOs[] | null;
+  subTypeOs?: SubTypeServiceOrder [] | null;
   periods?: Period[] | null;
   statuses?: ServiceOrderStatus[] | null;
 }

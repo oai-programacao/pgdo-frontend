@@ -9,6 +9,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import {
+  AbstractControl,
   FormArray,
   FormBuilder,
   FormGroup,
@@ -40,6 +41,8 @@ import {
   PeriodLabels,
   ServiceOrderStatus,
   ServiceOrderStatusLabels,
+  SubTypeServiceOrder,
+  SubTypeServiceOrderLabels,
   TypeOfOs,
   TypeOfOsLabels,
 } from "../../../../interfaces/enums.model";
@@ -56,8 +59,11 @@ import { HelperTechComponent } from "../../components/helper-tech/helper-tech.co
 import { EditComponent } from "../../components/edit/edit.component";
 import { ObservationComponent } from "../../components/observation/observation.component";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
-import { BadgeModule } from 'primeng/badge';
-
+import { BadgeModule } from "primeng/badge";
+import {
+  ClientType,
+  ClientTypeLabels,
+} from "../../../../interfaces/enums.model";
 @Component({
   selector: "app-admin-service-orders",
   imports: [
@@ -106,6 +112,8 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private pendingFirstValue: number | null = null;
 
+  public ServiceOrderStatus = ServiceOrderStatus;
+
   technicians: ViewTechnicianDto[] = [];
   technicianOptions: { label: string; value: string | null }[] = [];
   // os: ViewServiceOrderDto[] = [];
@@ -120,17 +128,23 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   first = 0;
   hasObservation: boolean = false;
   osExpired!: boolean;
-  
 
   selectedServiceOrder: ViewServiceOrderDto | null = null;
 
   statusOptions: any[] = [
-    { label: "Em Branco", value: null },
     ...Object.entries(ServiceOrderStatusLabels).map(([key, value]) => ({
       label: value,
       value: ServiceOrderStatus[key as keyof typeof ServiceOrderStatus],
     })),
   ];
+
+  subStatusOptions: any[] = [
+    ...Object.entries(SubTypeServiceOrderLabels).map(([key, value]) => ({
+      label: value,
+      value: SubTypeServiceOrder[key as keyof typeof SubTypeServiceOrder],
+    }))
+  ];
+
   serviceOrderTypeOptions: any[];
   cityOptions: any[];
   periodOptions: any[];
@@ -145,11 +159,15 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   isEditingTechDialogVisible = false;
   isPostingObeservationTechDialogVisible = false;
   isDeleteTechDialogVisible = false;
+  clientTypeOptions: any[];
 
   constructor() {
     this.serviceOrderTypeOptions = this.mapLabelsToOptions(TypeOfOsLabels);
+    // this.serviceOrderTypeOptions = this.mapLabelsToOptions(SubTypeServiceOrderLabels);
     this.cityOptions = this.mapLabelsToOptions(CitiesLabels);
     this.periodOptions = this.mapLabelsToOptions(PeriodLabels);
+    this.clientTypeOptions = this.mapLabelsToOptions(ClientTypeLabels);
+
     this.osGroup = this.fb.group({
       orders: this.fb.array([]),
     });
@@ -220,8 +238,8 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.initializeStateFromUrl();
     this.initTechnicians();
     this.loadExpiredOsCount();
+    this.restoreFiltersFromUrl();
     this.loadServiceOrders();
-    
   }
 
   get orders(): FormArray {
@@ -232,11 +250,22 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     return item.id;
   }
 
- 
-
   applyFilters(): void {
     this.first = 0;
     this.loadServiceOrders();
+
+    this.filterForm.reset({
+      contractNumber: null,
+      clientName: "",
+      technicianId: null,
+      statuses: [],
+      subTypeOs: [],
+      typesOfOS: [],
+      cities: [],
+      periods: [],
+      startDate: null,
+      endDate: null,
+    });
   }
 
   private initializeStateFromUrl(): void {
@@ -247,12 +276,14 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.first = page * this.rows;
   }
 
- loadServiceOrders(event?: TableLazyLoadEvent): void {
+loadServiceOrders(event?: TableLazyLoadEvent): void {
   this.isLoading = true;
+
   if (event) {
     this.first = event.first ?? 0;
     this.rows = event.rows ?? 10;
   }
+
   const page = Math.floor(this.first / this.rows);
 
   this.updateUrlQueryParams();
@@ -262,12 +293,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     .findAll(this.filterForm.value, page, this.rows)
     .subscribe({
       next: (dataPage) => {
-        let orders = dataPage.content ?? [];
-        const statuses = this.filterForm.value.statuses;
-        if (!statuses || statuses.length === 0 || !statuses.includes(ServiceOrderStatus.EXECUTED)) {
-          orders = orders.filter((os) => os.status !== ServiceOrderStatus.EXECUTED);
-        }
-        this.dataSource = orders; 
+        this.dataSource = dataPage.content ?? [];
         this.totalRecords = dataPage.page.totalElements;
         this.populateOrdersArray();
       },
@@ -281,143 +307,169 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
 }
 
   onTableLazyLoad(event: TableLazyLoadEvent) {
-  if (this.showingExpired) {
-    this.showExpiredOs(event);
-  } else {
-    this.loadServiceOrders(event);
+    if (this.showingExpired) {
+      this.showExpiredOs(event);
+    } else {
+      this.loadServiceOrders(event);
+    }
   }
-}
 
   private loadExpiredOsCount(): void {
     this.serviceOrderService.getExpiredCount().subscribe({
       next: (response) => {
-      const countValue = response.Count;
-      this.expiredOsCount = countValue ?? 0;
-      this.cdr.detectChanges(); 
-    },
-    error: (e) => {
-      this.expiredOsCount = 0;
-      this.cdr.detectChanges();
+        const countValue = response.Count;
+        this.expiredOsCount = countValue ?? 0;
+        this.cdr.detectChanges();
+      },
+      error: (e) => {
+        this.expiredOsCount = 0;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  showExpiredOs(event?: TableLazyLoadEvent): void {
+    if (!event) {
+      this.first = 0;
     }
-  });
+
+    this.isLoading = true;
+    this.showingExpired = true;
+
+    if (event) {
+      this.first = event.first ?? 0;
+      this.rows = event.rows ?? 20;
+    }
+
+    const page = Math.floor(this.first / this.rows);
+    this.updateUrlQueryParams();
+    this.pendingFirstValue = this.first;
+
+    this.serviceOrderService.getExpiredCliente(page, this.rows).subscribe({
+      next: (dataPage) => {
+        let expiredOrders = dataPage.content ?? [];
+        this.dataSource = dataPage.content ?? [];
+        this.totalRecords = dataPage.page.totalElements ?? 0;
+        this.populateOrdersArray();
+      },
+      error: () => {
+        this.isLoading = false;
+        this.messageService.add({
+          severity: "error",
+          summary: "Erro",
+          detail: "Falha ao carregar Ordens de Serviço Expiradas.",
+        });
+      },
+    });
   }
 
-showExpiredOs(event?: TableLazyLoadEvent): void {
-   if (!event) {
-    this.first = 0;
-  }
-
+  showAllOs(event?: TableLazyLoadEvent): void {
   this.isLoading = true;
-  this.showingExpired = true;
+  this.showingExpired = false;
 
   if (event) {
     this.first = event.first ?? 0;
-    this.rows = event.rows ?? 20;
+    this.rows = event.rows ?? 10;
   }
 
   const page = Math.floor(this.first / this.rows);
-  this.updateUrlQueryParams();
+
   this.pendingFirstValue = this.first;
 
-  this.serviceOrderService.getExpiredCliente(page, this.rows).subscribe({
-    next: (dataPage) => {
-      let expiredOrders = dataPage.content ?? [];
-      this.dataSource = dataPage.content ?? [];
-      this.totalRecords = dataPage.page.totalElements ?? 0;
-      this.populateOrdersArray();
-    },
-    error: () => {
-      this.isLoading = false;
+  this.serviceOrderService
+    .findByOsActive(page, this.rows)
+    .subscribe({
+      next: (dataPage) => {
+        this.dataSource = dataPage.content ?? [];
+        this.totalRecords = dataPage.page.totalElements;
+        this.populateOrdersArray();
+      },
+      error: () =>
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao carregar Ordens de Serviço ativas.',
+        }),
+    });
+}
+
+  updateServiceOrder(index: number): void {
+    const formGroup = this.orders.at(index) as FormGroup;
+    const id = formGroup.get("id")?.value;
+
+    if (!id) return;
+
+    const technician = formGroup.get("technician")?.value;
+    const startOfOs = formGroup.get("startOfOs")?.value;
+    const endOfOs = formGroup.get("endOfOs")?.value;
+
+    // Validações
+    if (!technician && (startOfOs || endOfOs)) {
       this.messageService.add({
-        severity: "error",
-        summary: "Erro",
-        detail: "Falha ao carregar Ordens de Serviço Expiradas.",
+        severity: "warn",
+        summary: "Validação",
+        detail:
+          "Para informar horário de início ou fim, é necessário definir um técnico.",
       });
+      formGroup.get("startOfOs")?.setValue(null, { emitEvent: false });
+      formGroup.get("endOfOs")?.setValue(null, { emitEvent: false });
+      return;
     }
-  });
-}
 
-  showAllOs(): void {
-  this.showingExpired = false;
-  this.first = 0;
-  this.loadServiceOrders();  
-}
-
-updateServiceOrder(index: number): void {
-  const formGroup = this.orders.at(index) as FormGroup;
-  const id = formGroup.get("id")?.value;
-
-  if (!id) return;
-
-  const technician = formGroup.get("technician")?.value;
-  const startOfOs = formGroup.get("startOfOs")?.value;
-  const endOfOs = formGroup.get("endOfOs")?.value;
-
-  // Validações
-  if (!technician && (startOfOs || endOfOs)) {
-    this.messageService.add({
-      severity: "warn",
-      summary: "Validação",
-      detail: "Para informar horário de início ou fim, é necessário definir um técnico.",
-    });
-    formGroup.get("startOfOs")?.setValue(null, { emitEvent: false });
-    formGroup.get("endOfOs")?.setValue(null, { emitEvent: false });
-    return;
-  }
-
-  if (technician && !startOfOs && endOfOs) {
-    this.messageService.add({
-      severity: "warn",
-      summary: "Validação",
-      detail: "Para informar o horário de fim, o horário de início deve estar preenchido.",
-    });
-    formGroup.get("endOfOs")?.setValue(null, { emitEvent: false });
-    return;
-  }
-
-  const dto: UpdateServiceOrderDto = {
-    scheduleDate: formGroup.get("scheduleDate")?.value || null,
-    period: formGroup.get("period")?.value || null,
-    technology: formGroup.get("technology")?.value || null,
-    technicianId: technician || null,
-    status: formGroup.get("status")?.value || null,
-    cabling: formGroup.get("cabling")?.value ?? null,
-    isActiveToReport: undefined,
-    startOfOs: startOfOs || null,
-    endOfOs: endOfOs || null,
-    observation: formGroup.get("observation")?.value || null,
-  };
-
-  this.serviceOrderService.update(id, dto).subscribe({
-    next: (updated?: ViewServiceOrderDto) => {
-      formGroup.patchValue(
-        {
-          technician: updated?.technician?.id ?? dto.technicianId,
-          status: updated?.status ?? dto.status,
-          startOfOs: updated?.startOfOs ?? dto.startOfOs,
-          endOfOs: updated?.endOfOs ?? dto.endOfOs,
-          observation: updated?.observation ?? dto.observation,
-          durationOfOs: updated?.durationOfOs,
-        },
-        { emitEvent: false }
-      );
-      // Se status for "Executado", recarrega a lista
-      if (
-        updated?.status === ServiceOrderStatus.EXECUTED ||
-        dto.status === ServiceOrderStatus.EXECUTED
-      ) {
-        this.loadServiceOrders();
-      }
-    },
-    error: (err) => {
+    if (technician && !startOfOs && endOfOs) {
       this.messageService.add({
-        severity: "error",
-        summary: "Erro",
-        detail: "Erro ao atualizar Ordem de Serviço.",
+        severity: "warn",
+        summary: "Validação",
+        detail:
+          "Para informar o horário de fim, o horário de início deve estar preenchido.",
       });
-    },
-  });
-}
+      formGroup.get("endOfOs")?.setValue(null, { emitEvent: false });
+      return;
+    }
+
+    const dto: UpdateServiceOrderDto = {
+      scheduleDate: formGroup.get("scheduleDate")?.value || null,
+      period: formGroup.get("period")?.value || null,
+      technology: formGroup.get("technology")?.value || null,
+      technicianId: technician || null,
+      status: formGroup.get("status")?.value || null,
+      cabling: formGroup.get("cabling")?.value ?? null,
+      isActiveToReport: undefined,
+      startOfOs: startOfOs || null,
+      endOfOs: endOfOs || null,
+      observation: formGroup.get("observation")?.value || null,
+    };
+
+    this.serviceOrderService.update(id, dto).subscribe({
+      next: (updated?: ViewServiceOrderDto) => {
+        formGroup.patchValue(
+          {
+            technician: updated?.technician?.id ?? dto.technicianId,
+            status: updated?.status ?? dto.status,
+            startOfOs: updated?.startOfOs ?? dto.startOfOs,
+            endOfOs: updated?.endOfOs ?? dto.endOfOs,
+            observation: updated?.observation ?? dto.observation,
+            durationOfOs: updated?.durationOfOs,
+          },
+          { emitEvent: false }
+        );
+        // Se status for "Executado", recarrega a lista
+        if (
+          updated?.status === ServiceOrderStatus.EXECUTED ||
+          dto.status === ServiceOrderStatus.EXECUTED
+        ) {
+          this.loadServiceOrders();
+        }
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: "error",
+          summary: "Erro",
+          detail: "Erro ao atualizar Ordem de Serviço.",
+        });
+      },
+    });
+  }
   clearFilters(): void {
     this.filterForm.reset();
     this.first = 0;
@@ -466,6 +518,7 @@ updateServiceOrder(index: number): void {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: params,
+      queryParamsHandling: '',
       replaceUrl: true,
     });
   }
@@ -475,10 +528,11 @@ updateServiceOrder(index: number): void {
       contractNumber: [null],
       clientName: [""],
       technicianId: [null],
-      statuses: [[]],
-      typesOfOS: [[]],
-      cities: [[]],
-      periods: [[]],
+      statuses: [],
+      subTypeOs: [],
+      typesOfOS: [],
+      cities: [],
+      periods: [],
       startDate: [null],
       endDate: [null],
     });
@@ -578,8 +632,10 @@ updateServiceOrder(index: number): void {
     Object.entries(labels).map(([value, label]) => ({ label, value }));
   getStatusLabel = (status: ServiceOrderStatus) =>
     ServiceOrderStatusLabels[status] || status;
+  getClientTypeLabel = (type: ClientType) => ClientTypeLabels[type] || type;
   getCitiesLabel = (city: City) => CitiesLabels[city] || city;
   getTypeOfOsLabel = (type: TypeOfOs) => TypeOfOsLabels[type] || type;
+  getSubTypeOsLabel = (type: SubTypeServiceOrder) => SubTypeServiceOrderLabels[type] || type;
   getPeriodLabel = (period: Period) => PeriodLabels[period] || period;
 
   confirmDeleteServiceOrder(event: Event, os: ViewServiceOrderDto) {
@@ -639,4 +695,42 @@ updateServiceOrder(index: number): void {
       },
     });
   }
+
+  restoreFiltersFromUrl(): void {
+    this.route.queryParams.subscribe((params) => {
+      this.filterForm.patchValue({
+        contractNumber: params["contractNumber"] ? Number(params["contractNumber"]) : null,
+        clientName: params["clientName"] || "",
+        technicianId: params["technicianId"] || null,
+        statuses: params["statuses"]
+          ? Array.isArray(params["statuses"])
+            ? params["statuses"]
+            : [params["statuses"]]
+          : [],
+        typesOfOS: params["typesOfOS"]
+          ? Array.isArray(params["typesOfOS"])
+            ? params["typesOfOS"]
+            : [params["typesOfOS"]]
+          : [],
+        subTypeOs: params["subTypeOs"]
+          ? Array.isArray(params["subTypeOs"])
+            ? params["subTypeOs"]
+            : [params["subTypeOs"]]
+          : [],
+        cities: params["cities"]
+          ? Array.isArray(params["cities"])
+            ? params["cities"]
+            : [params["cities"]]
+          : [],
+        periods: params["periods"]
+          ? Array.isArray(params["periods"])
+            ? params["periods"]
+            : [params["periods"]]
+          : [],
+        startDate: params["startDate"] ? new Date(params["startDate"]) : null,
+        endDate: params["endDate"] ? new Date(params["endDate"]) : null,
+      });
+    });
+  }
+
 }

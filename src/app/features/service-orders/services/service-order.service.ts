@@ -78,6 +78,11 @@ export class ServiceOrderService {
         (type) => (params = params.append("typesOfOS", type))
       );
     }
+    if (filters.subTypeOs && filters.subTypeOs.length > 0) {
+      filters.subTypeOs.forEach(
+        (type) => (params = params.append("subTypeOs", type))
+      )
+    }
     if (filters.periods && filters.periods.length > 0) {
       filters.periods.forEach(
         (period) => (params = params.append("periods", period))
@@ -96,6 +101,20 @@ export class ServiceOrderService {
 
   findById(id: string): Observable<ViewServiceOrderDto> {
     return this.http.get<ViewServiceOrderDto>(`${this.apiUrl}/${id}`);
+  }
+
+  findByOsActive(
+    page: number,
+    size: number
+  ): Observable<CustomPageResponse<ViewServiceOrderDto>> {
+    let params = new HttpParams()
+      .set("page", page.toString())
+      .set("size", size.toString());
+
+    return this.http.get<CustomPageResponse<ViewServiceOrderDto>>(
+      `${this.apiUrl}/osActive`,
+      { params }
+    );
   }
 
   update(
