@@ -142,7 +142,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     ...Object.entries(SubTypeServiceOrderLabels).map(([key, value]) => ({
       label: value,
       value: SubTypeServiceOrder[key as keyof typeof SubTypeServiceOrder],
-    }))
+    })),
   ];
 
   serviceOrderTypeOptions: any[];
@@ -250,9 +250,8 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
 
   applyFilters(): void {
     this.first = 0;
-    this.loadServiceOrders();
-
     this.filterForm.reset();
+    this.loadServiceOrders();
   }
 
   private initializeStateFromUrl(): void {
@@ -263,35 +262,35 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.first = page * this.rows;
   }
 
-loadServiceOrders(event?: TableLazyLoadEvent): void {
-  this.isLoading = true;
+  loadServiceOrders(event?: TableLazyLoadEvent): void {
+    this.isLoading = true;
 
-  if (event) {
-    this.first = event.first ?? 0;
-    this.rows = event.rows ?? 10;
+    if (event) {
+      this.first = event.first ?? 0;
+      this.rows = event.rows ?? 10;
+    }
+
+    const page = Math.floor(this.first / this.rows);
+
+    this.updateUrlQueryParams();
+    this.pendingFirstValue = this.first;
+
+    this.serviceOrderService
+      .findAll(this.filterForm.value, page, this.rows)
+      .subscribe({
+        next: (dataPage) => {
+          this.dataSource = dataPage.content ?? [];
+          this.totalRecords = dataPage.page.totalElements;
+          this.populateOrdersArray();
+        },
+        error: () =>
+          this.messageService.add({
+            severity: "error",
+            summary: "Erro",
+            detail: "Falha ao carregar Ordens de Serviço.",
+          }),
+      });
   }
-
-  const page = Math.floor(this.first / this.rows);
-
-  this.updateUrlQueryParams();
-  this.pendingFirstValue = this.first;
-
-  this.serviceOrderService
-    .findAll(this.filterForm.value, page, this.rows)
-    .subscribe({
-      next: (dataPage) => {
-        this.dataSource = dataPage.content ?? [];
-        this.totalRecords = dataPage.page.totalElements;
-        this.populateOrdersArray();
-      },
-      error: () =>
-        this.messageService.add({
-          severity: "error",
-          summary: "Erro",
-          detail: "Falha ao carregar Ordens de Serviço.",
-        }),
-    });
-}
 
   onTableLazyLoad(event: TableLazyLoadEvent) {
     if (this.showingExpired) {
@@ -351,21 +350,19 @@ loadServiceOrders(event?: TableLazyLoadEvent): void {
   }
 
   showAllOs(event?: TableLazyLoadEvent): void {
-  this.isLoading = true;
-  this.showingExpired = false;
+    this.isLoading = true;
+    this.showingExpired = false;
 
-  if (event) {
-    this.first = event.first ?? 0;
-    this.rows = event.rows ?? 10;
-  }
+    if (event) {
+      this.first = event.first ?? 0;
+      this.rows = event.rows ?? 10;
+    }
 
-  const page = Math.floor(this.first / this.rows);
+    const page = Math.floor(this.first / this.rows);
 
-  this.pendingFirstValue = this.first;
+    this.pendingFirstValue = this.first;
 
-  this.serviceOrderService
-    .findByOsActive(page, this.rows)
-    .subscribe({
+    this.serviceOrderService.findByOsActive(page, this.rows).subscribe({
       next: (dataPage) => {
         this.dataSource = dataPage.content ?? [];
         this.totalRecords = dataPage.page.totalElements;
@@ -373,12 +370,12 @@ loadServiceOrders(event?: TableLazyLoadEvent): void {
       },
       error: () =>
         this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao carregar Ordens de Serviço ativas.',
+          severity: "error",
+          summary: "Erro",
+          detail: "Falha ao carregar Ordens de Serviço ativas.",
         }),
     });
-}
+  }
 
   updateServiceOrder(index: number): void {
     const formGroup = this.orders.at(index) as FormGroup;
@@ -505,7 +502,7 @@ loadServiceOrders(event?: TableLazyLoadEvent): void {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: params,
-      queryParamsHandling: '',
+      queryParamsHandling: "",
       replaceUrl: true,
     });
   }
@@ -533,6 +530,12 @@ loadServiceOrders(event?: TableLazyLoadEvent): void {
       date: [null, Validators.required],
       observation: ["", Validators.required],
     });
+  }
+
+  logStatusValue(index: number) {
+    const control = this.orders.at(index)?.get("status");
+    console.log(`Status do index ${index}:`, control?.value);
+    return control?.value;
   }
 
   private initTechnicians(): void {
@@ -622,7 +625,8 @@ loadServiceOrders(event?: TableLazyLoadEvent): void {
   getClientTypeLabel = (type: ClientType) => ClientTypeLabels[type] || type;
   getCitiesLabel = (city: City) => CitiesLabels[city] || city;
   getTypeOfOsLabel = (type: TypeOfOs) => TypeOfOsLabels[type] || type;
-  getSubTypeOsLabel = (type: SubTypeServiceOrder) => SubTypeServiceOrderLabels[type] || type;
+  getSubTypeOsLabel = (type: SubTypeServiceOrder) =>
+    SubTypeServiceOrderLabels[type] || type;
   getPeriodLabel = (period: Period) => PeriodLabels[period] || period;
 
   confirmDeleteServiceOrder(event: Event, os: ViewServiceOrderDto) {
@@ -682,7 +686,4 @@ loadServiceOrders(event?: TableLazyLoadEvent): void {
       },
     });
   }
-
- 
-
 }
