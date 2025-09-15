@@ -45,10 +45,10 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
-    this.loginError = null; // Reseta mensagens de erro anteriores
+    this.loginError = null;
 
     if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched(); // Marca todos os campos como "tocados" para exibir erros de validação
+      this.loginForm.markAllAsTouched();
       return;
     }
 
@@ -58,7 +58,7 @@ export class LoginComponent {
     this.authService.login({ email, password }).subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.router.navigate(["app/home"]); // Redireciona para a página inicial após login bem-sucedido
+        this.router.navigate(["app/home"]);
       },
       error: (error) => {
         this.isLoading = false;

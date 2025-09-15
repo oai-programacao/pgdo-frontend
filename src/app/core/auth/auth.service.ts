@@ -98,11 +98,19 @@ export class AuthService {
       .post<LoginResponseDto>(`${this.apiUrl}/login`, credentials)
       .pipe(
         tap((response) => {
-          this.storeTokensAndScheduleRefresh(response);
-          this.currentUserSubject.next(this.getUserFromToken());
+          console.log("Login response recebido:", response);
 
-          // Ativar WebSocket após login bem-sucedido
+          this.storeTokensAndScheduleRefresh(response);
+          console.log("Tokens armazenados");
+
+          const user = this.getUserFromToken();
+          console.log("Usuário decodificado:", user);
+
+          this.currentUserSubject.next(user);
+          console.log("Subject atualizado");
+
           this.wsService.initWebSocket();
+          console.log("WebSocket inicializado");
         }),
         catchError(this.handleError)
       );
@@ -162,6 +170,8 @@ export class AuthService {
     this.currentUserSubject.next(null);
     this.router.navigate(["/login"]);
     // Ajuste para sua rota de login, se '' não for ela
+
+    this.wsService.disconnect(); // Desconecta o WebSocket ao sair
   }
 
   getAccessToken(): string | null {
