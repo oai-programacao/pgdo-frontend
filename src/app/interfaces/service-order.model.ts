@@ -29,13 +29,13 @@ export interface ViewServiceOrderDto {
   district: string;
   address: string;
   clientType: ClientType;
-  typeOfOs: TypeOfOs;
+  typeOfOs: TypeOfOs[];
   scheduleDate?: string;
   period?: Period;
   technology?: Technology;
   technician?: ViewTechnicianDto;
-  status?: string; 
-  subTypeOs?: SubTypeServiceOrder;
+  status?: ServiceOrderStatus[]; 
+  subTypeOs?: SubTypeServiceOrder[];
   technicalHelp?: ViewTechnicalHelpDto[];
   unproductiveVisits?: ViewUnproductiveVisits[];
   startOfOs: string;

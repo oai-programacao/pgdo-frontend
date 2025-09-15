@@ -1,3 +1,4 @@
+import { PeriodLabels } from "./../../../../interfaces/enums.model";
 import { CommonModule } from "@angular/common";
 import {
   ChangeDetectorRef,
@@ -5,11 +6,9 @@ import {
   inject,
   OnDestroy,
   OnInit,
-  Output,
   ViewChild,
 } from "@angular/core";
 import {
-  AbstractControl,
   FormArray,
   FormBuilder,
   FormGroup,
@@ -36,9 +35,7 @@ import {
 import {
   CitiesLabels,
   City,
-  CommandArea,
   Period,
-  PeriodLabels,
   ServiceOrderStatus,
   ServiceOrderStatusLabels,
   SubTypeServiceOrder,
@@ -146,20 +143,20 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   ];
 
   serviceOrderTypeOptions: any[];
-  cityOptions: any[];
-  periodOptions: any[];
+  cityOptions: City[];
+  periodOptions: { label: string; value: Period }[];
 
   filterForm!: FormGroup;
   helperForm!: FormGroup;
   unproductiveVisitForm!: FormGroup;
   isSubmittingSubForm = false;
+  clientTypeOptions: ClientType[];
 
   isUnproductiveVisitDialogVisible = false;
   isHelperTechDialogVisible = false;
   isEditingTechDialogVisible = false;
   isPostingObeservationTechDialogVisible = false;
   isDeleteTechDialogVisible = false;
-  clientTypeOptions: any[];
 
   constructor() {
     this.serviceOrderTypeOptions = this.mapLabelsToOptions(TypeOfOsLabels);
@@ -250,13 +247,33 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
 
   applyFilters(): void {
     this.first = 0;
-    this.filterForm.reset();
     this.loadServiceOrders();
+    console.log("Filtros aplicados:", this.filterForm.value);
+    this.filterForm.reset({
+      typesOfOS: [],
+    });
   }
 
   private initializeStateFromUrl(): void {
     const params = this.route.snapshot.queryParams;
-    this.filterForm.patchValue(params);
+
+    const formattedParams = { ...params };
+
+    // Converte filtros do tipo array
+    ["periods", "statuses", "typesOfOS", "subTypeOs", "cities"].forEach(
+      (key) => {
+        if (params[key]) {
+          formattedParams[key] = Array.isArray(params[key])
+            ? params[key]
+            : [params[key]];
+        } else {
+          formattedParams[key] = [];
+        }
+      }
+    );
+
+    this.filterForm.patchValue(formattedParams);
+
     this.rows = params["rows"] ? +params["rows"] : 20;
     const page = params["page"] ? +params["page"] : 0;
     this.first = page * this.rows;
@@ -438,10 +455,8 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
           { emitEvent: false }
         );
         // Se status for "Executado", recarrega a lista
-        if (
-          updated?.status === ServiceOrderStatus.EXECUTED ||
-          dto.status === ServiceOrderStatus.EXECUTED
-        ) {
+        const updatedStatus = updated?.status ?? dto.status ?? [];
+        if (updatedStatus.includes(ServiceOrderStatus.EXECUTED)) {
           this.loadServiceOrders();
         }
       },
@@ -454,6 +469,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       },
     });
   }
+
   clearFilters(): void {
     this.filterForm.reset();
     this.first = 0;
@@ -512,11 +528,11 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       contractNumber: [null],
       clientName: [""],
       technicianId: [null],
-      statuses: [],
-      subTypeOs: [],
-      typesOfOS: [],
-      cities: [],
-      periods: [],
+      statuses: [[]],
+      subTypeOs: [[]],
+      typesOfOS: [[]],
+      cities: [[]],
+      periods: [[]],
       startDate: [null],
       endDate: [null],
     });
@@ -584,27 +600,25 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     serviceOrder: ViewServiceOrderDto
   ): FormGroup {
     return this.fb.group({
-      id: [serviceOrder.id, Validators.required],
-      contractNumber: [serviceOrder.contractNumber, Validators.required],
-      identificationNumber: [
-        serviceOrder.identificationNumber,
-        Validators.required,
-      ],
-      clientName: [serviceOrder.clientName, Validators.required],
-      phone1: [serviceOrder.phone1, Validators.required],
+      id: [serviceOrder.id],
+      contractNumber: [serviceOrder.contractNumber],
+      identificationNumber: [serviceOrder.identificationNumber],
+      clientName: [serviceOrder.clientName],
+      phone1: [serviceOrder.phone1],
       phone2: [serviceOrder.phone2],
-      responsiblePerson: [serviceOrder.responsiblePerson, Validators.required],
-      CommandArea: [serviceOrder.commandArea, Validators.required],
-      city: [serviceOrder.city, Validators.required],
-      district: [serviceOrder.district, Validators.required],
-      address: [serviceOrder.address, Validators.required],
-      clientType: [serviceOrder.clientType, Validators.required],
-      typeOfOs: [serviceOrder.typeOfOs, Validators.required],
+      responsiblePerson: [serviceOrder.responsiblePerson],
+      CommandArea: [serviceOrder.commandArea],
+      city: [serviceOrder.city ?? []],
+      district: [serviceOrder.district],
+      address: [serviceOrder.address],
+      clientType: [serviceOrder.clientType],
+      typeOfOs: [serviceOrder.typeOfOs ?? []],
+      subTypeOs: [serviceOrder.subTypeOs ?? []],
       scheduleDate: [serviceOrder.scheduleDate],
-      period: [serviceOrder.period, Validators.required],
+      period: [serviceOrder.period],
       technology: [serviceOrder.technology],
       technician: [serviceOrder.technician?.id],
-      status: [serviceOrder.status, Validators.required],
+      status: [serviceOrder.status ?? []],
       technicalHelp: [serviceOrder.technicalHelp || []],
       unproductiveVisits: [serviceOrder.unproductiveVisits || []],
       startOfOs: [serviceOrder.startOfOs],
@@ -684,6 +698,45 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
           detail: "Erro ao excluir a ordem de serviço.",
         });
       },
+    });
+  }
+
+  restoreFiltersFromUrl(): void {
+    this.route.queryParams.subscribe((params) => {
+      this.filterForm.patchValue({
+        contractNumber: params["contractNumber"]
+          ? Number(params["contractNumber"])
+          : null,
+        clientName: params["clientName"] || "",
+        technicianId: params["technicianId"] || null,
+        statuses: params["statuses"]
+          ? Array.isArray(params["statuses"])
+            ? params["statuses"]
+            : [params["statuses"]]
+          : [],
+        typesOfOS: params["typesOfOS"]
+          ? Array.isArray(params["typesOfOS"])
+            ? params["typesOfOS"]
+            : [params["typesOfOS"]]
+          : [],
+        subTypeOs: params["subTypeOs"]
+          ? Array.isArray(params["subTypeOs"])
+            ? params["subTypeOs"]
+            : [params["subTypeOs"]]
+          : [],
+        cities: params["cities"]
+          ? Array.isArray(params["cities"])
+            ? params["cities"]
+            : [params["cities"]]
+          : [],
+        periods: params["periods"]
+          ? Array.isArray(params["periods"])
+            ? params["periods"]
+            : [params["periods"]]
+          : [],
+        startDate: params["startDate"] ? new Date(params["startDate"]) : null,
+        endDate: params["endDate"] ? new Date(params["endDate"]) : null,
+      });
     });
   }
 }

@@ -4,10 +4,8 @@ import {
   EventEmitter,
   inject,
   Input,
-  OnChanges,
   OnInit,
   Output,
-  SimpleChanges,
 } from "@angular/core";
 import { InputTextModule } from "primeng/inputtext";
 import { SelectModule } from "primeng/select";
@@ -34,7 +32,6 @@ import { ServiceOrderService } from "../../services/service-order.service";
 import { MessageService } from "primeng/api";
 import { PhonesPipe } from "../../../../shared/pipes/phones.pipe";
 import { ToastModule } from "primeng/toast";
-import { finalize } from "rxjs";
 
 @Component({
   selector: "app-edit",
@@ -85,8 +82,6 @@ export class EditComponent implements OnInit {
         this.serviceOrder?.isActiveToReport ?? null
       ),
     });
-
-   
   }
 
   editServiceOrder() {
@@ -107,12 +102,18 @@ export class EditComponent implements OnInit {
       });
   }
 
-
-
   private mapLabelsToOptions = (labels: Record<string, string>): any[] =>
-  Object.entries(labels).map(([value, label]) => ({ label, value }));
-  getStatusLabel = (status: string) =>
-  ServiceOrderStatusLabels[status as ServiceOrderStatus] || status;
+    Object.entries(labels).map(([value, label]) => ({ label, value }));
+
+  getStatusLabel(
+    statuses: ServiceOrderStatus[] | ServiceOrderStatus | undefined
+  ): string {
+    if (!statuses) return " - ";
+    if (Array.isArray(statuses)) {
+      return statuses.map((s) => ServiceOrderStatusLabels[s] || s).join(", ");
+    }
+    return ServiceOrderStatusLabels[statuses] || statuses;
+  }
   getCitiesLabel = (city: City) => CitiesLabels[city] || city;
   getTypeOfOsLabel = (type: TypeOfOs) => TypeOfOsLabels[type] || type;
   getPeriodLabel = (period: Period) => PeriodLabels[period] || period;

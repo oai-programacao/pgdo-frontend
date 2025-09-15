@@ -1,72 +1,226 @@
-
-<div class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md">
+<div
+  class="p-4 md:p-6 bg-white dark:bg-slate-900 min-h-full rounded-lg shadow-md"
+>
   <p-toast />
 
-   <p-fieldset [toggleable]="true" [collapsed]="true" styleClass="mb-6 filter-fieldset">
+  <p-fieldset
+    [toggleable]="true"
+    [collapsed]="true"
+    styleClass="mb-6 filter-fieldset"
+  >
     <ng-template pTemplate="header">
       <div class="flex items-center gap-2">
         <i class="pi pi-filter"></i>
         <span class="font-bold text-md">Filtros de Pesquisa</span>
-        </div>
+      </div>
     </ng-template>
-    
+
     <form [formGroup]="filterForm">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-6 p-fluid">
-        
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-6 p-fluid"
+      >
         <div>
-          <label for="contractNumber" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Nº Contrato</label>
-          <p-inputNumber inputId="contractNumber" formControlName="contractNumber" mode="decimal" [useGrouping]="false" placeholder="Digite o número"></p-inputNumber>
+          <label
+            for="contractNumber"
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >Nº Contrato</label
+          >
+          <p-inputNumber
+            inputId="contractNumber"
+            formControlName="contractNumber"
+            mode="decimal"
+            [useGrouping]="false"
+            placeholder="Digite o número"
+          ></p-inputNumber>
         </div>
         <div>
-          <label for="clientName" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Nome do Cliente</label>
-          <input id="clientName" type="text" pInputText formControlName="clientName" placeholder="Busque por nome"/>
+          <label
+            for="clientName"
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >Nome do Cliente</label
+          >
+          <input
+            id="clientName"
+            type="text"
+            pInputText
+            formControlName="clientName"
+            placeholder="Busque por nome"
+          />
         </div>
         <div>
-          <label for="technicianId" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Técnico</label>
-          <p-select inputId="technicianId" [options]="(technicians$ | async) ?? []" formControlName="technicianId" placeholder="Todos" 
-                      optionLabel="name" optionValue="id" [showClear]="true" class="w-full" panelStyleClass="w-full" appendTo="body"/>
+          <label
+            for="technicianId"
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >Técnico</label
+          >
+          <p-select
+            inputId="technicianId"
+            [options]="(technicians$ | async) ?? []"
+            formControlName="technicianId"
+            placeholder="Todos"
+            optionLabel="name"
+            optionValue="id"
+            [showClear]="true"
+            class="w-full"
+            panelStyleClass="w-full"
+            appendTo="body"
+          />
         </div>
         <div>
-          <label for="responsiblePersonId" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Responsável</label>
-          <p-select inputId="responsiblePersonId" [options]="(responsiblePersons$ | async) ?? []" formControlName="responsiblePersonId" placeholder="Todos" 
-                    optionLabel="name" optionValue="id" [showClear]="true" class="w-full" panelStyleClass="w-full" appendTo="body"/>
+          <label
+            for="responsiblePersonId"
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >Responsável</label
+          >
+          <p-select
+            inputId="responsiblePersonId"
+            [options]="(responsiblePersons$ | async) ?? []"
+            formControlName="responsiblePersonId"
+            placeholder="Todos"
+            optionLabel="name"
+            optionValue="id"
+            [showClear]="true"
+            class="w-full"
+            panelStyleClass="w-full"
+            appendTo="body"
+          />
         </div>
         <div>
-          <label for="startDate" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Agendado De</label>
-          <p-datepicker inputId="startDate" formControlName="startDate" dateFormat="dd/mm/yy" [showIcon]="true" placeholder="dd/mm/aaaa" showClear appendTo="body"/>
+          <label
+            for="startDate"
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >Agendado De</label
+          >
+          <p-datepicker
+            inputId="startDate"
+            formControlName="startDate"
+            dateFormat="dd/mm/yy"
+            [showIcon]="true"
+            placeholder="dd/mm/aaaa"
+            showClear
+            appendTo="body"
+          />
         </div>
         <div>
-          <label for="endDate" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Agendado Até</label>
-          <p-datepicker inputId="endDate" formControlName="endDate" dateFormat="dd/mm/yy" [showIcon]="true" placeholder="dd/mm/aaaa" showClear appendTo="body" />
+          <label
+            for="endDate"
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >Agendado Até</label
+          >
+          <p-datepicker
+            inputId="endDate"
+            formControlName="endDate"
+            dateFormat="dd/mm/yy"
+            [showIcon]="true"
+            placeholder="dd/mm/aaaa"
+            showClear
+            appendTo="body"
+          />
         </div>
         <div>
-          <label for="periods" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Períodos</label>
-          <p-multiSelect inputId="periods" [options]="periodOptions" formControlName="periods" placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full"  />
+          <label
+            for="periods"
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >Períodos</label
+          >
+          <p-multiSelect
+            inputId="periods"
+            [options]="periodOptions"
+            formControlName="periods"
+            placeholder="Todos"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            class="w-full"
+            panelStyleClass="w-full"
+          />
         </div>
         <div>
-          <label for="statuses" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Status da OS</label>
-          <p-multiSelect inputId="statuses" [options]="statusOptions" formControlName="statuses" placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full" />
+          <label
+            for="statuses"
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >Status da OS</label
+          >
+          <p-multiSelect
+            inputId="statuses"
+            [options]="statusOptions"
+            formControlName="statuses"
+            placeholder="Todos"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            class="w-full"
+            panelStyleClass="w-full"
+          />
         </div>
         <div>
-          <label for="typesOfOS" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Tipo de OS</label>
-          <p-multiSelect inputId="typesOfOS" [options]="serviceOrderTypeOptions" formControlName="typesOfOS" placeholder="Todos" optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full" />
+          <label
+            for="typesOfOS"
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >Tipo de OS</label
+          >
+          <p-multiSelect
+            inputId="typesOfOS"
+            [options]="serviceOrderTypeOptions"
+            formControlName="typesOfOS"
+            placeholder="Todos"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            class="w-full"
+            panelStyleClass="w-full"
+          />
         </div>
-         <div>
-          <label for="cities" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Cidades</label>
-          <p-multiSelect inputId="cities" [options]="cityOptions" formControlName="cities" placeholder="Todas" optionLabel="label" optionValue="value" [showClear]="true" class="w-full" panelStyleClass="w-full" />
+        <div>
+          <label
+            for="cities"
+            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+            >Cidades</label
+          >
+          <p-multiSelect
+            inputId="cities"
+            [options]="cityOptions"
+            formControlName="cities"
+            placeholder="Todas"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            class="w-full"
+            panelStyleClass="w-full"
+          />
         </div>
       </div>
 
-      <div class="flex justify-end items-center gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
-        <button pButton type="button" label="Limpar Filtros" icon="pi pi-filter-slash" class="p-button-outlined p-button-secondary" (click)="clearFilters()"></button>
+      <div
+        class="flex justify-end items-center gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700"
+      >
+        <button
+          pButton
+          type="button"
+          label="Limpar Filtros"
+          icon="pi pi-filter-slash"
+          class="p-button-outlined p-button-secondary"
+          (click)="clearFilters()"
+        ></button>
       </div>
     </form>
   </p-fieldset>
 
-  <p-table #dt [value]="serviceOrders" [loading]="isLoading" styleClass="p-datatable-striped p-datatable-gridlines text-sm"
-      [paginator]="true" [rows]="rows" [totalRecords]="totalRecords" (onPage)="onPageChange($event)" [lazy]="true"
-      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ordens" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true"
-      responsiveLayout="scroll">
+  <p-table
+    #dt
+    [value]="serviceOrders"
+    [loading]="isLoading"
+    styleClass="p-datatable-striped p-datatable-gridlines text-sm"
+    [paginator]="true"
+    [rows]="rows"
+    [totalRecords]="totalRecords"
+    (onPage)="onPageChange($event)"
+    [lazy]="true"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ordens"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    [showCurrentPageReport]="true"
+    responsiveLayout="scroll"
+  >
     <ng-template pTemplate="header">
       <tr>
         <th style="width: 10%">Nº Contrato</th>
@@ -81,72 +235,134 @@
     <ng-template pTemplate="body" let-os>
       <tr>
         <td>{{ os.contractNumber }}</td>
-        <td class="truncate max-w-xs" [pTooltip]="os.clientName">{{ os.clientName }}</td>
+        <td class="truncate max-w-xs" [pTooltip]="os.clientName">
+          {{ os.clientName }}
+        </td>
         <td>{{ getTypeOfOsLabel(os.typeOfOs) }}</td>
         <td>{{ os.scheduleDate }}</td>
-       <td>{{ os.technician?.name || '-' }}</td>
+        <td>{{ os.technician?.name || "-" }}</td>
         <td class="text-center">
-          <p-tag [value]="getStatusLabel(os.status)" [severity]="getStatusSeverity(os.status)"></p-tag>
+          <p-tag
+            [value]="getStatusLabel(os.status)"
+            [severity]="getStatusSeverity(os.status)"
+          ></p-tag>
         </td>
         <td class="text-center space-x-2">
-          <button pButton type="button" icon="pi pi-eye" class="p-button-rounded p-button-info p-button-outlined" pTooltip="Ver Detalhes" (click)="showDetails(os)"></button>
-          </td>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-eye"
+            class="p-button-rounded p-button-info p-button-outlined"
+            pTooltip="Ver Detalhes"
+            (click)="showDetails(os)"
+          ></button>
+        </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="8" class="text-center p-6">Nenhuma Ordem de Serviço encontrada para os filtros aplicados.</td>
+        <td colspan="8" class="text-center p-6">
+          Nenhuma Ordem de Serviço encontrada para os filtros aplicados.
+        </td>
       </tr>
     </ng-template>
   </p-table>
 </div>
 
-<p-dialog header="Detalhes da Ordem de Serviço" [(visible)]="displayDetails" [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="10000" [closeOnEscape]="true" [dismissableMask]="true"
-          (onHide)="displayDetails = false" [resizable]="false" [draggable]="false">
+<p-dialog
+  header="Detalhes da Ordem de Serviço"
+  [(visible)]="displayDetails"
+  [modal]="true"
+  [style]="{ width: '50vw' }"
+  [baseZIndex]="10000"
+  [closeOnEscape]="true"
+  [dismissableMask]="true"
+  (onHide)="displayDetails = false"
+  [resizable]="false"
+  [draggable]="false"
+>
   <ng-template pTemplate="header">
-    <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-200">Detalhes da OS</h2>
+    <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-200">
+      Detalhes da OS
+    </h2>
   </ng-template>
   <ng-template pTemplate="content">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
-        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Nº Contrato</label>
+        <label
+          class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+          >Nº Contrato</label
+        >
         <p>{{ selectedServiceOrder?.contractNumber }}</p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Cliente</label>
+        <label
+          class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+          >Cliente</label
+        >
         <p>{{ selectedServiceOrder?.clientName }}</p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Tipo OS</label>
-        <p>{{ getTypeOfOsLabel(selectedServiceOrder?.typeOfOs!) }}</p>
+        <label
+          class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+          >Tipo OS</label
+        >
+        <p>{{ getTypeOfOsLabel(selectedServiceOrder!.typeOfOs) }}</p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Sub Tipo OS</label>
-        <p>{{ getSubTypeOsLabel(selectedServiceOrder?.subTypeOs!) }}</p>
+        <label
+          class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+          >Tipo OS</label
+        >
+        <p>{{ getTypeOfOsLabel(selectedServiceOrder?.typeOfOs || []) }}</p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Data Agendada</label>
+        <label
+          class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+          >Data Agendada</label
+        >
         <p>{{ selectedServiceOrder?.scheduleDate }}</p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Período</label>
+        <label
+          class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+          >Período</label
+        >
         <p>{{ getPeriodLabel(selectedServiceOrder?.period!) }}</p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Técnico</label>
-       <p>{{ selectedServiceOrder?.technician?.name || '-' }}</p>
+        <label
+          class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+          >Técnico</label
+        >
+        <p>{{ selectedServiceOrder?.technician?.name || "-" }}</p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Responsável</label>
-        <p>{{ selectedServiceOrder?.responsiblePerson || '-' }}</p>
+        <label
+          class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+          >Responsável</label
+        >
+        <p>{{ selectedServiceOrder?.responsiblePerson || "-" }}</p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Cidade</label>
-        <p>{{  getCityLabel(selectedServiceOrder?.city!)  || '-' }}</p>
+        <label
+          class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+          >Cidade</label
+        >
+        <p>{{ getCityLabel(selectedServiceOrder?.city!) || "-" }}</p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Endereço</label>
-        <p>{{ selectedServiceOrder?.address + ' - ' + selectedServiceOrder?.district }}</p>
+        <label
+          class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+          >Endereço</label
+        >
+        <p>
+          {{
+            selectedServiceOrder?.address +
+              " - " +
+              selectedServiceOrder?.district
+          }}
+        </p>
       </div>
     </div>
   </ng-template>
