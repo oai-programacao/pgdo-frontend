@@ -163,7 +163,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.serviceOrderTypeOptions = this.mapLabelsToOptions(TypeOfOsLabels);
-    // this.serviceOrderTypeOptions = this.mapLabelsToOptions(SubTypeServiceOrderLabels);
     this.cityOptions = this.mapLabelsToOptions(CitiesLabels);
     this.periodOptions = this.mapLabelsToOptions(PeriodLabels);
     this.clientTypeOptions = this.mapLabelsToOptions(ClientTypeLabels);
@@ -238,7 +237,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.initializeStateFromUrl();
     this.initTechnicians();
     this.loadExpiredOsCount();
-    this.restoreFiltersFromUrl();
     this.loadServiceOrders();
   }
 
@@ -254,18 +252,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.first = 0;
     this.loadServiceOrders();
 
-    this.filterForm.reset({
-      contractNumber: null,
-      clientName: "",
-      technicianId: null,
-      statuses: [],
-      subTypeOs: [],
-      typesOfOS: [],
-      cities: [],
-      periods: [],
-      startDate: null,
-      endDate: null,
-    });
+    this.filterForm.reset();
   }
 
   private initializeStateFromUrl(): void {
@@ -696,41 +683,6 @@ loadServiceOrders(event?: TableLazyLoadEvent): void {
     });
   }
 
-  restoreFiltersFromUrl(): void {
-    this.route.queryParams.subscribe((params) => {
-      this.filterForm.patchValue({
-        contractNumber: params["contractNumber"] ? Number(params["contractNumber"]) : null,
-        clientName: params["clientName"] || "",
-        technicianId: params["technicianId"] || null,
-        statuses: params["statuses"]
-          ? Array.isArray(params["statuses"])
-            ? params["statuses"]
-            : [params["statuses"]]
-          : [],
-        typesOfOS: params["typesOfOS"]
-          ? Array.isArray(params["typesOfOS"])
-            ? params["typesOfOS"]
-            : [params["typesOfOS"]]
-          : [],
-        subTypeOs: params["subTypeOs"]
-          ? Array.isArray(params["subTypeOs"])
-            ? params["subTypeOs"]
-            : [params["subTypeOs"]]
-          : [],
-        cities: params["cities"]
-          ? Array.isArray(params["cities"])
-            ? params["cities"]
-            : [params["cities"]]
-          : [],
-        periods: params["periods"]
-          ? Array.isArray(params["periods"])
-            ? params["periods"]
-            : [params["periods"]]
-          : [],
-        startDate: params["startDate"] ? new Date(params["startDate"]) : null,
-        endDate: params["endDate"] ? new Date(params["endDate"]) : null,
-      });
-    });
-  }
+ 
 
 }

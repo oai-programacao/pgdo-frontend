@@ -194,16 +194,16 @@
                 appendTo="body"
                 [styleClass]="
                   'min-w-full ' +
-                  (orders.controls[i]?.get('status')?.value ===
+                  (orders.controls[i]!.get('status')?.value ===
                   ServiceOrderStatus.EXECUTED
                     ? 'status-executado'
-                    : orders.controls[i]?.get('status')?.value ===
+                    : orders.controls[i]!.get('status')?.value ===
                       ServiceOrderStatus.IN_PRODUCTION
                     ? 'status-andamento'
-                    : orders.controls[i]?.get('status')?.value ===
+                    : orders.controls[i]!.get('status')?.value ===
                       ServiceOrderStatus.CANCELED
                     ? 'status-cancelado'
-                    : orders.controls[i]?.get('status')?.value ===
+                    : orders.controls[i]!.get('status')?.value ===
                       ServiceOrderStatus.RESCHEDULED
                     ? 'status-reagendado'
                     : '')
