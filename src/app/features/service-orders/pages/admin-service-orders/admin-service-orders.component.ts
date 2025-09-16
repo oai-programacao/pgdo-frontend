@@ -248,10 +248,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   applyFilters(): void {
     this.first = 0;
     this.loadServiceOrders();
-    console.log("Filtros aplicados:", this.filterForm.value);
-    this.filterForm.reset({
-      typesOfOS: [],
-    });
   }
 
   private initializeStateFromUrl(): void {
