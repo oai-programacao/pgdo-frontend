@@ -94,30 +94,26 @@ export class AuthService {
   }
 
   login(credentials: LoginDto): Observable<LoginResponseDto> {
-     const headers = new HttpHeaders({
-      'X-Client-Type': 'EMPLOYEE',
-    });
-    return this.http
-      .post<LoginResponseDto>(`${this.apiUrl}/login`, { headers, ...credentials })
-      .pipe(
-        tap((response) => {
-          console.log("Login response recebido:", response);
+  const headers = new HttpHeaders({
+    'X-Client-Type': 'EMPLOYEE',
+  });
 
-          this.storeTokensAndScheduleRefresh(response);
-          console.log("Tokens armazenados");
-
-          const user = this.getUserFromToken();
-          console.log("Usuário decodificado:", user);
-
-          this.currentUserSubject.next(user);
-          console.log("Subject atualizado");
-
-          this.wsService.initWebSocket();
-          console.log("WebSocket inicializado");
-        }),
-        catchError(this.handleError)
-      );
-  }
+  return this.http
+    .post<LoginResponseDto>(
+      `${this.apiUrl}/login`,
+      credentials,
+      { headers }
+    )
+    .pipe(
+      tap((response) => {
+        this.storeTokensAndScheduleRefresh(response);
+        const user = this.getUserFromToken();
+        this.currentUserSubject.next(user);
+        this.wsService.initWebSocket();
+      }),
+      catchError(this.handleError)
+    );
+} 
 
   refreshToken(): Observable<LoginResponseDto> {
     const currentRefreshToken = this.getRefreshToken();
