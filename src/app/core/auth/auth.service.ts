@@ -95,7 +95,7 @@ export class AuthService {
 
   login(credentials: LoginDto): Observable<LoginResponseDto> {
      const headers = new HttpHeaders({
-      'X-Client-Type': 'SELLER',
+      'X-Client-Type': 'EMPLOYEE',
     });
     return this.http
       .post<LoginResponseDto>(`${this.apiUrl}/login`, { headers, ...credentials })
