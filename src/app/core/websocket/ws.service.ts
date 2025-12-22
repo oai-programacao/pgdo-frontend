@@ -90,7 +90,7 @@ export class WsService {
         case "new_offer_request":
           this.playSound();
           this.toastService.show(
-            `Nova oferta solicitada por ${data.responsible || "usuário"}`,
+            `Nova oferta solicitada por ${data.responsible || data.sellerName || "Usuário"}`,
             "info"
           );
           break;

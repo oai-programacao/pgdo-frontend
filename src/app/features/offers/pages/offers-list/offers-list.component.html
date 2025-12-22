@@ -459,7 +459,14 @@
         <td
           class="p-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200"
         >
-          {{ formattedPeriod(offer.period) }}
+          <ng-container *ngIf="offer.responsible; else seller">
+            {{ offer.responsible }}
+          </ng-container>
+
+          <ng-template #seller>
+            {{ offer.sellerName }}
+            <p-tag value="Vendedor" severity="info" class="ml-2"></p-tag>
+          </ng-template>
         </td>
         <td
           class="p-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200"

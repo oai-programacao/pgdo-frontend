@@ -37,6 +37,8 @@ import { CreateManyAvailableOffersDto } from "../../../../interfaces/offers.mode
 import { TooltipModule } from "primeng/tooltip";
 import { AuthService } from "../../../../core/auth/auth.service";
 import { WsService } from "../../../../core/websocket/ws.service";
+import { TagModule } from 'primeng/tag';
+
 
 @Component({
   selector: "app-offers-list",
@@ -54,6 +56,7 @@ import { WsService } from "../../../../core/websocket/ws.service";
     BadgeModule,
     OverlayBadgeModule,
     TooltipModule,
+    TagModule
   ],
   templateUrl: "./offers-list.component.html",
   styleUrl: "./offers-list.component.scss",
