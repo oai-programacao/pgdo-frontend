@@ -38,56 +38,7 @@ export class MainLayoutComponent implements OnDestroy {
         "ROLE_CDS",
         "ROLE_TOWER"
       ],
-      expanded: false, // Estado inicial do submenu (opcional)
-      children: [
-        // {
-        //   id: "client-list",
-        //   label: "Buscar Faturas",
-        //   icon: "pi pi-receipt",
-        //   route: "/app/clientes/procurar",
-        //   exactMatch: true,
-        // },
-        {
-          id: "pesquisar-cliente",
-          label: "Pesquisar Cliente",
-          icon: "pi pi-search",
-          route: "/app/clientes/pesquisar-cliente",
-          exactMatch: true,
-        },
-        {
-          id: "register-client",
-          label: "Cadastrar Novo Cliente",
-          icon: "pi pi-user-plus",
-          route: "/app/clientes/cliente-cadastrar",
-          exactMatch: true,
-        },
-        {
-          id: "client-list",
-          label: "Listar Clientes",
-          icon: "pi pi-users",
-          route: "/app/clientes/cliente-cadastrados",
-          exactMatch: true,
-        },
-        {
-          id: "confirm-installation",
-          label: "Confirmar Instalação",
-          icon: "pi pi-check",
-          route: "/app/clientes/confirmar-instalacao",
-          exactMatch: true,
-        },
-        {
-          id: "change-owner",
-          label: "Troca de Titularidade",
-          icon: "pi pi-file-export",
-          route: "/app/troca-titularidade",
-          allowedRoles: [
-            "ROLE_ADMIN",
-            "ROLE_STORE_MANAGER",
-            "ROLE_STORE_EMPLOYEE",
-            "ROLE_TOWER"
-          ],
-        },
-      ],
+      expanded: false,
     },
     // Companhia
     {
