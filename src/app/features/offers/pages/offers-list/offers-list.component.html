@@ -1,325 +1,563 @@
 <div class="h-full bg-white p-4 md:p-6 rounded-lg shadow">
-    <p-toast position="bottom-right"/>
-    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-        <h1 class="text-2xl font-semibold text-slate-800">Gerenciamento de Ofertas</h1>
-        <div class="flex flex-col sm:flex-row gap-2">
-            <p-button
-                label="Ofertas Solicitadas"
-                icon="pi pi-list"
-                outlined
-                text
-                severity="info"
-                [badge]="requestedOffers.length.toString()"
-                [badgeSeverity]="'danger'"
-                (click)="displayRequestedOffersDialog = true"
-            />
-            <button
-                pButton
-                label="Criar Ofertas"
-                icon="pi pi-plus"
-                class="p-button-success"
-                (click)="showCreateDialog()"
-            ></button>
-        </div>
+  <p-toast position="bottom-right" />
+  <div
+    class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4"
+  >
+    <h1 class="text-2xl font-semibold text-slate-800">
+      Gerenciamento de Ofertas
+    </h1>
+    <div class="flex flex-col sm:flex-row gap-2">
+      <p-button
+        label="Ofertas Solicitadas"
+        icon="pi pi-list"
+        outlined
+        text
+        severity="info"
+        [badge]="requestedOffers.length.toString()"
+        [badgeSeverity]="'danger'"
+        (click)="displayRequestedOffersDialog = true"
+      />
+      <button
+        pButton
+        label="Criar Ofertas"
+        icon="pi pi-plus"
+        class="p-button-success"
+        (click)="showCreateDialog()"
+      ></button>
     </div>
+  </div>
 
-    <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800">
-      <div>
-        <label for="filterCity" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Cidade</label>
-        <p-select
-            appendTo="body"
-            id="filterCity"
-            [options]="cities"
-            [(ngModel)]="selectedCity"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Todas as Cidades"
-            styleClass="w-full"
-            panelStyleClass="w-full"
-            (onChange)="onFilterChange()"
-            showClear
-        />
-      </div>
-      <div>
-        <label for="filterTypeOfOs" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tipo de OS</label>
-        <p-select
-            appendTo="body"
-            id="filterTypeOfOs"
-            [options]="typesOfOs"
-            [(ngModel)]="selectedTypeOfOs"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Todas as Cidades"
-            styleClass="w-full"
-            panelStyleClass="w-full"
-            (onChange)="onFilterChange()"
-            showClear
-        />
-      </div>
-      <div>
-        <label for="filterPeriods" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Períodos</label>
-        <p-select
-            appendTo="body"
-            id="filterPeriods"
-            [options]="periods"
-            [(ngModel)]="selectedPeriod"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Todos os Períodos"
-            styleClass="w-full"
-            panelStyleClass="w-full"
-            (onChange)="onFilterChange()"
-            showClear
-        />
-      </div>
+  <div
+    class="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800"
+  >
+    <div>
+      <label
+        for="filterCity"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+        >Cidade</label
+      >
+      <p-select
+        appendTo="body"
+        id="filterCity"
+        [options]="cities"
+        [(ngModel)]="selectedCity"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Todas as Cidades"
+        styleClass="w-full"
+        panelStyleClass="w-full"
+        (onChange)="onFilterChange()"
+        showClear
+      />
     </div>
+    <div>
+      <label
+        for="filterTypeOfOs"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+        >Tipo de OS</label
+      >
+      <p-select
+        appendTo="body"
+        id="filterTypeOfOs"
+        [options]="typesOfOs"
+        [(ngModel)]="selectedTypeOfOs"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Todas as Cidades"
+        styleClass="w-full"
+        panelStyleClass="w-full"
+        (onChange)="onFilterChange()"
+        showClear
+      />
+    </div>
+    <div>
+      <label
+        for="filterPeriods"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+        >Períodos</label
+      >
+      <p-select
+        appendTo="body"
+        id="filterPeriods"
+        [options]="periods"
+        [(ngModel)]="selectedPeriod"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Todos os Períodos"
+        styleClass="w-full"
+        panelStyleClass="w-full"
+        (onChange)="onFilterChange()"
+        showClear
+      />
+    </div>
+  </div>
 
-
-    <p-table
-        [value]="offers"
-        [loading]="isLoading"
-        responsiveLayout="scroll"
-        styleClass="p-datatable-striped p-datatable-gridlines"
-        [paginator]="true"
-        [rows]="10"
-        [rowsPerPageOptions]="[10, 25, 50]"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ofertas"
-        [showCurrentPageReport]="true"
-    >
+  <p-table
+    [value]="offers"
+    [loading]="isLoading"
+    responsiveLayout="scroll"
+    styleClass="p-datatable-striped p-datatable-gridlines"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ofertas"
+    [showCurrentPageReport]="true"
+  >
     <ng-template #header>
-        <tr>
-          <th class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Cidade</th>
-          <th class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Tipo de OS</th>
-          <th class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Data</th>
-          <th class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Quantidade</th>
-          <th class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Periodo</th>
-          <th class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Ações</th>
-        </tr>
+      <tr>
+        <th
+          class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700"
+        >
+          Cidade
+        </th>
+        <th
+          class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700"
+        >
+          Tipo de OS
+        </th>
+        <th
+          class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700"
+        >
+          Data
+        </th>
+        <th
+          class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700"
+        >
+          Quantidade
+        </th>
+        <th
+          class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700"
+        >
+          Periodo
+        </th>
+        <th
+          class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700"
+        >
+          Ações
+        </th>
+      </tr>
     </ng-template>
     <ng-template #body let-offer>
-        <tr>
-            <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">
-                {{ formattedCity(offer.city) }}
-            </td>
-            <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">
-                {{ formattedTypeOfOs(offer.typeOfOs)}}
-            </td>
-            <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">
-                {{ offer.date}}
-            </td>
-            <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">
-                {{ offer.total}}
-            <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">
-                {{ formattedPeriod(offer.period) }}
-            </td>
-            <td class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">
-                <div class="flex flex-col items-center gap-1">
-                  <p-button
-                      text
-                      size="small"
-                      rounded
-                      pTooltip="Excluir Oferta"
-                      tooltipPosition="left"
-                      severity="danger"
-                      icon="pi pi-trash"
-                      (onClick)="openDeleteDialog(offer)"
-                  ></p-button>
-                </div>
-            </td>
-        </tr>
+      <tr>
+        <td
+          class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200"
+        >
+          {{ formattedCity(offer.city) }}
+        </td>
+        <td
+          class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200"
+        >
+          {{ formattedTypeOfOs(offer.typeOfOs) }}
+        </td>
+        <td
+          class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200"
+        >
+          {{ offer.date }}
+        </td>
+        <td
+          class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200"
+        >
+          {{ offer.total }}
+        </td>
 
+        <td
+          class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200"
+        >
+          {{ formattedPeriod(offer.period) }}
+        </td>
+        <td
+          class="p-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200"
+        >
+          <div class="flex flex-col items-center gap-1">
+            <p-button
+              text
+              size="small"
+              rounded
+              pTooltip="Excluir Oferta"
+              tooltipPosition="left"
+              severity="danger"
+              icon="pi pi-trash"
+              (onClick)="openDeleteDialog(offer)"
+            ></p-button>
+          </div>
+        </td>
+      </tr>
     </ng-template>
-
-    </p-table>
-
+  </p-table>
 </div>
 
-<p-dialog 
-  header="Criar Ofertas" 
-  [(visible)]="displayCreateDialog" 
-  [modal]="true" 
-  [style]="{width: '50vw', minWidth: '450px'}" 
-  [draggable]="false">
-  
-  <form [formGroup]="createOffersForm" (ngSubmit)="createManyOffers()" class="p-fluid space-y-6">
+<p-dialog
+  header="Criar Ofertas"
+  [(visible)]="displayCreateDialog"
+  [modal]="true"
+  [style]="{ width: '50vw', minWidth: '450px' }"
+  [draggable]="false"
+>
+  <form
+    [formGroup]="createOffersForm"
+    (ngSubmit)="createManyOffers()"
+    class="p-fluid space-y-6"
+  >
     <div class="sm:w-full md:w-1/2">
-      <label for="create-date" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Data da Oferta <span class="text-red-500">*</span></label>
-      <p-datepicker 
-        appendTo="body" 
-        inputId="create-date" 
-        formControlName="date" 
-        [showIcon]="true" 
-        dataType="string" 
-        dateFormat="dd/mm/yy" 
-        styleClass="w-full" 
-        inputStyleClass="w-full" 
-        [showButtonBar]="true" placeholder="dd/mm/aaaa" [disabledDays]="[0]"
-        [ngClass]="{'ng-invalid ng-dirty': createOffersForm.get('date')?.invalid && createOffersForm.get('date')?.touched}" />
-      <small *ngIf="createOffersForm.get('date')?.invalid && createOffersForm.get('date')?.touched" class="p-error block mt-1.5 text-xs">
+      <label
+        for="create-date"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+        >Data da Oferta <span class="text-red-500">*</span></label
+      >
+      <p-datepicker
+        appendTo="body"
+        inputId="create-date"
+        formControlName="date"
+        [showIcon]="true"
+        dataType="string"
+        dateFormat="dd/mm/yy"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+        [showButtonBar]="true"
+        placeholder="dd/mm/aaaa"
+        [disabledDays]="[0]"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            createOffersForm.get('date')?.invalid &&
+            createOffersForm.get('date')?.touched
+        }"
+      />
+      <small
+        *ngIf="
+          createOffersForm.get('date')?.invalid &&
+          createOffersForm.get('date')?.touched
+        "
+        class="p-error block mt-1.5 text-xs"
+      >
         Data é obrigatória.
       </small>
     </div>
 
     <div>
-      <label for="create-typeOfOs" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Tipo de OS <span class="text-red-500">*</span></label>
-      <p-select inputId="create-typeOfOs" appendTo="body" [options]="typesOfOs.slice(1)" formControlName="typeOfOs" placeholder="Selecione um tipo" optionLabel="label" optionValue="value" styleClass="w-full"
-                  [ngClass]="{'ng-invalid ng-dirty': createOffersForm.get('typeOfOs')?.invalid && createOffersForm.get('typeOfOs')?.touched}" />
-      <small *ngIf="createOffersForm.get('typeOfOs')?.invalid && createOffersForm.get('typeOfOs')?.touched" class="p-error block mt-1.5 text-xs">
+      <label
+        for="create-typeOfOs"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+        >Tipo de OS <span class="text-red-500">*</span></label
+      >
+      <p-select
+        inputId="create-typeOfOs"
+        appendTo="body"
+        [options]="typesOfOs.slice(1)"
+        formControlName="typeOfOs"
+        placeholder="Selecione um tipo"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="w-full"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            createOffersForm.get('typeOfOs')?.invalid &&
+            createOffersForm.get('typeOfOs')?.touched
+        }"
+      />
+      <small
+        *ngIf="
+          createOffersForm.get('typeOfOs')?.invalid &&
+          createOffersForm.get('typeOfOs')?.touched
+        "
+        class="p-error block mt-1.5 text-xs"
+      >
         Tipo de OS é obrigatório.
       </small>
     </div>
 
     <div>
-      <label for="create-city" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Cidade <span class="text-red-500">*</span></label>
-      <p-select inputId="create-city" appendTo="body" [options]="cities.slice(1)" formControlName="city" placeholder="Selecione uma cidade" optionLabel="label" optionValue="value" styleClass="w-full"
-                  [ngClass]="{'ng-invalid ng-dirty': createOffersForm.get('city')?.invalid && createOffersForm.get('city')?.touched}" />
-      <small *ngIf="createOffersForm.get('city')?.invalid && createOffersForm.get('city')?.touched" class="p-error block mt-1.5 text-xs">
+      <label
+        for="create-city"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+        >Cidade <span class="text-red-500">*</span></label
+      >
+      <p-select
+        inputId="create-city"
+        appendTo="body"
+        [options]="cities.slice(1)"
+        formControlName="city"
+        placeholder="Selecione uma cidade"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="w-full"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            createOffersForm.get('city')?.invalid &&
+            createOffersForm.get('city')?.touched
+        }"
+      />
+      <small
+        *ngIf="
+          createOffersForm.get('city')?.invalid &&
+          createOffersForm.get('city')?.touched
+        "
+        class="p-error block mt-1.5 text-xs"
+      >
         Cidade é obrigatória.
       </small>
     </div>
 
     <div>
-      <label for="create-period" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Período <span class="text-red-500">*</span></label>
-      <p-select appendTo="body" inputId="create-period" [options]="periods.slice(1)" formControlName="period" placeholder="Selecione um período" optionLabel="label" optionValue="value" styleClass="w-full"
-                  [ngClass]="{'ng-invalid ng-dirty': createOffersForm.get('period')?.invalid && createOffersForm.get('period')?.touched}" />
-      <small *ngIf="createOffersForm.get('period')?.invalid && createOffersForm.get('period')?.touched" class="p-error block mt-1.5 text-xs">
+      <label
+        for="create-period"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+        >Período <span class="text-red-500">*</span></label
+      >
+      <p-select
+        appendTo="body"
+        inputId="create-period"
+        [options]="periods.slice(1)"
+        formControlName="period"
+        placeholder="Selecione um período"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="w-full"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            createOffersForm.get('period')?.invalid &&
+            createOffersForm.get('period')?.touched
+        }"
+      />
+      <small
+        *ngIf="
+          createOffersForm.get('period')?.invalid &&
+          createOffersForm.get('period')?.touched
+        "
+        class="p-error block mt-1.5 text-xs"
+      >
         Período é obrigatório.
       </small>
     </div>
-    
+
     <div>
-      <label for="create-quantity" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Quantidade <span class="text-red-500">*</span></label>
-      <p-inputNumber inputId="create-quantity" formControlName="quantity" mode="decimal" styleClass="w-full" useGrouping min="1"
-                     [ngClass]="{'ng-invalid ng-dirty': createOffersForm.get('quantity')?.invalid && createOffersForm.get('quantity')?.touched}"></p-inputNumber>
-      <small *ngIf="createOffersForm.get('quantity')?.invalid && createOffersForm.get('quantity')?.touched" class="p-error block mt-1.5 text-xs">
+      <label
+        for="create-quantity"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+        >Quantidade <span class="text-red-500">*</span></label
+      >
+      <p-inputNumber
+        inputId="create-quantity"
+        formControlName="quantity"
+        mode="decimal"
+        styleClass="w-full"
+        useGrouping
+        min="1"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            createOffersForm.get('quantity')?.invalid &&
+            createOffersForm.get('quantity')?.touched
+        }"
+      ></p-inputNumber>
+      <small
+        *ngIf="
+          createOffersForm.get('quantity')?.invalid &&
+          createOffersForm.get('quantity')?.touched
+        "
+        class="p-error block mt-1.5 text-xs"
+      >
         Quantidade deve ser no mínimo 1.
       </small>
     </div>
   </form>
 
   <ng-template pTemplate="footer">
-    <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="displayCreateDialog=false"></button>
-    <button pButton type="button" label="Criar Ofertas" icon="pi pi-check" [loading]="isSubmitting" [disabled]="createOffersForm.invalid || isSubmitting" (click)="createManyOffers()"></button>
+    <button
+      pButton
+      type="button"
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="displayCreateDialog = false"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Criar Ofertas"
+      icon="pi pi-check"
+      [loading]="isSubmitting"
+      [disabled]="createOffersForm.invalid || isSubmitting"
+      (click)="createManyOffers()"
+    ></button>
   </ng-template>
 </p-dialog>
 
 <p-dialog
-  header="Ofertas Solicitadas" 
-  [(visible)]="displayRequestedOffersDialog" 
-  [modal]="true" 
-  [style]="{width: '80vw', minWidth: '450px'}"
+  header="Ofertas Solicitadas"
+  [(visible)]="displayRequestedOffersDialog"
+  [modal]="true"
+  [style]="{ width: '80vw', minWidth: '450px' }"
   [draggable]="false"
   (onHide)="loadOffers()"
-  >
-  
+>
   <p-table
-      [value]="requestedOffers"
-      [loading]="isLoading"
-      responsiveLayout="scroll"
-      styleClass="p-datatable-striped p-datatable-gridlines"
-      [paginator]="true"
-      [rows]="10"
-      [rowsPerPageOptions]="[10, 25, 50]"
-      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ofertas solicitadas"
-      [showCurrentPageReport]="true"
+    [value]="requestedOffers"
+    [loading]="isLoading"
+    responsiveLayout="scroll"
+    styleClass="p-datatable-striped p-datatable-gridlines"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ofertas solicitadas"
+    [showCurrentPageReport]="true"
   >
     <ng-template #header>
-        <tr>
-          <th class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Cidade</th>
-          <th class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Tipo de OS</th>
-          <th class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Data</th>
-          <th class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Responsável</th>
-          <th class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Periodo</th>
-          <th class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700">Ações</th>
-        </tr>
+      <tr>
+        <th
+          class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700"
+        >
+          Cidade
+        </th>
+        <th
+          class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700"
+        >
+          Tipo de OS
+        </th>
+        <th
+          class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700"
+        >
+          Data
+        </th>
+        <th
+          class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700"
+        >
+          Responsável
+        </th>
+        <th
+          class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700"
+        >
+          Periodo
+        </th>
+        <th
+          class="p-4 text-left w-1/5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700"
+        >
+          Ações
+        </th>
+      </tr>
     </ng-template>
     <ng-template #body let-offer>
-        <tr>
-            <td class="p-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">
-                {{ formattedCity(offer.city) }}
-            </td>
-            <td class="p-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">
-                {{ formattedTypeOfOs(offer.typeOfOs) }}
-            </td>
-            <td class="p-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">
-                {{ offer.date }}
-            </td>
-            <td class="p-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">
-                {{ offer.responsible }}
-            </td>
-            <td class="p-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">
-                {{ formattedPeriod(offer.period) }}
-            </td>
-            <td class="p-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">
-                <div class="flex flex-col items-center gap-1">
-                  <p-button
-                      text
-                      size="small"
-                      rounded
-                      pTooltip="Aceitar Solicitação"
-                      icon="pi pi-check"
-                      (click)="acceptOffer(offer.id)"
-                  ></p-button>
-                  <p-button
-                      text
-                      size="small"
-                      rounded
-                      pTooltip="Rejeitar Solicitação"
-                      severity="danger"
-                      icon="pi pi-times"
-                      (click)="rejectOffer(offer.id)"
-                  ></p-button>
-                </div>
-            </td>
-        </tr>
+      <tr>
+        <td
+          class="p-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200"
+        >
+          {{ formattedCity(offer.city) }}
+        </td>
+        <td
+          class="p-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200"
+        >
+          {{ formattedTypeOfOs(offer.typeOfOs) }}
+        </td>
+        <td
+          class="p-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200"
+        >
+          {{ offer.date }}
+        </td>
+        <td
+          class="p-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200"
+        >
+          {{ offer.responsible || offer.sellerName }}
+        </td>
+        <td
+          class="p-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200"
+        >
+          {{ formattedPeriod(offer.period) }}
+        </td>
+        <td
+          class="p-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200"
+        >
+          <div class="flex flex-col items-center gap-1">
+            <p-button
+              text
+              size="small"
+              rounded
+              pTooltip="Aceitar Solicitação"
+              icon="pi pi-check"
+              [disabled]="loadingOffers[offer.id]"
+              (click)="acceptOffer(offer.id)"
+            ></p-button>
+
+            <p-button
+              text
+              size="small"
+              rounded
+              pTooltip="Rejeitar Solicitação"
+              severity="danger"
+              icon="pi pi-times"
+              [disabled]="loadingOffers[offer.id]"
+              (click)="rejectOffer(offer.id)"
+            ></p-button>
+          </div>
+        </td>
+      </tr>
     </ng-template>
     <ng-template #emptymessage>
-        <tr>
-            <td colspan="6" class="text-center p-4 text-sm text-slate-500 dark:text-slate-400">
-                Nenhuma oferta solicitada encontrada.
-            </td>
-        </tr>
+      <tr>
+        <td
+          colspan="6"
+          class="text-center p-4 text-sm text-slate-500 dark:text-slate-400"
+        >
+          Nenhuma oferta solicitada encontrada.
+        </td>
+      </tr>
     </ng-template>
   </p-table>
 </p-dialog>
 
-<p-dialog header="Deletar Ofertas Disponíveis" 
-          [(visible)]="displayDeleteDialog" 
-          [modal]="true" 
-          [style]="{width: '35vw', minWidth: '350px'}" 
-          (onHide)="cancelDelete()"
-          [draggable]="false">
-  
+<p-dialog
+  header="Deletar Ofertas Disponíveis"
+  [(visible)]="displayDeleteDialog"
+  [modal]="true"
+  [style]="{ width: '35vw', minWidth: '350px' }"
+  (onHide)="cancelDelete()"
+  [draggable]="false"
+>
   <div *ngIf="offerToDelete" class="p-fluid space-y-4">
     <p class="text-slate-700 dark:text-slate-300">
-      Quantas ofertas do tipo <strong>{{ formattedTypeOfOs(offerToDelete.typeOfOs) }}</strong> para
-      <strong>{{ formattedCity(offerToDelete.city) }}</strong> no período da 
+      Quantas ofertas do tipo
+      <strong>{{ formattedTypeOfOs(offerToDelete.typeOfOs) }}</strong> para
+      <strong>{{ formattedCity(offerToDelete.city) }}</strong> no período da
       <strong>{{ formattedPeriod(offerToDelete.period) }}</strong> do dia
       <strong>{{ offerToDelete.date }}</strong> você deseja deletar?
     </p>
     <p class="text-sm text-slate-500">
       Total disponível neste grupo: <strong>{{ offerToDelete.total }}</strong>
     </p>
-    
+
     <div>
-      <label for="quantityToDelete" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+      <label
+        for="quantityToDelete"
+        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+      >
         Quantidade a Deletar
       </label>
-      <p-inputNumber 
-        inputId="quantityToDelete" 
-        [(ngModel)]="quantityToDelete" 
-        mode="decimal" 
-        [min]="1" 
-        [max]="offerToDelete.total" 
+      <p-inputNumber
+        inputId="quantityToDelete"
+        [(ngModel)]="quantityToDelete"
+        mode="decimal"
+        [min]="1"
+        [max]="offerToDelete.total"
         [showButtons]="true"
-        styleClass="w-full">
+        styleClass="w-full"
+      >
       </p-inputNumber>
     </div>
   </div>
 
   <ng-template pTemplate="footer">
-    <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="cancelDelete()"></button>
-    <button pButton type="button" label="Confirmar Exclusão" icon="pi pi-trash" class="p-button-danger" (click)="confirmDelete()"></button>
+    <button
+      pButton
+      type="button"
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="cancelDelete()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Confirmar Exclusão"
+      icon="pi pi-trash"
+      class="p-button-danger"
+      (click)="confirmDelete()"
+    ></button>
   </ng-template>
 </p-dialog>
-

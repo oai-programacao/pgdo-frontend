@@ -38,8 +38,6 @@ import { TooltipModule } from "primeng/tooltip";
 import { AuthService } from "../../../../core/auth/auth.service";
 import { WsService } from "../../../../core/websocket/ws.service";
 
-
-
 @Component({
   selector: "app-offers-list",
   imports: [
@@ -73,6 +71,7 @@ export class OffersListComponent implements OnInit, OnDestroy {
 
   private subscriptions = new Subscription();
   private pollingSubscription?: Subscription;
+  loadingOffers: Record<string, boolean> = {};
 
   cities = [
     { label: "Todas as Cidades", value: null },
@@ -138,7 +137,10 @@ export class OffersListComponent implements OnInit, OnDestroy {
         this.cdRef.detectChanges();
       })
     );
-    this.pollingSubscription = interval(1500).subscribe(() => { this.loadRequestedOffers(); this.loadOffers(); });
+    this.pollingSubscription = interval(1500).subscribe(() => {
+      this.loadRequestedOffers();
+      this.loadOffers();
+    });
   }
 
   ngOnDestroy(): void {
@@ -320,7 +322,12 @@ export class OffersListComponent implements OnInit, OnDestroy {
   }
 
   acceptOffer(offerId: string) {
-    
+    if (this.loadingOffers[offerId]) {
+      return;
+    }
+
+    this.loadingOffers[offerId] = true;
+
     this.wsService.acceptOffer(offerId);
 
     this.messageService.add({
@@ -335,10 +342,16 @@ export class OffersListComponent implements OnInit, OnDestroy {
   }
 
   rejectOffer(offerId: string) {
+    if (this.loadingOffers[offerId]) {
+      return;
+    }
+
+    this.loadingOffers[offerId] = true;
+
     this.wsService.rejectOffer(offerId);
 
     this.messageService.add({
-      severity: "info",
+      severity: "success",
       summary: "Sucesso",
       detail: "Oferta rejeitada com sucesso!",
       life: 4000,
