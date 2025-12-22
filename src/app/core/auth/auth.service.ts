@@ -82,7 +82,7 @@ export class AuthService {
       const user: AuthenticatedUser = {
         email: decodedToken.email!,
         roles: decodedToken.roles || [], // Garante que roles seja um array, mesmo se ausente
-        employeeId: decodedToken.sub, // Se o backend enviar
+        employeeId: decodedToken.sub, 
         name: decodedToken.name, // Se o backend enviar
       };
       return user;
