@@ -112,22 +112,6 @@ export const routes: Routes = [
           ).then((m) => m.SellerManageSalesComponent),
         title: "Minhas Vendas",
       },
-      // {
-      //   path: "vendas",
-      //   loadComponent: () =>
-      //     import(
-      //       "./features/sales/pages/admin-manage-sales/admin-manage-sales.component"
-      //     ).then((m) => m.AdminManageSalesComponent),
-      //   title: "Gerenciar Vendas",
-      // },
-      // {
-      //   path: "pos-vendas",
-      //   loadComponent: () =>
-      //     import(
-      //       "./features/after-sales/pages/manage-after-sales/manage-after-sales.component"
-      //     ).then((m) => m.ManageAfterSalesComponent),
-      //   title: "Pós Vendas",
-      // },
       {
         path: "onus",
         loadComponent: () =>
