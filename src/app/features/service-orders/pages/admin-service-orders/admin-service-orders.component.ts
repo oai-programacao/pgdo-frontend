@@ -748,7 +748,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       return "VENDA";
     }
 
-    if (os.typeOfOs === "CHANGE_ADDRESS") {
+    if (os.typeOfOs === "CHANGE_OF_ADDRESS") {
       return "MUDANÇA DE ENDEREÇO";
     }
 
