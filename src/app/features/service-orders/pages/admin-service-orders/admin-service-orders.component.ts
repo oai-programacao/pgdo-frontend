@@ -735,4 +735,23 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       });
     });
   }
+
+  showExtraTag(os: any): boolean {
+    return (
+      !!os?.responsibleSeller &&
+      (os.typeOfOs === "INSTALLATION" || os.typeOfOs === "CHANGE_ADDRESS")
+    );
+  }
+
+  getExtraTagLabel(os: any): string {
+    if (os.typeOfOs === "INSTALLATION") {
+      return "VENDA";
+    }
+
+    if (os.typeOfOs === "CHANGE_ADDRESS") {
+      return "MUDANÇA DE ENDEREÇO";
+    }
+
+    return "";
+  }
 }

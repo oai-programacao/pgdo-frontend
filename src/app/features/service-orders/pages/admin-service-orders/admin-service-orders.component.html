@@ -288,6 +288,22 @@
               <div class="text-s text-slate-500 truncate w-fit">
                 Telefone - {{ os.phone1 | phones }}
               </div>
+              <div
+                *ngIf="os.responsibleSeller"
+                class="text-s text-slate-500 truncate w-fit"
+              >
+                Vendedor - {{ os.responsibleSeller }}
+              </div>
+              <div
+                *ngIf="os.responsibleSeller"
+                class="text-s text-slate-500 truncate w-fit"
+              >
+                <p-tag
+                  *ngIf="showExtraTag(os)"
+                  [value]="getExtraTagLabel(os)"
+                  severity="info"
+                ></p-tag>
+              </div>
             </td>
             <td>{{ getTypeOfOsLabel(os.typeOfOs) }}</td>
             <td>{{ getSubTypeOsLabel(os.subTypeOs) }}</td>

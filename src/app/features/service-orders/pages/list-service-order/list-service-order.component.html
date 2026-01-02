@@ -234,11 +234,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-os>
       <tr>
-        <td>{{ os.contractNumber }}
-          <p-tag *ngIf="os.responsibleSeller" 
-          [value]="'VENDA'" 
-          severity="success"></p-tag>
-        </td>
+        <td>{{ os.contractNumber }}</td>
         <td class="truncate max-w-xs" [pTooltip]="os.clientName">
           {{ os.clientName }}
         </td>
