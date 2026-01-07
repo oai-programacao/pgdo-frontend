@@ -23,12 +23,21 @@ nav {
   background-color: rgb(252, 248, 48, 0.5);
 }
 
+
+.info-icon {
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.6));
+}
+
 .financial-tooltip {
-  background-color: #fff8c5 !important;
+  background-color: #fff7cc !important;
   color: #92400e !important;
-  border: 1px solid #f59e0b !important;
+  border: 2px solid #f59e0b !important;
+  font-weight: 500;
   font-size: 0.75rem;
-  max-width: 260px;
+  max-width: 280px;
   padding: 8px 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
 }

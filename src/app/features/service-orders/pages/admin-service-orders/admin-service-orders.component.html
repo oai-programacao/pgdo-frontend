@@ -295,28 +295,25 @@
                 Vendedor - {{ os.responsibleSeller }}
               </div>
               <div
-                *ngIf="os.responsibleSeller && os.typeOfOs=== 'INSTALLATION'"
-                class="text-s text-slate-500 truncate w-fit"
-              >
-                <p-tag
-                  *ngIf="showExtraTag(os)"
-                  [value]="getExtraTagLabel(os)"
-                  [severity]="'warn'"
-                  pTooltip="Após a Ordem de Serviço ficar com o status EXECUTADA, o carnê financeiro referente a esta venda será lançado automaticamente."
-                  tooltipPosition="top"
-                  tooltipStyleClass="financial-tooltip"
-                ></p-tag>
-              </div>
-
-              <div
                 *ngIf="os.responsibleSeller"
-                class="text-s text-slate-500 truncate w-fit"
+                class="text-s text-slate-500 truncate w-fit flex items-center gap-2"
               >
                 <p-tag
                   *ngIf="showExtraTag(os)"
                   [value]="getExtraTagLabel(os)"
                   severity="info"
                 ></p-tag>
+
+                <!-- Ícone informativo -->
+                <span
+                  *ngIf="os.type === 'INSTALLATION'"
+                  class="info-icon"
+                  pTooltip="Após a Ordem de Serviço ficar com o status EXECUTADA, o carnê financeiro referente a esta venda será lançado automaticamente."
+                  tooltipPosition="top"
+                  tooltipStyleClass="financial-tooltip"
+                >
+                  ℹ️
+                </span>
               </div>
             </td>
             <td>{{ getTypeOfOsLabel(os.typeOfOs) }}</td>
