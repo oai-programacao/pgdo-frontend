@@ -145,6 +145,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       ServiceOrderStatus.UNDEFINED,
       ServiceOrderStatus.IN_PRODUCTION,
       ServiceOrderStatus.RESCHEDULED,
+      ServiceOrderStatus.EXECUTED,
     ];
 
     const isVenda =
@@ -168,8 +169,14 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     const isVenda =
       os.typeOfOs?.includes(TypeOfOs.INSTALLATION) && !!os.responsibleSeller;
 
-    // 🔒 Não permite alterar após EXECUTED
+    // 🔒 Se já EXECUTED, não muda mais
     if (isVenda && currentStatus === ServiceOrderStatus.EXECUTED) {
+      control.setValue(currentStatus, { emitEvent: false });
+      return;
+    }
+
+    // 🚫 Bloqueia EXECUTED manualmente
+    if (isVenda && newStatus === ServiceOrderStatus.EXECUTED) {
       control.setValue(currentStatus, { emitEvent: false });
       return;
     }
@@ -194,7 +201,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // outros casos permitidos
+    // ✅ Outros casos permitidos
     this.allowStatusUpdate.add(index);
   }
 
