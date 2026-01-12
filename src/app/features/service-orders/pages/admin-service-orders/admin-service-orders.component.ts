@@ -156,54 +156,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       : ALL_STATUSES;
   }
 
-  onStatusChange(
-    newStatus: ServiceOrderStatus,
-    os: ViewServiceOrderDto,
-    index: number
-  ) {
-    const control = this.orders.at(index).get("status");
-    if (!control) return;
-
-    const currentStatus = os.status?.[0];
-
-    const isVenda =
-      os.typeOfOs?.includes(TypeOfOs.INSTALLATION) && !!os.responsibleSeller;
-
-    // 🚫 Bloqueia EXECUTED manualmente
-    if (isVenda && newStatus === ServiceOrderStatus.EXECUTED) {
-      this.messageService.add({
-        severity: "warn",
-        summary: "Ação não permitida",
-        detail: "Este status é definido automaticamente pelo sistema.",
-      });
-
-      control.setValue(currentStatus, { emitEvent: false });
-      return;
-    }
-
-    if (isVenda && newStatus === ServiceOrderStatus.IN_PRODUCTION) {
-      this.confirmationService.confirm({
-        header: "Confirmação",
-        message:
-          "Deseja mesmo iniciar essa OS de venda? O cliente será notificado via WhatsApp.",
-        icon: "pi pi-exclamation-triangle",
-
-        accept: () => {
-          this.allowStatusUpdate.add(index);
-          control.setValue(newStatus);
-        },
-
-        reject: () => {
-          control.setValue(currentStatus, { emitEvent: false });
-        },
-      });
-      return;
-    }
-
-    // ✅ Outros casos permitidos
-    this.allowStatusUpdate.add(index);
-  }
-
   subStatusOptions: any[] = [
     ...Object.entries(SubTypeServiceOrderLabels).map(([key, value]) => ({
       label: value,
@@ -465,9 +417,15 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
 
     if (!id) return;
 
+    const currentOs = this.dataSource[index]; // ou de onde vem o os original
+    const isVenda =
+      currentOs?.typeOfOs?.includes(TypeOfOs.INSTALLATION) &&
+      !!currentOs?.responsibleSeller;
+
     const technician = formGroup.get("technician")?.value;
     const startOfOs = formGroup.get("startOfOs")?.value;
     const endOfOs = formGroup.get("endOfOs")?.value;
+    const status = formGroup.get("status")?.value;
 
     if (!technician && (startOfOs || endOfOs)) {
       this.messageService.add({
@@ -489,6 +447,19 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
           "Para informar o horário de fim, o horário de início deve estar preenchido.",
       });
       formGroup.get("endOfOs")?.setValue(null, { emitEvent: false });
+      return;
+    }
+
+    // 🚫 bloqueia EXECUTED manual
+    if (isVenda && status === ServiceOrderStatus.EXECUTED) {
+      this.messageService.add({
+        severity: "warn",
+        summary: "Ação não permitida",
+        detail: "Para OS de venda da loja, não é possível colocaro o status EXECUTADA manualmente, é definido automaticamente pelo sistema pelo fim do horário de EM PRODUÇÃO.",
+      });
+
+      // reverte visualmente
+      formGroup.get("status")?.setValue(currentOs.status, { emitEvent: false });
       return;
     }
 
@@ -556,14 +527,8 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
         if (!control) return;
 
         control.valueChanges
-          .pipe(debounceTime(500), takeUntil(this.destroy$))
+          .pipe(debounceTime(5000), takeUntil(this.destroy$))
           .subscribe(() => {
-            
-            if (controlName === "status") {
-              if (!this.allowStatusUpdate.has(index)) return;
-              this.allowStatusUpdate.delete(index);
-            }
-
             this.updateServiceOrder(index);
           });
       });
