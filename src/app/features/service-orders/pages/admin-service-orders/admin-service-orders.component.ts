@@ -169,19 +169,18 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     const isVenda =
       os.typeOfOs?.includes(TypeOfOs.INSTALLATION) && !!os.responsibleSeller;
 
-    // 🔒 Se já EXECUTED, não muda mais
-    if (isVenda && currentStatus === ServiceOrderStatus.EXECUTED) {
-      control.setValue(currentStatus, { emitEvent: false });
-      return;
-    }
-
     // 🚫 Bloqueia EXECUTED manualmente
     if (isVenda && newStatus === ServiceOrderStatus.EXECUTED) {
+      this.messageService.add({
+        severity: "warn",
+        summary: "Ação não permitida",
+        detail: "Este status é definido automaticamente pelo sistema.",
+      });
+
       control.setValue(currentStatus, { emitEvent: false });
       return;
     }
 
-    // ⚠️ Confirmação obrigatória ao iniciar produção
     if (isVenda && newStatus === ServiceOrderStatus.IN_PRODUCTION) {
       this.confirmationService.confirm({
         header: "Confirmação",
@@ -557,8 +556,14 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
         if (!control) return;
 
         control.valueChanges
-          .pipe(debounceTime(5000), takeUntil(this.destroy$))
+          .pipe(debounceTime(500), takeUntil(this.destroy$))
           .subscribe(() => {
+            
+            if (controlName === "status") {
+              if (!this.allowStatusUpdate.has(index)) return;
+              this.allowStatusUpdate.delete(index);
+            }
+
             this.updateServiceOrder(index);
           });
       });
