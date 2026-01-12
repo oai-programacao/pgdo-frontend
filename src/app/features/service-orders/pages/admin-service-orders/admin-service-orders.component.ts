@@ -449,29 +449,13 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       formGroup.get("endOfOs")?.setValue(null, { emitEvent: false });
       return;
     }
-
-    if (
-      isVenda &&
-      status === ServiceOrderStatus.IN_PRODUCTION &&
-      (!technician || !startOfOs || !endOfOs)
-    ) {
-      this.messageService.add({
-        severity: "warn",
-        summary: "Validação obrigatória",
-        detail:
-          "Para iniciar uma OS de venda é obrigatório informar técnico, horário de início e horário de fim.",
-      });
-
-      formGroup.get("status")?.setValue(currentOs.status, { emitEvent: false });
-      return;
-    }
+    
 
     if (isVenda && status === ServiceOrderStatus.EXECUTED) {
       this.messageService.add({
         severity: "warn",
         summary: "Ação não permitida",
-        detail:
-          "Para OS de venda da loja, não é possível colocaro o status EXECUTADA manualmente, é definido automaticamente pelo sistema pelo fim do horário de EM PRODUÇÃO.",
+        detail: "Para OS de venda da loja, não é possível colocaro o status EXECUTADA manualmente, é definido automaticamente pelo sistema pelo fim do horário de EM PRODUÇÃO.",
       });
 
       // reverte visualmente
