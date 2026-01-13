@@ -835,17 +835,14 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     const control = this.orders.at(index).get("status");
     if (!control) return;
 
-    const previousStatus = os.status?.[0]; // ✅ estado original
+    const previousStatus = os.status?.[0];
+
     const isVenda =
       os.typeOfOs?.includes(TypeOfOs.INSTALLATION) && !!os.responsibleSeller;
 
-    if (
-      isVenda &&
-      newStatus === ServiceOrderStatus.IN_PRODUCTION &&
-      previousStatus !== ServiceOrderStatus.IN_PRODUCTION
-    ) {
-      this.blockUpdate.add(index);
-
+    // 👉 Só intercepta VENDA indo para EM PRODUÇÃO
+    if (isVenda && newStatus === ServiceOrderStatus.IN_PRODUCTION) {
+      // 🔒 Reverte imediatamente (impede update automático)
       control.setValue(previousStatus, { emitEvent: false });
 
       this.confirmationService.confirm({
@@ -853,22 +850,23 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
         message: `
 Deseja mesmo iniciar essa Ordem de Serviço de venda?<br><br>
 O cliente será notificado via WhatsApp que o técnico está a caminho com as informações da OS.<br><br>
-Lembrando que o status <b>EXECUTADO</b> é inserido automaticamente ao finalizar o horário de produção.<br>
+O status <b>EXECUTADO</b> será inserido automaticamente.<br>
 <b>Não será possível reverter.</b>
       `,
         icon: "pi pi-exclamation-triangle",
 
         accept: () => {
-          control.setValue(newStatus); // agora sim
+          // ✅ agora sim altera
+          control.setValue(newStatus);
+          // 👆 dispara valueChanges → updateServiceOrder
         },
 
         reject: () => {
-          control.setValue(previousStatus, { emitEvent: false });
+          // nada a fazer, já voltou
         },
       });
 
       return;
     }
   }
-  
 }
