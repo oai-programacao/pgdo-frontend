@@ -559,10 +559,9 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
           .pipe(debounceTime(5000), takeUntil(this.destroy$))
           .subscribe(() => {
             if (this.blockUpdate.has(index)) {
-              this.blockUpdate.delete(index); // libera depois do primeiro bloqueio
+              this.blockUpdate.delete(index);
               return;
             }
-
             this.updateServiceOrder(index);
           });
       });
@@ -836,22 +835,18 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     const control = this.orders.at(index).get("status");
     if (!control) return;
 
-    // 🔹 SEMPRE use o valor do FORM
-    const currentStatus = control.value;
-
+    const previousStatus = os.status?.[0]; // ✅ estado original
     const isVenda =
       os.typeOfOs?.includes(TypeOfOs.INSTALLATION) && !!os.responsibleSeller;
 
-    // ⚠️ Confirmação apenas na transição real para IN_PRODUCTION
     if (
       isVenda &&
       newStatus === ServiceOrderStatus.IN_PRODUCTION &&
-      currentStatus !== ServiceOrderStatus.IN_PRODUCTION
+      previousStatus !== ServiceOrderStatus.IN_PRODUCTION
     ) {
-      
       this.blockUpdate.add(index);
-      
-      control.setValue(currentStatus, { emitEvent: false });
+
+      control.setValue(previousStatus, { emitEvent: false });
 
       this.confirmationService.confirm({
         header: "Confirmação",
@@ -864,16 +859,16 @@ Lembrando que o status <b>EXECUTADO</b> é inserido automaticamente ao finalizar
         icon: "pi pi-exclamation-triangle",
 
         accept: () => {
-          // ✅ agora dispara valueChanges e o update
-          control.setValue(newStatus);
+          control.setValue(newStatus); // agora sim
         },
 
         reject: () => {
-          control.setValue(currentStatus, { emitEvent: false });
+          control.setValue(previousStatus, { emitEvent: false });
         },
       });
 
       return;
     }
   }
+  
 }
