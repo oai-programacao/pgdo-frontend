@@ -247,7 +247,7 @@
         [paginator]="true"
         [rows]="rows"
         [totalRecords]="totalRecords"
-        (onPage)="onTableLazyLoad($event)"
+        (onLazyLoad)="onTableLazyLoad($event)"
         [lazy]="true"
         [rowsPerPageOptions]="[1, 20, 30, 50, 100]"
         stripedRows

@@ -643,18 +643,19 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       });
   }
 
-  private populateOrdersArray() {
-    setTimeout(() => {
-      const serviceOrderGroups = this.dataSource.map((order) =>
-        this.createServiceOrderGroup(order)
-      );
-      const newOrdersArray = this.fb.array(serviceOrderGroups);
-      this.osGroup.setControl("orders", newOrdersArray);
+  private populateOrdersArray(): void {
+    const ordersArray = this.osGroup.get("orders") as FormArray;
 
-      this.isLoading = false;
-      this.cdr.markForCheck();
-      this.setupFormListeners();
-    }, 0);
+    ordersArray.clear();
+
+    this.dataSource.forEach((order) => {
+      ordersArray.push(this.createServiceOrderGroup(order));
+    });
+
+    this.isLoading = false;
+    this.cdr.markForCheck();
+
+    this.setupFormListeners();
   }
 
   ngAfterViewChecked(): void {
