@@ -110,7 +110,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   private pendingFirstValue: number | null = null;
   public ServiceOrderStatus = ServiceOrderStatus;
   public TypeOfOs = TypeOfOs;
-  private blockUpdate = new Set<number>();
 
   technicians: ViewTechnicianDto[] = [];
   technicianOptions: { label: string; value: string | null }[] = [];
@@ -558,10 +557,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
         control.valueChanges
           .pipe(debounceTime(5000), takeUntil(this.destroy$))
           .subscribe(() => {
-            if (this.blockUpdate.has(index)) {
-              this.blockUpdate.delete(index);
-              return; 
-            }
             this.updateServiceOrder(index);
           });
       });
@@ -835,26 +830,36 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     const control = this.orders.at(index).get("status");
     if (!control) return;
 
-    const currentStatus = os.status?.[0];
+    // 🔹 SEMPRE use o valor do FORM
+    const currentStatus = control.value;
 
     const isVenda =
       os.typeOfOs?.includes(TypeOfOs.INSTALLATION) && !!os.responsibleSeller;
 
-    if (isVenda && newStatus === ServiceOrderStatus.IN_PRODUCTION) {
+    // ⚠️ Confirmação apenas na transição real para IN_PRODUCTION
+    if (
+      isVenda &&
+      newStatus === ServiceOrderStatus.IN_PRODUCTION &&
+      currentStatus !== ServiceOrderStatus.IN_PRODUCTION
+    ) {
+      // bloqueia alteração automática do select
       control.setValue(currentStatus, { emitEvent: false });
 
       this.confirmationService.confirm({
         header: "Confirmação",
         message: `
-    Deseja mesmo iniciar essa Ordem de Serviço de venda?<br><br>
-    O cliente será notificado via WhatsApp que o técnico está a caminho com as informações da OS.<br><br>
-    Lembrando que o status <b>EXECUTADO</b> é inserido automaticamente ao finalizar o horário de produção.<br>
-    <b>Não será possível reverter.</b>
-  `,
+Deseja mesmo iniciar essa Ordem de Serviço de venda?<br><br>
+O cliente será notificado via WhatsApp que o técnico está a caminho com as informações da OS.<br><br>
+Lembrando que o status <b>EXECUTADO</b> é inserido automaticamente ao finalizar o horário de produção.<br>
+<b>Não será possível reverter.</b>
+      `,
         icon: "pi pi-exclamation-triangle",
+
         accept: () => {
+          // ✅ agora dispara valueChanges e o update
           control.setValue(newStatus);
         },
+
         reject: () => {
           control.setValue(currentStatus, { emitEvent: false });
         },
@@ -863,4 +868,5 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       return;
     }
   }
+  
 }
