@@ -442,6 +442,15 @@
                   </div>
                 </ng-template>
               </p-select>
+
+              <button
+                *ngIf="os.typeOfOs === 'INSTALLATION' && os.responsibleSeller"
+                pButton
+                icon="pi pi-angle-right"
+                class="p-button-rounded p-button-success"
+                pTooltip="Iniciar OS de Venda"
+                (click)="openShopOsDialog(os)"
+              ></button>
             </td>
             <td>
               <div class="flex flex-col items-center justify-center gap-2">
@@ -587,3 +596,60 @@
 </p-dialog>
 
 <p-confirmdialog />
+
+<p-dialog
+  header="Iniciar OS de Venda"
+  [(visible)]="isShopOsDialogVisible"
+  [modal]="true"
+  [style]="{ width: '32rem' }"
+>
+  <form [formGroup]="shopOsForm" class="p-fluid">
+    <div class="mb-3">
+      <label>Data de Agendamento</label>
+      <p-datepicker formControlName="scheduleDate" appendTo="body" />
+    </div>
+
+    <div class="mb-3">
+      <label>Período</label>
+      <p-select [options]="periodOptions" formControlName="period" />
+    </div>
+
+    <div class="mb-3">
+      <label>Técnico</label>
+      <p-select
+        [options]="technicianOptions"
+        optionLabel="label"
+        optionValue="value"
+        formControlName="technician"
+      />
+    </div>
+
+    <div class="mb-3 grid grid-cols-2 gap-3">
+      <div>
+        <label>Início</label>
+        <p-datepicker timeOnly hourFormat="24" formControlName="startOfOs" />
+      </div>
+      <div>
+        <label>Fim</label>
+        <p-datepicker timeOnly hourFormat="24" formControlName="endOfOs" />
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2 mt-4">
+      <button
+        pButton
+        label="Cancelar"
+        class="p-button-text"
+        (click)="isShopOsDialogVisible = false"
+      ></button>
+
+      <button
+        pButton
+        label="Confirmar"
+        class="p-button-success"
+        (click)="confirmShopOs()"
+        [disabled]="shopOsForm.invalid"
+      ></button>
+    </div>
+  </form>
+</p-dialog>

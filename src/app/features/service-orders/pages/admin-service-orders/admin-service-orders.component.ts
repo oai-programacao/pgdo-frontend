@@ -125,6 +125,9 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   first = 0;
   hasObservation: boolean = false;
   osExpired!: boolean;
+  isShopOsDialogVisible = false;
+  selectedShopOs!: ViewServiceOrderDto;
+  shopOsForm!: FormGroup;
 
   selectedServiceOrder: ViewServiceOrderDto | null = null;
 
@@ -739,6 +742,54 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
         startDate: params["startDate"] ? new Date(params["startDate"]) : null,
         endDate: params["endDate"] ? new Date(params["endDate"]) : null,
       });
+    });
+  }
+
+  openShopOsDialog(os: ViewServiceOrderDto): void {
+    this.selectedShopOs = os;
+
+    this.shopOsForm = this.fb.group({
+      scheduleDate: [os.scheduleDate, Validators.required],
+      period: [os.period, Validators.required],
+      technician: [os.technician?.id, Validators.required],
+      startOfOs: [os.startOfOs, Validators.required],
+      endOfOs: [os.endOfOs, Validators.required],
+      status: [ServiceOrderStatus.IN_PRODUCTION, Validators.required],
+    });
+
+    this.isShopOsDialogVisible = true;
+  }
+
+  confirmShopOs(): void {
+    if (this.shopOsForm.invalid) return;
+
+    const dto: UpdateServiceOrderDto = {
+      scheduleDate: this.shopOsForm.value.scheduleDate,
+      period: this.shopOsForm.value.period,
+      technicianId: this.shopOsForm.value.technician,
+      startOfOs: this.shopOsForm.value.startOfOs,
+      endOfOs: this.shopOsForm.value.endOfOs,
+      status: ServiceOrderStatus.IN_PRODUCTION,
+    };
+
+    this.serviceOrderService.update(this.selectedShopOs.id, dto).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: "success",
+          summary: "OS iniciada",
+          detail: "Ordem de Serviço de venda iniciada com sucesso.",
+        });
+
+        this.isShopOsDialogVisible = false;
+        this.loadServiceOrders();
+      },
+      error: () => {
+        this.messageService.add({
+          severity: "error",
+          summary: "Erro",
+          detail: "Falha ao iniciar OS de venda.",
+        });
+      },
     });
   }
 }
