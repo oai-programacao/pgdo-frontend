@@ -347,9 +347,9 @@
             <td>{{ getSubTypeOsLabel(os.subTypeOs) }}</td>
             <td>
               <p-datepicker
-              *ngIf="
-                      !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
-                    "
+                *ngIf="
+                  !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
+                "
                 formControlName="scheduleDate"
                 dateFormat="dd/mm/yy"
                 dataType="string"
@@ -362,9 +362,9 @@
             </td>
             <td>
               <p-select
-              *ngIf="
-                      !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
-                    "
+                *ngIf="
+                  !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
+                "
                 [options]="periodOptions"
                 formControlName="period"
                 appendTo="body"
@@ -373,9 +373,9 @@
             </td>
             <td>
               <p-select
-              *ngIf="
-                      !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
-                    "
+                *ngIf="
+                  !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
+                "
                 [options]="technicianOptions"
                 formControlName="technician"
                 optionLabel="label"
@@ -388,9 +388,9 @@
             </td>
             <td>
               <p-datepicker
-              *ngIf="
-                      !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
-                    "
+                *ngIf="
+                  !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
+                "
                 formControlName="startOfOs"
                 styleClass="min-w-[5rem]"
                 [timeOnly]="true"
@@ -403,9 +403,9 @@
             </td>
             <td>
               <p-datepicker
-              *ngIf="
-                      !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
-                    "
+                *ngIf="
+                  !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
+                "
                 formControlName="endOfOs"
                 styleClass="min-w-[5rem]"
                 [timeOnly]="true"
@@ -416,14 +416,16 @@
                 showClear
               />
             </td>
-            <td>
+            <td
+              *ngIf="!(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)"
+            >
               {{ os.durationOfOs | formatDuration }}
             </td>
             <td>
               <p-select
-              *ngIf="
-                      os.typeOfOs === 'INSTALLATION' && os.responsibleSeller
-                    "
+                *ngIf="
+                  !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
+                "
                 [options]="statusOptions"
                 formControlName="status"
                 optionLabel="label"
