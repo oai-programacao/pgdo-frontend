@@ -792,4 +792,10 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       },
     });
   }
+
+  isOsShop(os: ViewServiceOrderDto): boolean {
+    return (
+      os.typeOfOs?.includes(TypeOfOs.INSTALLATION) && !!os.responsibleSeller
+    );
+  }
 }
