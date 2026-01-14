@@ -336,6 +336,11 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
             totalRecordsAfter: this.totalRecords,
           });
 
+          const ordersFGs = this.dataSource.map((os) =>
+            this.createServiceOrderGroup(os)
+          );
+          this.osGroup.setControl("orders", this.fb.array(ordersFGs));
+
           this.populateOrdersArray();
           this.isLoading = false;
         },
