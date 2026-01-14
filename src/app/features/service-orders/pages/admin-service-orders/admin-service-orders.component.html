@@ -274,7 +274,7 @@
         <ng-template #body let-os let-i="rowIndex">
           <tr [formGroupName]="i">
             <td>{{ os.contractNumber }}</td>
-            
+
             <td>
               <div class="os-card">
                 <!-- HEADER -->
@@ -285,8 +285,11 @@
                   </div>
 
                   <!-- TAG DE VENDA -->
+
                   <p-tag
-                    *ngIf="isOsShop(os)"
+                    *ngIf="
+                      os.typeOfOs === 'INSTALLATION' && os.responsibleSeller
+                    "
                     value="LOJA • VENDA"
                     severity="success"
                     icon="pi pi-shopping-cart"
@@ -344,6 +347,9 @@
             <td>{{ getSubTypeOsLabel(os.subTypeOs) }}</td>
             <td>
               <p-datepicker
+                [disabled]="
+                  os.typeOfOs === 'INSTALLATION' && !!os.responsibleSeller
+                "
                 formControlName="scheduleDate"
                 dateFormat="dd/mm/yy"
                 dataType="string"
@@ -351,21 +357,25 @@
                 styleClass="min-w-[7rem]"
                 fluid
                 [disabledDays]="[0]"
-                [disabled]="isOsShop(os)"
                 id="scheduleDate-{{ i }}"
               />
             </td>
             <td>
               <p-select
+                [disabled]="
+                  os.typeOfOs === 'INSTALLATION' && !!os.responsibleSeller
+                "
                 [options]="periodOptions"
                 formControlName="period"
                 appendTo="body"
                 styleClass="min-w-full max-w-[100%]"
-                [disabled]="isOsShop(os)"
               />
             </td>
             <td>
               <p-select
+                [disabled]="
+                  os.typeOfOs === 'INSTALLATION' && !!os.responsibleSeller
+                "
                 [options]="technicianOptions"
                 formControlName="technician"
                 optionLabel="label"
@@ -374,11 +384,13 @@
                 styleClass="min-w-[170px] max-w-[170px]"
                 id="technician"
                 showClear
-                [disabled]="isOsShop(os)"
               />
             </td>
             <td>
               <p-datepicker
+                [disabled]="
+                  os.typeOfOs === 'INSTALLATION' && !!os.responsibleSeller
+                "
                 formControlName="startOfOs"
                 styleClass="min-w-[5rem]"
                 [timeOnly]="true"
@@ -387,11 +399,13 @@
                 hourFormat="24"
                 appendTo="body"
                 showClear
-                [disabled]="isOsShop(os)"
               />
             </td>
             <td>
               <p-datepicker
+                [disabled]="
+                  os.typeOfOs === 'INSTALLATION' && !!os.responsibleSeller
+                "
                 formControlName="endOfOs"
                 styleClass="min-w-[5rem]"
                 [timeOnly]="true"
@@ -400,7 +414,6 @@
                 hourFormat="24"
                 appendTo="body"
                 showClear
-                [disabled]="isOsShop(os)"
               />
             </td>
             <td>
@@ -408,11 +421,13 @@
             </td>
             <td>
               <p-select
+                [disabled]="
+                  os.typeOfOs === 'INSTALLATION' && !!os.responsibleSeller
+                "
                 [options]="statusOptions"
                 formControlName="status"
                 optionLabel="label"
                 optionValue="value"
-                [disabled]="isOsShop(os)"
                 appendTo="body"
                 [styleClass]="
                   'min-w-full ' +
