@@ -128,7 +128,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   isShopOsDialogVisible = false;
   selectedShopOs!: ViewServiceOrderDto;
   shopOsForm!: FormGroup;
-  isEndOfOsReadonly: boolean = false;
 
   selectedServiceOrder: ViewServiceOrderDto | null = null;
 
@@ -161,6 +160,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   isEditingTechDialogVisible = false;
   isPostingObeservationTechDialogVisible = false;
   isDeleteTechDialogVisible = false;
+  isEndOfOsReadonly: boolean = false;
 
   constructor() {
     this.serviceOrderTypeOptions = this.mapLabelsToOptions(TypeOfOsLabels);
@@ -755,11 +755,20 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       period: [os.period, Validators.required],
       technician: [os.technician?.id, Validators.required],
       startOfOs: [os.startOfOs, Validators.required],
-      endOfOs: [{ value: null, disabled: true }],
-      status: [ServiceOrderStatus.IN_PRODUCTION, Validators.required],
+      endOfOs: [os.endOfOs || null], // só setamos valor, não desabilitamos
+      status: [
+        os.status || ServiceOrderStatus.IN_PRODUCTION,
+        Validators.required,
+      ],
     });
 
     this.controlEndOfOsField();
+
+    // Reage a alterações do início
+    this.shopOsForm.get("startOfOs")?.valueChanges.subscribe(() => {
+      this.controlEndOfOsField();
+    });
+
     this.isShopOsDialogVisible = true;
   }
 
@@ -826,7 +835,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     const start = this.shopOsForm.get("startOfOs")?.value;
     const status = this.selectedShopOs?.status;
 
-    // Campo ficará readonly quando não estiver em produção ou start não estiver preenchido
+    // Só permite editar Fim se start preenchido e status IN_PRODUCTION
     this.isEndOfOsReadonly = !(
       start && status === ServiceOrderStatus.IN_PRODUCTION
     );
