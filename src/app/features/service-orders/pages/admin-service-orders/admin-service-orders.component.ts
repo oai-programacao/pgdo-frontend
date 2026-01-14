@@ -296,43 +296,42 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.first = page * this.rows;
   }
 
-  loadServiceOrders(event?: TableLazyLoadEvent): void {
+  loadServiceOrders(page = 0, rows = this.rows): void {
     this.isLoading = true;
 
-    if (event) {
-      this.first = event.first ?? 0;
-      this.rows = event.rows ?? 10;
-    }
-
-    const page = Math.floor(this.first / this.rows);
-
-    if (event) {
-      this.updateUrlQueryParams();
-    }
-
     this.serviceOrderService
-      .findAll(this.filterForm.value, page, this.rows)
+      .findAll(this.filterForm.value, page, rows)
       .subscribe({
         next: (dataPage) => {
           this.dataSource = dataPage.content ?? [];
           this.totalRecords = dataPage.page.totalElements;
           this.populateOrdersArray();
+          this.isLoading = false;
         },
-        error: () =>
+        error: () => {
+          this.isLoading = false;
           this.messageService.add({
             severity: "error",
             summary: "Erro",
             detail: "Falha ao carregar Ordens de Serviço.",
-          }),
+          });
+        },
       });
   }
 
   onTableLazyLoad(event: TableLazyLoadEvent) {
+    this.first = event.first ?? 0;
+    this.rows = event.rows ?? this.rows;
+
+    const page = Math.floor(this.first / this.rows);
+
     if (this.showingExpired) {
-      this.showExpiredOs(event);
+      this.loadExpiredOs(page, this.rows);
     } else {
-      this.loadServiceOrders(event);
+      this.loadServiceOrders(page, this.rows);
     }
+
+    this.updateUrlQueryParams(page);
   }
 
   private loadExpiredOsCount(): void {
@@ -349,28 +348,16 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     });
   }
 
-  showExpiredOs(event?: TableLazyLoadEvent): void {
-    if (!event) {
-      this.first = 0;
-    }
-
+  loadExpiredOs(page = 0, rows = this.rows): void {
     this.isLoading = true;
     this.showingExpired = true;
 
-    if (event) {
-      this.first = event.first ?? 0;
-      this.rows = event.rows ?? 20;
-    }
-
-    const page = Math.floor(this.first / this.rows);
-    this.updateUrlQueryParams();
-
-    this.serviceOrderService.getExpiredCliente(page, this.rows).subscribe({
+    this.serviceOrderService.getExpiredCliente(page, rows).subscribe({
       next: (dataPage) => {
-        let expiredOrders = dataPage.content ?? [];
         this.dataSource = dataPage.content ?? [];
         this.totalRecords = dataPage.page.totalElements ?? 0;
         this.populateOrdersArray();
+        this.isLoading = false;
       },
       error: () => {
         this.isLoading = false;
@@ -565,9 +552,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     });
   }
 
-  private updateUrlQueryParams(): void {
-    const page = Math.floor(this.first / this.rows);
-
+  private updateUrlQueryParams(page: number): void {
     const params: any = {
       page: page > 0 ? page : null,
       rows: this.rows !== 20 ? this.rows : null,
@@ -583,7 +568,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: params,
-      queryParamsHandling: "",
       replaceUrl: true,
     });
   }
