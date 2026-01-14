@@ -348,7 +348,7 @@
             <td>
               <p-datepicker
               *ngIf="
-                      os.typeOfOs === 'INSTALLATION' && os.responsibleSeller
+                      !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
                     "
                 formControlName="scheduleDate"
                 dateFormat="dd/mm/yy"
@@ -363,7 +363,7 @@
             <td>
               <p-select
               *ngIf="
-                      os.typeOfOs === 'INSTALLATION' && os.responsibleSeller
+                      !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
                     "
                 [options]="periodOptions"
                 formControlName="period"
@@ -374,7 +374,7 @@
             <td>
               <p-select
               *ngIf="
-                      os.typeOfOs === 'INSTALLATION' && os.responsibleSeller
+                      !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
                     "
                 [options]="technicianOptions"
                 formControlName="technician"
@@ -389,7 +389,7 @@
             <td>
               <p-datepicker
               *ngIf="
-                      os.typeOfOs === 'INSTALLATION' && os.responsibleSeller
+                      !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
                     "
                 formControlName="startOfOs"
                 styleClass="min-w-[5rem]"
@@ -404,7 +404,7 @@
             <td>
               <p-datepicker
               *ngIf="
-                      os.typeOfOs === 'INSTALLATION' && os.responsibleSeller
+                      !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
                     "
                 formControlName="endOfOs"
                 styleClass="min-w-[5rem]"
@@ -465,8 +465,9 @@
                 *ngIf="os.typeOfOs === 'INSTALLATION' && os.responsibleSeller"
                 pButton
                 icon="pi pi-angle-right"
-                class="p-button-rounded p-button-success"
+                [rounded]="true"
                 pTooltip="Iniciar OS de Venda"
+                [raised]="true"
                 (click)="openShopOsDialog(os)"
               ></button>
             </td>
