@@ -160,7 +160,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   isEditingTechDialogVisible = false;
   isPostingObeservationTechDialogVisible = false;
   isDeleteTechDialogVisible = false;
-  editEndOs: boolean = false;
+  canEditEndOfOs: boolean = false;
 
   constructor() {
     this.serviceOrderTypeOptions = this.mapLabelsToOptions(TypeOfOsLabels);
@@ -755,13 +755,17 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       period: [os.period, Validators.required],
       technician: [os.technician?.id, Validators.required],
       startOfOs: [os.startOfOs, Validators.required],
-      endOfOs: [os.endOfOs || null],
+      endOfOs: [os.endOfOs || ""],
       status: [
         os.status || ServiceOrderStatus.IN_PRODUCTION,
         Validators.required,
       ],
     });
 
+    // Atualiza variável de edição
+    this.updateEndOfOsState();
+
+    // Reage a alterações do início da OS
     this.shopOsForm.get("startOfOs")?.valueChanges.subscribe(() => {
       this.updateEndOfOsState();
     });
@@ -770,14 +774,13 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   }
 
   private updateEndOfOsState(): void {
-  const status = this.selectedShopOs?.status;
-  const start = this.shopOsForm.get("startOfOs")?.value;
+    const status = this.selectedShopOs?.status;
+    const start = this.shopOsForm.get("startOfOs")!.value;
 
-  // true se tiver startOfOs e status IN_PRODUCTION
-  this.editEndOs = !!start && status === ServiceOrderStatus.IN_PRODUCTION;
-
-}
-
+    // Só permite editar se startOfOs preenchido e status IN_PRODUCTION
+    this.canEditEndOfOs =
+      !!start && status === ServiceOrderStatus.IN_PRODUCTION;
+  }
 
   confirmShopOs(): void {
     if (this.shopOsForm.invalid) return;
@@ -837,5 +840,4 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
 
     return value;
   }
-
 }
