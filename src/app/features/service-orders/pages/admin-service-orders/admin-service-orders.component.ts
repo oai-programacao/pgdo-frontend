@@ -831,7 +831,8 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       endControl?.enable();
     } else {
       endControl?.disable();
-      endControl?.reset();
     }
   }
+
+
 }
