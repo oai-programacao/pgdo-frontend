@@ -762,8 +762,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       ],
     });
 
-    this.controlEndOfOsField();
-
     // Reage a alterações do início
     this.shopOsForm.get("startOfOs")?.valueChanges.subscribe(() => {
       this.controlEndOfOsField();
