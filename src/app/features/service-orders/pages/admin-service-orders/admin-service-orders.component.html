@@ -201,7 +201,7 @@
             severity="danger"
             [badge]="expiredOsCount.toString()"
             [badgeSeverity]="'danger'"
-            (click)="loadExpiredOs()"
+            (click)="showExpiredOs()"
           />
           <p-button
             label="Os Em Produção"
@@ -420,7 +420,7 @@
                 (onChange)="onStatusChange($event.value,os,i)"
                 [styleClass]="
                   'min-w-full ' +
-                  (orders.controls[i]!.get('status')?.value ===
+                  (getOrderStatus(i) ===
                   ServiceOrderStatus.EXECUTED
                     ? 'status-executado'
                     : orders.controls[i]!.get('status')?.value ===

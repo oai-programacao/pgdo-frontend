@@ -107,12 +107,15 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly confirmationService = inject(ConfirmationService);
   private destroy$ = new Subject<void>();
+  private pendingFirstValue: number | null = null;
+
   public ServiceOrderStatus = ServiceOrderStatus;
   public TypeOfOs = TypeOfOs;
-  private blockUpdate = new Set<number>();
 
   technicians: ViewTechnicianDto[] = [];
   technicianOptions: { label: string; value: string | null }[] = [];
+  // os: ViewServiceOrderDto[] = [];
+  // expiredOs: ViewServiceOrderDto[] = [];
   dataSource: ViewServiceOrderDto[] = [];
   expiredOsCount = 0;
   showingExpired = false;
@@ -132,29 +135,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       value: ServiceOrderStatus[key as keyof typeof ServiceOrderStatus],
     })),
   ];
-
-  getStatusOptions(os: ViewServiceOrderDto): any[] {
-    const ALL_STATUSES = Object.entries(ServiceOrderStatusLabels).map(
-      ([key, label]) => ({
-        label,
-        value: ServiceOrderStatus[key as keyof typeof ServiceOrderStatus],
-      })
-    );
-
-    const VENDA_ALLOWED = [
-      ServiceOrderStatus.UNDEFINED,
-      ServiceOrderStatus.IN_PRODUCTION,
-      ServiceOrderStatus.RESCHEDULED,
-      ServiceOrderStatus.EXECUTED,
-    ];
-
-    const isVenda =
-      os.typeOfOs?.includes(TypeOfOs.INSTALLATION) && !!os.responsibleSeller;
-
-    return isVenda
-      ? ALL_STATUSES.filter((o) => VENDA_ALLOWED.includes(o.value))
-      : ALL_STATUSES;
-  }
 
   subStatusOptions: any[] = [
     ...Object.entries(SubTypeServiceOrderLabels).map(([key, value]) => ({
@@ -262,17 +242,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     return this.osGroup.get("orders") as FormArray;
   }
 
-  get ordersControls() {
-    return this.orders.controls;
-  }
-
-  get ordersDataSource() {
-    return this.ordersControls.map((ctrl, idx) => ({
-      ...this.dataSource[idx],
-      formGroup: ctrl,
-    }));
-  }
-
   trackById(index: number, item: ViewServiceOrderDto): string {
     return item.id;
   }
@@ -307,62 +276,42 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.first = page * this.rows;
   }
 
-  loadServiceOrders(page = 0, rows = this.rows): void {
-    console.log("👉 loadServiceOrders CALLED", {
-      page,
-      rows,
-      first: this.first,
-      totalRecordsBefore: this.totalRecords,
-    });
-
+  loadServiceOrders(event?: TableLazyLoadEvent): void {
     this.isLoading = true;
 
+    if (event) {
+      this.first = event.first ?? 0;
+      this.rows = event.rows ?? 10;
+    }
+
+    const page = Math.floor(this.first / this.rows);
+
+    this.updateUrlQueryParams();
+    this.pendingFirstValue = this.first;
+
     this.serviceOrderService
-      .findAll(this.filterForm.value, page, rows)
+      .findAll(this.filterForm.value, page, this.rows)
       .subscribe({
         next: (dataPage) => {
-          console.log("✅ API RESPONSE", {
-            receivedPage: page,
-            contentLength: dataPage.content?.length,
-            totalElements: dataPage.page.totalElements,
-          });
-
           this.dataSource = dataPage.content ?? [];
-          this.totalRecords = dataPage.page.totalElements ?? 0;
-
-          console.log("📊 STATE AFTER UPDATE", {
-            first: this.first,
-            rows: this.rows,
-            totalRecordsAfter: this.totalRecords,
-          });
-
-          const ordersFGs = this.dataSource.map((os) =>
-            this.createServiceOrderGroup(os)
-          );
-          this.osGroup.setControl("orders", this.fb.array(ordersFGs));
-
+          this.totalRecords = dataPage.page.totalElements;
           this.populateOrdersArray();
-          this.isLoading = false;
         },
-        error: () => {
-          this.isLoading = false;
-        },
+        error: () =>
+          this.messageService.add({
+            severity: "error",
+            summary: "Erro",
+            detail: "Falha ao carregar Ordens de Serviço.",
+          }),
       });
   }
 
   onTableLazyLoad(event: TableLazyLoadEvent) {
-    this.first = event.first ?? 0;
-    this.rows = event.rows ?? this.rows;
-
-    const page = Math.floor(this.first / this.rows);
-
     if (this.showingExpired) {
-      this.loadExpiredOs(page, this.rows);
+      this.showExpiredOs(event);
     } else {
-      this.loadServiceOrders(page, this.rows);
+      this.loadServiceOrders(event);
     }
-
-    this.updateUrlQueryParams(page);
   }
 
   private loadExpiredOsCount(): void {
@@ -379,16 +328,29 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadExpiredOs(page = 0, rows = this.rows): void {
+  showExpiredOs(event?: TableLazyLoadEvent): void {
+    if (!event) {
+      this.first = 0;
+    }
+
     this.isLoading = true;
     this.showingExpired = true;
 
-    this.serviceOrderService.getExpiredCliente(page, rows).subscribe({
+    if (event) {
+      this.first = event.first ?? 0;
+      this.rows = event.rows ?? 20;
+    }
+
+    const page = Math.floor(this.first / this.rows);
+    this.updateUrlQueryParams();
+    this.pendingFirstValue = this.first;
+
+    this.serviceOrderService.getExpiredCliente(page, this.rows).subscribe({
       next: (dataPage) => {
+        let expiredOrders = dataPage.content ?? [];
         this.dataSource = dataPage.content ?? [];
         this.totalRecords = dataPage.page.totalElements ?? 0;
         this.populateOrdersArray();
-        this.isLoading = false;
       },
       error: () => {
         this.isLoading = false;
@@ -412,6 +374,8 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
 
     const page = Math.floor(this.first / this.rows);
 
+    this.pendingFirstValue = this.first;
+
     this.serviceOrderService.findByOsActive(page, this.rows).subscribe({
       next: (dataPage) => {
         this.dataSource = dataPage.content ?? [];
@@ -433,31 +397,11 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
 
     if (!id) return;
 
-    const currentOs = this.dataSource[index]; // ou de onde vem o os original
-    const isVenda =
-      currentOs?.typeOfOs?.includes(TypeOfOs.INSTALLATION) &&
-      !!currentOs?.responsibleSeller;
-
     const technician = formGroup.get("technician")?.value;
     const startOfOs = formGroup.get("startOfOs")?.value;
     const endOfOs = formGroup.get("endOfOs")?.value;
-    const status = formGroup.get("status")?.value;
 
-    if (
-      isVenda &&
-      currentOs?.status?.includes(ServiceOrderStatus.EXECUTED) &&
-      status !== ServiceOrderStatus.EXECUTED
-    ) {
-      this.messageService.add({
-        severity: "warn",
-        summary: "Ação não permitida",
-        detail:
-          "Uma Ordem de Serviço de venda já EXECUTADA não pode ter seu status alterado.",
-      });
-      formGroup.get("status")?.setValue(currentOs.status, { emitEvent: false });
-      return;
-    }
-
+    // Validações
     if (!technician && (startOfOs || endOfOs)) {
       this.messageService.add({
         severity: "warn",
@@ -478,32 +422,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
           "Para informar o horário de fim, o horário de início deve estar preenchido.",
       });
       formGroup.get("endOfOs")?.setValue(null, { emitEvent: false });
-      return;
-    }
-
-    if (
-      isVenda &&
-      status === ServiceOrderStatus.IN_PRODUCTION &&
-      (!technician || !startOfOs || !endOfOs)
-    ) {
-      this.messageService.add({
-        severity: "warn",
-        summary: "Validação obrigatória",
-        detail:
-          "Para iniciar uma OS de venda é obrigatório informar técnico, horário de início e horário de fim.",
-      });
-      formGroup.get("status")?.setValue(currentOs.status, { emitEvent: false });
-      return;
-    }
-
-    if (isVenda && status === ServiceOrderStatus.EXECUTED) {
-      this.messageService.add({
-        severity: "warn",
-        summary: "Ação não permitida",
-        detail:
-          "Para OS de venda da loja, não é possível colocar o status EXECUTADA manualmente, é definido automaticamente pelo sistema pelo fim do horário de EM PRODUÇÃO.",
-      });
-      formGroup.get("status")?.setValue(currentOs.status, { emitEvent: false });
       return;
     }
 
@@ -533,7 +451,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
           },
           { emitEvent: false }
         );
-
+        // Se status for "Executado", recarrega a lista
         const updatedStatus = updated?.status ?? dto.status ?? [];
         if (updatedStatus.includes(ServiceOrderStatus.EXECUTED)) {
           this.loadServiceOrders();
@@ -573,17 +491,15 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
         control.valueChanges
           .pipe(debounceTime(5000), takeUntil(this.destroy$))
           .subscribe(() => {
-            if (this.blockUpdate.has(index)) {
-              this.blockUpdate.delete(index);
-              return;
-            }
             this.updateServiceOrder(index);
           });
       });
     });
   }
 
-  private updateUrlQueryParams(page: number): void {
+  private updateUrlQueryParams(): void {
+    const page = Math.floor(this.first / this.rows);
+
     const params: any = {
       page: page > 0 ? page : null,
       rows: this.rows !== 20 ? this.rows : null,
@@ -599,6 +515,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: params,
+      queryParamsHandling: "",
       replaceUrl: true,
     });
   }
@@ -655,18 +572,30 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       });
   }
 
-  populateOrdersArray(): void {
-    const formGroups = this.dataSource.map((os) =>
-      this.createServiceOrderGroup(os)
+  private populateOrdersArray() {
+    // Cria os FormGroups para cada OS
+    const serviceOrderGroups = this.dataSource.map((order) =>
+      this.createServiceOrderGroup(order)
     );
 
-    this.osGroup.setControl("orders", this.fb.array(formGroups));
+    // Cria FormArray e seta no FormGroup principal
+    const newOrdersArray = this.fb.array(serviceOrderGroups);
+    this.osGroup.setControl("orders", newOrdersArray);
 
-    setTimeout(() => {
-      if (this.dt) {
-        this.dt.first = this.first;
-      }
-    });
+    // Espera o Angular renderizar a tabela antes de setar dt.first
+    this.cdr.detectChanges();
+
+    // Configura os listeners depois que os controles existem
+    this.setupFormListeners();
+
+    this.isLoading = false;
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.pendingFirstValue !== null && this.dt) {
+      this.dt.first = this.pendingFirstValue;
+      this.pendingFirstValue = null;
+    }
   }
 
   private createServiceOrderGroup(
@@ -832,6 +761,15 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     return "";
   }
 
+  getStatusOptions(
+    os: ViewServiceOrderDto
+  ): { label: string; value: ServiceOrderStatus }[] {
+    return Object.entries(ServiceOrderStatusLabels).map(([key, label]) => ({
+      label,
+      value: ServiceOrderStatus[key as keyof typeof ServiceOrderStatus],
+    }));
+  }
+
   onStatusChange(
     newStatus: ServiceOrderStatus,
     os: ViewServiceOrderDto,
@@ -871,4 +809,9 @@ O cliente será notificado via WhatsApp que o técnico está a caminho.<br><br>
       return;
     }
   }
+
+  getOrderStatus(i: number): ServiceOrderStatus | null {
+  return this.orders.at(i)?.get('status')?.value ?? null;
+}
+
 }
