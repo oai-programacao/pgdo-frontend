@@ -689,21 +689,35 @@
     </div>
 
     <!-- Horários -->
+    <!-- Horários -->
     <div class="grid grid-cols-2 gap-3 mb-2">
       <!-- Início -->
       <div>
         <label class="text-sm font-medium mb-1 block"> ▶️ Início </label>
-        <p-datepicker timeOnly hourFormat="24" formControlName="startOfOs" />
+        <input
+          type="time"
+          class="p-inputtext w-full"
+          [readonly]="false"
+          [value]="shopOsForm.get('startOfOs')!.value"
+          (input)="
+            shopOsForm.get('startOfOs')!.setValue($any($event.target).value)
+          "
+        />
       </div>
 
       <!-- Fim -->
-      <input
-        type="time"
-        class="p-inputtext w-full"
-        [readonly]="!canEditEndOfOs"
-        [value]="shopOsForm.get('endOfOs')!.value"
-        (input)="shopOsForm.get('endOfOs')!.setValue($any($event.target).value)"
-      />
+      <div>
+        <label class="text-sm font-medium mb-1 block"> ⏹ Fim </label>
+        <input
+          type="time"
+          class="p-inputtext w-full"
+          [readonly]="!canEditEndOfOs"
+          [value]="shopOsForm.get('endOfOs')!.value"
+          (input)="
+            shopOsForm.get('endOfOs')!.setValue($any($event.target).value)
+          "
+        />
+      </div>
     </div>
 
     <div
