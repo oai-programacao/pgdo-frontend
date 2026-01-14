@@ -416,11 +416,16 @@
                 showClear
               />
             </td>
-            <td
-              *ngIf="!(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)"
-            >
-              {{ os.durationOfOs | formatDuration }}
+            <td>
+              <ng-container
+                *ngIf="
+                  !(os.typeOfOs === 'INSTALLATION' && os.responsibleSeller)
+                "
+              >
+                {{ os.durationOfOs | formatDuration }}
+              </ng-container>
             </td>
+
             <td>
               <p-select
                 *ngIf="
