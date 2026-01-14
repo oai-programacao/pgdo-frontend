@@ -297,24 +297,39 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   }
 
   loadServiceOrders(page = 0, rows = this.rows): void {
+    console.log("👉 loadServiceOrders CALLED", {
+      page,
+      rows,
+      first: this.first,
+      totalRecordsBefore: this.totalRecords,
+    });
+
     this.isLoading = true;
 
     this.serviceOrderService
       .findAll(this.filterForm.value, page, rows)
       .subscribe({
         next: (dataPage) => {
+          console.log("✅ API RESPONSE", {
+            receivedPage: page,
+            contentLength: dataPage.content?.length,
+            totalElements: dataPage.page.totalElements,
+          });
+
           this.dataSource = dataPage.content ?? [];
-          this.totalRecords = dataPage.page.totalElements;
+          this.totalRecords = dataPage.page.totalElements ?? 0;
+
+          console.log("📊 STATE AFTER UPDATE", {
+            first: this.first,
+            rows: this.rows,
+            totalRecordsAfter: this.totalRecords,
+          });
+
           this.populateOrdersArray();
           this.isLoading = false;
         },
         error: () => {
           this.isLoading = false;
-          this.messageService.add({
-            severity: "error",
-            summary: "Erro",
-            detail: "Falha ao carregar Ordens de Serviço.",
-          });
         },
       });
   }
