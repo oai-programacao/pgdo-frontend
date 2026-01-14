@@ -1,6 +1,14 @@
-import { CommandArea, City, ClientType, TypeOfOs, Period, Technology, ServiceOrderStatus, SubTypeServiceOrder } from "./enums.model";
+import {
+  CommandArea,
+  City,
+  ClientType,
+  TypeOfOs,
+  Period,
+  Technology,
+  ServiceOrderStatus,
+  SubTypeServiceOrder,
+} from "./enums.model";
 import { ViewTechnicianDto } from "./technician.model";
-
 
 export interface PageInfo {
   size: number;
@@ -22,8 +30,8 @@ export interface ViewServiceOrderDto {
   clientName: string;
   phone1: string;
   phone2?: string;
-  responsibleSeller?: string
-  responsiblePerson?: string
+  responsibleSeller?: string;
+  responsiblePerson?: string;
   commandArea: CommandArea;
   city: City;
   district: string;
@@ -34,14 +42,14 @@ export interface ViewServiceOrderDto {
   period?: Period;
   technology?: Technology;
   technician?: ViewTechnicianDto;
-  status?: ServiceOrderStatus[]; 
+  status?: ServiceOrderStatus[];
   subTypeOs?: SubTypeServiceOrder[];
   technicalHelp?: ViewTechnicalHelpDto[];
   unproductiveVisits?: ViewUnproductiveVisits[];
   startOfOs: string;
   endOfOs?: string;
   durationOfOs?: string;
-  cabling?: boolean
+  cabling?: boolean;
   observation?: string;
   createdAt: string;
   updatedAt?: string;
@@ -74,15 +82,15 @@ export interface CountResponse {
 
 export interface UpdateServiceOrderDto {
   period?: Period;
-  scheduleDate?: string | undefined;
+  scheduleDate?: string | null;
   technology?: Technology;
-  technicianId?: string; // ID do técnico
-  status?: ServiceOrderStatus; // Status da OS
-  cabling?: boolean; // Se é cabeamento ou não
-  isActiveToReport?: boolean; // Se a OS está ativa para relatório
-  startOfOs?: string; // HH:mm
-  endOfOs?: string; // HH:mm
-  observation?: string; // Observação da OS
+  technicianId?: string | null;
+  status?: ServiceOrderStatus;
+  cabling?: boolean;
+  isActiveToReport?: boolean;
+  startOfOs?: string | null; // HH:mm
+  endOfOs?: string | null; // HH:mm
+  observation?: string | null;
 }
 
 export interface CreateServiceOrderHelperDto {
@@ -128,12 +136,12 @@ export interface ServiceOrderFilters {
   contractNumber?: number | null;
   clientName?: string | null;
   responsiblePersonId?: string | null;
-  technicianId?: string | null; 
-  startDate?: string | null; 
-  endDate?: string | null; 
+  technicianId?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
   cities?: City[] | null;
   typesOfOS?: TypeOfOs[] | null;
-  subTypeOs?: SubTypeServiceOrder [] | null;
+  subTypeOs?: SubTypeServiceOrder[] | null;
   periods?: Period[] | null;
   statuses?: ServiceOrderStatus[] | null;
 }
@@ -144,5 +152,5 @@ export interface ServiceOrderPage {
     number: number;
     totalElements: number;
     totalPages: number;
-  }
+  };
 }

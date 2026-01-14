@@ -475,7 +475,7 @@
                 severity="contrast"
                 icon="pi pi-angle-right"
                 [rounded]="true"
-                pTooltip="Iniciar OS de Venda"
+                pTooltip="Iniciar OS de Venda [EM PRODUÇÃO]"
                 [raised]="true"
                 (click)="openShopOsDialog(os)"
               ></button>
@@ -680,26 +680,12 @@
     <div class="grid grid-cols-2 gap-3 mb-2">
       <div>
         <label class="text-sm font-medium mb-1 block"> ▶️ Início </label>
-        <p-datepicker
-          dateFormat="HH:mm"
-          hourFormat="24"
-          appendTo="body"
-          timeOnly
-          formControlName="startOfOs"
-          showIcon
-        />
+        <p-datepicker timeOnly hourFormat="24" formControlName="startOfOs" />
       </div>
 
       <div>
         <label class="text-sm font-medium mb-1 block"> ⏹ Fim </label>
-        <p-datepicker
-          dateFormat="HH:mm"
-          hourFormat="24"
-          appendTo="body"
-          timeOnly
-          formControlName="endOfOs"
-          showIcon
-        />
+        <p-datepicker timeOnly hourFormat="24" formControlName="endOfOs" />
       </div>
     </div>
 

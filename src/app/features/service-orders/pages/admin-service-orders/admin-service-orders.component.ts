@@ -767,8 +767,8 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       scheduleDate: this.shopOsForm.value.scheduleDate,
       period: this.shopOsForm.value.period,
       technicianId: this.shopOsForm.value.technician,
-      startOfOs: this.shopOsForm.value.startOfOs,
-      endOfOs: this.shopOsForm.value.endOfOs,
+      startOfOs: this.toLocalTime(this.shopOsForm.value.startOfOs),
+      endOfOs: this.toLocalTime(this.shopOsForm.value.endOfOs),
       status: ServiceOrderStatus.IN_PRODUCTION,
     };
 
@@ -797,5 +797,17 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     return (
       os.typeOfOs?.includes(TypeOfOs.INSTALLATION) && !!os.responsibleSeller
     );
+  }
+
+  private toLocalTime(value: Date | string | null): string | null {
+    if (!value) return null;
+
+    if (value instanceof Date) {
+      const h = String(value.getHours()).padStart(2, "0");
+      const m = String(value.getMinutes()).padStart(2, "0");
+      return `${h}:${m}`;
+    }
+
+    return value;
   }
 }
