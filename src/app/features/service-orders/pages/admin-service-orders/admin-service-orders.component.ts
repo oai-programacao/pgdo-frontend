@@ -593,40 +593,46 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   }
 
   private createServiceOrderGroup(
-    serviceOrder: ViewServiceOrderDto
-  ): FormGroup {
-    return this.fb.group({
-      id: [serviceOrder.id],
-      contractNumber: [serviceOrder.contractNumber],
-      identificationNumber: [serviceOrder.identificationNumber],
-      clientName: [serviceOrder.clientName],
-      phone1: [serviceOrder.phone1],
-      phone2: [serviceOrder.phone2],
-      responsiblePerson: [serviceOrder.responsiblePerson],
-      CommandArea: [serviceOrder.commandArea],
-      city: [serviceOrder.city ?? []],
-      district: [serviceOrder.district],
-      address: [serviceOrder.address],
-      clientType: [serviceOrder.clientType],
-      typeOfOs: [serviceOrder.typeOfOs ?? []],
-      subTypeOs: [serviceOrder.subTypeOs ?? []],
-      scheduleDate: [serviceOrder.scheduleDate],
-      period: [serviceOrder.period],
-      technology: [serviceOrder.technology],
-      technician: [serviceOrder.technician?.id],
-      status: [serviceOrder.status ?? []],
-      technicalHelp: [serviceOrder.technicalHelp || []],
-      unproductiveVisits: [serviceOrder.unproductiveVisits || []],
-      startOfOs: [serviceOrder.startOfOs],
-      endOfOs: [serviceOrder.endOfOs],
-      durationOfOs: [serviceOrder.durationOfOs],
-      cabling: [serviceOrder.cabling],
-      observation: [serviceOrder.observation],
-      createdAt: [serviceOrder.createdAt],
-      updatedAt: [serviceOrder.updatedAt],
-      updatedBy: [serviceOrder.updatedBy],
-    });
-  }
+  serviceOrder: ViewServiceOrderDto
+): FormGroup {
+
+  const isShop = this.isOsShop(serviceOrder);
+
+  return this.fb.group({
+    id: [serviceOrder.id],
+    contractNumber: [serviceOrder.contractNumber],
+    identificationNumber: [serviceOrder.identificationNumber],
+    clientName: [serviceOrder.clientName],
+    phone1: [serviceOrder.phone1],
+    phone2: [serviceOrder.phone2],
+    responsiblePerson: [serviceOrder.responsiblePerson],
+    CommandArea: [serviceOrder.commandArea],
+    city: [serviceOrder.city ?? []],
+    district: [serviceOrder.district],
+    address: [serviceOrder.address],
+    clientType: [serviceOrder.clientType],
+    typeOfOs: [serviceOrder.typeOfOs ?? []],
+    subTypeOs: [serviceOrder.subTypeOs ?? []],
+
+   
+    scheduleDate: [{ value: serviceOrder.scheduleDate, disabled: isShop }],
+    period: [{ value: serviceOrder.period, disabled: isShop }],
+    technician: [{ value: serviceOrder.technician?.id, disabled: isShop }],
+    startOfOs: [{ value: serviceOrder.startOfOs, disabled: isShop }],
+    endOfOs: [{ value: serviceOrder.endOfOs, disabled: isShop }],
+    status: [{ value: serviceOrder.status, disabled: isShop }],
+
+    technology: [serviceOrder.technology],
+    technicalHelp: [serviceOrder.technicalHelp || []],
+    unproductiveVisits: [serviceOrder.unproductiveVisits || []],
+    durationOfOs: [serviceOrder.durationOfOs],
+    cabling: [serviceOrder.cabling],
+    observation: [serviceOrder.observation],
+    createdAt: [serviceOrder.createdAt],
+    updatedAt: [serviceOrder.updatedAt],
+    updatedBy: [serviceOrder.updatedBy],
+  });
+}
 
   private mapLabelsToOptions = (labels: Record<string, string>): any[] =>
     Object.entries(labels).map(([value, label]) => ({ label, value }));
