@@ -753,31 +753,40 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       period: [os.period, Validators.required],
       technician: [os.technician?.id, Validators.required],
       startOfOs: [os.startOfOs, Validators.required],
-      endOfOs: [null],
+      endOfOs: [{ value: null, disabled: true }],
       status: [ServiceOrderStatus.IN_PRODUCTION, Validators.required],
     });
 
+    this.controlEndOfOsField();
     this.isShopOsDialogVisible = true;
   }
 
   confirmShopOs(): void {
     if (this.shopOsForm.invalid) return;
 
+    const formValue = this.shopOsForm.value;
+
+    const hasEnd = !!formValue.endOfOs;
+
     const dto: UpdateServiceOrderDto = {
-      scheduleDate: this.shopOsForm.value.scheduleDate,
-      period: this.shopOsForm.value.period,
-      technicianId: this.shopOsForm.value.technician,
-      startOfOs: this.toLocalTime(this.shopOsForm.value.startOfOs),
-      endOfOs: this.toLocalTime(this.shopOsForm.value.endOfOs),
-      status: ServiceOrderStatus.IN_PRODUCTION,
+      scheduleDate: formValue.scheduleDate,
+      period: formValue.period,
+      technicianId: formValue.technician,
+      startOfOs: this.toLocalTime(formValue.startOfOs),
+      endOfOs: hasEnd ? this.toLocalTime(formValue.endOfOs) : undefined,
+      status: hasEnd
+        ? ServiceOrderStatus.EXECUTED
+        : ServiceOrderStatus.IN_PRODUCTION,
     };
 
     this.serviceOrderService.update(this.selectedShopOs.id, dto).subscribe({
       next: () => {
         this.messageService.add({
           severity: "success",
-          summary: "OS iniciada",
-          detail: "Ordem de Serviço de venda iniciada com sucesso.",
+          summary: hasEnd ? "OS finalizada" : "OS iniciada",
+          detail: hasEnd
+            ? "Ordem de Serviço finalizada com sucesso."
+            : "Ordem de Serviço iniciada com sucesso.",
         });
 
         this.isShopOsDialogVisible = false;
@@ -787,7 +796,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
         this.messageService.add({
           severity: "error",
           summary: "Erro",
-          detail: "Falha ao iniciar OS de venda.",
+          detail: "Falha ao atualizar a Ordem de Serviço.",
         });
       },
     });
@@ -809,5 +818,23 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     }
 
     return value;
+  }
+
+  private controlEndOfOsField(): void {
+    const start = this.shopOsForm.get("startOfOs")?.value;
+    const statuses = this.selectedShopOs?.status;
+
+    const endControl = this.shopOsForm.get("endOfOs");
+
+    const isInProduction =
+      Array.isArray(statuses) &&
+      statuses.includes(ServiceOrderStatus.IN_PRODUCTION);
+
+    if (start && isInProduction) {
+      endControl?.enable();
+    } else {
+      endControl?.disable();
+      endControl?.reset();
+    }
   }
 }
