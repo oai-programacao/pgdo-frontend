@@ -249,7 +249,7 @@
         [totalRecords]="totalRecords"
         (onPage)="onTableLazyLoad($event)"
         [lazy]="true"
-        [rowsPerPageOptions]="[1, 20, 30, 50, 100]"
+        [rowsPerPageOptions]="[20, 30, 50, 100]"
         stripedRows
         [showCurrentPageReport]="true"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} OS"
@@ -275,20 +275,65 @@
           <tr [formGroupName]="i">
             <td>{{ os.contractNumber }}</td>
             <td>
-              <div class="font-medium truncate w-fit">{{ os.clientName }}</div>
-              <div class="text-s text-slate-500 truncate w-fit">
-                {{ os.address }}
-              </div>
-              <div class="text-s text-slate-500 truncate w-fit">
-                Tipo - {{ getClientTypeLabel(os.clientType) }}
-              </div>
-              <div class="text-s text-slate-500 truncate w-fit">
-                Cidade - {{ getCitiesLabel(os.city) }}
-              </div>
-              <div class="text-s text-slate-500 truncate w-fit">
-                Telefone - {{ os.phone1 | phones }}
+              <div class="os-card">
+                <!-- Header -->
+                <div class="os-card-header">
+                  <div class="client-name">
+                    <i class="pi pi-user"></i>
+                    <span>{{ os.clientName }}</span>
+                  </div>
+
+                  <!-- TAG DE VENDA -->
+                  <p-tag
+                    *ngIf="
+                      os.typeOfOs === 'INSTALLATION' && os.responsibleSeller
+                    "
+                    value="LOJA - VENDA"
+                    severity="success"
+                    rounded
+                  ></p-tag>
+                </div>
+
+                <!-- Endereço -->
+                <div class="os-card-row">
+                  <i class="pi pi-map-marker"></i>
+                  <span>{{ os.address }}</span>
+                </div>
+
+                <!-- Infos -->
+                <div class="os-card-grid">
+                  <div>
+                    <strong>Tipo:</strong>
+                    {{ getClientTypeLabel(os.clientType) }}
+                  </div>
+                  <div>
+                    <strong>Cidade:</strong> {{ getCitiesLabel(os.city) }}
+                  </div>
+                  <div><strong>Telefone:</strong> {{ os.phone1 | phones }}</div>
+
+                  <!-- Vendedor -->
+                  <div *ngIf="os.responsibleSeller">
+                    <strong>Vendedor:</strong> {{ os.responsibleSeller }}
+                  </div>
+                </div>
+
+                <!-- ALERTA DE VENDA -->
+                <div
+                  *ngIf="os.typeOfOs === 'INSTALLATION' && os.responsibleSeller"
+                  class="sale-alert"
+                  pTooltip="
+        Esta Ordem de Serviço é uma OS DE VENDA.
+        Após a execução, o financeiro será lançado automaticamente.
+        Esta OS não pode ser excluída, apenas reagendada.
+      "
+                  tooltipPosition="top"
+                >
+                  <i class="pi pi-info-circle"></i>
+                  <span>OS tratada de forma especial</span>
+                </div>
               </div>
             </td>
+
             <td>{{ getTypeOfOsLabel(os.typeOfOs) }}</td>
             <td>{{ getSubTypeOsLabel(os.subTypeOs) }}</td>
             <td>
