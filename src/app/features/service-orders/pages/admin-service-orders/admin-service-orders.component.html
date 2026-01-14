@@ -640,12 +640,21 @@
         <label class="text-sm font-medium mb-1 block">
           📅 Data de Agendamento
         </label>
-        <p-datepicker formControlName="scheduleDate" appendTo="body" showIcon />
+        <p-datepicker
+          formControlName="scheduleDate"
+          appendTo="body"
+          showIcon
+          appendTo="body"
+        />
       </div>
 
       <div>
         <label class="text-sm font-medium mb-1 block"> ⏰ Período </label>
-        <p-select [options]="periodOptions" formControlName="period" />
+        <p-select
+          [options]="periodOptions"
+          formControlName="period"
+          appendTo="body"
+        />
       </div>
     </div>
 
@@ -660,6 +669,7 @@
         optionValue="value"
         formControlName="technician"
         showClear
+        appendTo="body"
       />
     </div>
 
@@ -668,6 +678,7 @@
       <div>
         <label class="text-sm font-medium mb-1 block"> ▶️ Início </label>
         <p-datepicker
+          appendTo="body"
           timeOnly
           hourFormat="24"
           formControlName="startOfOs"
@@ -678,6 +689,7 @@
       <div>
         <label class="text-sm font-medium mb-1 block"> ⏹ Fim </label>
         <p-datepicker
+          appendTo="body"
           timeOnly
           hourFormat="24"
           formControlName="endOfOs"
