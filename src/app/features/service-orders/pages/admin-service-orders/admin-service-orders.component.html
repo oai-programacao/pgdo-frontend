@@ -697,13 +697,14 @@
 
       <div>
         <label class="text-sm font-medium mb-1 block"> ⏹ Fim </label>
-        <p-datepicker
+          <p-datepicker
           timeOnly
           hourFormat="24"
           formControlName="endOfOs"
-          [readonlyInput]="isEndOfOsReadonly"
+          [readonlyInput]="true"
           [showIcon]="!isEndOfOsReadonly"
           appendTo="body"
+          (onFocus)="preventEndOfOsEdit($event)"
         />
       </div>
     </div>

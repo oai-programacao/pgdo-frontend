@@ -762,10 +762,8 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       ],
     });
 
-    // Atualiza estado do campo endOfOs ao abrir
     this.updateEndOfOsState();
 
-    // Reage a alterações do início da OS (startOfOs)
     this.shopOsForm.get("startOfOs")?.valueChanges.subscribe(() => {
       this.updateEndOfOsState();
     });
@@ -776,7 +774,6 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   private updateEndOfOsState(): void {
     const status = this.selectedShopOs?.status;
 
-    // Só permite edição se status IN_PRODUCTION
     this.isEndOfOsReadonly = status !== ServiceOrderStatus.IN_PRODUCTION;
   }
 
@@ -837,5 +834,12 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     }
 
     return value;
+  }
+
+  preventEndOfOsEdit(event: any) {
+    if (this.isEndOfOsReadonly) {
+      event.preventDefault();
+      (event.target as HTMLInputElement).blur(); 
+    }
   }
 }
