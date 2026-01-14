@@ -697,8 +697,9 @@
 
       <div>
         <label class="text-sm font-medium mb-1 block"> ⏹ Fim </label>
-        <p-datepicker timeOnly hourFormat="24" formControlName="endOfOs" />
+        <p-datepicker timeOnly hourFormat="24" formControlName="endOfOs" [readonlyInput]="isEndOfOsReadonly" />
       </div>
+      
     </div>
 
     <div

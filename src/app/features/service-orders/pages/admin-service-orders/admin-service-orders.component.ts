@@ -128,6 +128,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   isShopOsDialogVisible = false;
   selectedShopOs!: ViewServiceOrderDto;
   shopOsForm!: FormGroup;
+  isEndOfOsReadonly: boolean = false;
 
   selectedServiceOrder: ViewServiceOrderDto | null = null;
 
@@ -825,14 +826,13 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     const start = this.shopOsForm.get("startOfOs")?.value;
     const status = this.selectedShopOs?.status;
 
-    const endControl = this.shopOsForm.get("endOfOs");
+    // Campo ficará readonly quando não estiver em produção ou start não estiver preenchido
+    this.isEndOfOsReadonly = !(
+      start && status === ServiceOrderStatus.IN_PRODUCTION
+    );
 
-    if (start && status === ServiceOrderStatus.IN_PRODUCTION) {
-      endControl?.enable();
-    } else {
-      endControl?.disable();
-      endControl?.setValue(endControl?.value, { emitEvent: false });
-    }
+    // Se quiser garantir que o valor continue correto no form
+    const endControl = this.shopOsForm.get("endOfOs");
+    endControl?.setValue(endControl?.value, { emitEvent: false });
   }
-  
 }
