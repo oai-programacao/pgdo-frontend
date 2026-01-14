@@ -454,8 +454,9 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
           { emitEvent: false }
         );
         // Se status for "Executado", recarrega a lista
-        const updatedStatus = updated?.status ?? dto.status ?? [];
-        if (updatedStatus.includes(ServiceOrderStatus.EXECUTED)) {
+        const updatedStatus = updated?.status ?? dto.status;
+
+        if (updatedStatus === ServiceOrderStatus.EXECUTED) {
           this.loadServiceOrders();
         }
       },
@@ -822,20 +823,15 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
 
   private controlEndOfOsField(): void {
     const start = this.shopOsForm.get("startOfOs")?.value;
-    const statuses = this.selectedShopOs?.status;
+    const status = this.selectedShopOs?.status;
 
     const endControl = this.shopOsForm.get("endOfOs");
 
-    const isInProduction =
-      Array.isArray(statuses) &&
-      statuses.includes(ServiceOrderStatus.IN_PRODUCTION);
-
-    if (start && !isInProduction) {
+    if (start && status === ServiceOrderStatus.IN_PRODUCTION) {
       endControl?.enable();
     } else {
       endControl?.disable();
       endControl?.reset();
     }
   }
-
 }

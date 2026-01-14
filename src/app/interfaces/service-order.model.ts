@@ -42,7 +42,7 @@ export interface ViewServiceOrderDto {
   period?: Period;
   technology?: Technology;
   technician?: ViewTechnicianDto;
-  status?: ServiceOrderStatus[];
+  status?: ServiceOrderStatus;
   subTypeOs?: SubTypeServiceOrder[];
   technicalHelp?: ViewTechnicalHelpDto[];
   unproductiveVisits?: ViewUnproductiveVisits[];
