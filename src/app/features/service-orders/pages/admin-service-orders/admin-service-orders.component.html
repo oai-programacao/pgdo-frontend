@@ -454,7 +454,7 @@
                       'status-cancelado':
                         option.value === ServiceOrderStatus.CANCELED,
                       'status-reagendado':
-                        option.value === ServiceOrderStatus.RESCHEDULED
+                        option.value === ServiceOrderStatus.RESCHEDULED,
                     }"
                   >
                     {{ option.label }}
@@ -476,7 +476,7 @@
                     'status-cancelado':
                       os.status === ServiceOrderStatus.CANCELED,
                     'status-reagendado':
-                      os.status === ServiceOrderStatus.RESCHEDULED
+                      os.status === ServiceOrderStatus.RESCHEDULED,
                   }"
                 >
                   {{ getStatusLabel(os.status) }}
@@ -595,13 +595,13 @@
   [(visible)]="isHelperTechDialogVisible"
   [style]="{ width: '30rem' }"
 >
-  @if(isHelperTechDialogVisible && selectedServiceOrder){
-  <app-helper-tech
-    #helperTechDialog
-    (eventHelper)="onHelperSuccess()"
-    [technicians]="technicianOptions"
-    [serviceOrder]="selectedServiceOrder"
-  ></app-helper-tech>
+  @if (isHelperTechDialogVisible && selectedServiceOrder) {
+    <app-helper-tech
+      #helperTechDialog
+      (eventHelper)="onHelperSuccess()"
+      [technicians]="technicianOptions"
+      [serviceOrder]="selectedServiceOrder"
+    ></app-helper-tech>
   }
 </p-dialog>
 
@@ -613,12 +613,12 @@
   [(visible)]="isEditingTechDialogVisible"
   [style]="{ width: '50rem' }"
 >
-  @if(selectedServiceOrder && isEditingTechDialogVisible){
-  <app-edit
-    #editOS
-    (eventEdit)="onEditSuccess()"
-    [serviceOrder]="selectedServiceOrder"
-  ></app-edit>
+  @if (selectedServiceOrder && isEditingTechDialogVisible) {
+    <app-edit
+      #editOS
+      (eventEdit)="onEditSuccess()"
+      [serviceOrder]="selectedServiceOrder"
+    ></app-edit>
   }
 </p-dialog>
 
@@ -630,12 +630,11 @@
   [(visible)]="isPostingObeservationTechDialogVisible"
   [style]="{ width: '30rem' }"
 >
-  @if(selectedServiceOrder && isPostingObeservationTechDialogVisible){
-
-  <app-observation
-    (eventObservation)="onObservationSuccess()"
-    [serviceOrder]="selectedServiceOrder"
-  ></app-observation>
+  @if (selectedServiceOrder && isPostingObeservationTechDialogVisible) {
+    <app-observation
+      (eventObservation)="onObservationSuccess()"
+      [serviceOrder]="selectedServiceOrder"
+    ></app-observation>
   }
 </p-dialog>
 
@@ -763,7 +762,8 @@
         icon="pi pi-check"
         class="p-button-success"
         (click)="confirmShopOs()"
-        [disabled]="shopOsForm.invalid"
+        [disabled]="shopOsForm.invalid || isSubmittingShopOs"
+        [loading]="isSubmittingShopOs"
       ></button>
     </div>
   </form>

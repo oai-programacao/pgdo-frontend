@@ -43,6 +43,7 @@ import {
   TypeOfOs,
   TypeOfOsLabels,
 } from "../../../../interfaces/enums.model";
+import { finalize } from "rxjs/operators";
 import { PhonesPipe } from "../../../../shared/pipes/phones.pipe";
 import { FormatDurationPipe } from "../../../../shared/pipes/format-duration.pipe";
 import { ButtonModule } from "primeng/button";
@@ -128,6 +129,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   isShopOsDialogVisible = false;
   selectedShopOs!: ViewServiceOrderDto;
   shopOsForm!: FormGroup;
+  isSubmittingShopOs = false;
 
   selectedServiceOrder: ViewServiceOrderDto | null = null;
 
@@ -794,24 +796,29 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   }
 
   confirmShopOs(): void {
-    if (this.shopOsForm.invalid) return;
+  if (this.shopOsForm.invalid) return;
+  if (this.isSubmittingShopOs) return; // trava clique duplo
 
-    const formValue = this.shopOsForm.value;
+  this.isSubmittingShopOs = true;
 
-    const hasEnd = !!formValue.endOfOs;
+  const formValue = this.shopOsForm.value;
+  const hasEnd = !!formValue.endOfOs;
 
-    const dto: UpdateServiceOrderDto = {
-      scheduleDate: formValue.scheduleDate,
-      period: formValue.period,
-      technicianId: formValue.technician,
-      startOfOs: this.toLocalTime(formValue.startOfOs),
-      endOfOs: hasEnd ? this.toLocalTime(formValue.endOfOs) : undefined,
-      status: hasEnd
-        ? ServiceOrderStatus.EXECUTED
-        : ServiceOrderStatus.IN_PRODUCTION,
-    };
+  const dto: UpdateServiceOrderDto = {
+    scheduleDate: formValue.scheduleDate,
+    period: formValue.period,
+    technicianId: formValue.technician,
+    startOfOs: this.toLocalTime(formValue.startOfOs),
+    endOfOs: hasEnd ? this.toLocalTime(formValue.endOfOs) : undefined,
+    status: hasEnd
+      ? ServiceOrderStatus.EXECUTED
+      : ServiceOrderStatus.IN_PRODUCTION,
+  };
 
-    this.serviceOrderService.update(this.selectedShopOs.id, dto).subscribe({
+  this.serviceOrderService
+    .update(this.selectedShopOs.id, dto)
+    .pipe(finalize(() => (this.isSubmittingShopOs = false)))
+    .subscribe({
       next: () => {
         this.messageService.add({
           severity: "success",
@@ -832,7 +839,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
         });
       },
     });
-  }
+}
 
   updateScheduleDateShopOs(): void {
 
