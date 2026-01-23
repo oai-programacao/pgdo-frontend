@@ -176,7 +176,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   }
 
   openUnproductiveVisitDialog(
-    selectServiceOrder: ViewServiceOrderDto | null = null
+    selectServiceOrder: ViewServiceOrderDto | null = null,
   ) {
     this.isUnproductiveVisitDialogVisible = true;
     this.selectedServiceOrder = selectServiceOrder;
@@ -193,7 +193,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   }
 
   openObservationTechDialog(
-    selectedServiceOrder: ViewServiceOrderDto | null = null
+    selectedServiceOrder: ViewServiceOrderDto | null = null,
   ) {
     this.selectedServiceOrder = selectedServiceOrder;
     this.isPostingObeservationTechDialogVisible = true;
@@ -271,7 +271,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
         } else {
           formattedParams[key] = [];
         }
-      }
+      },
     );
 
     this.filterForm.patchValue(formattedParams);
@@ -454,7 +454,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
             observation: updated?.observation ?? dto.observation,
             durationOfOs: updated?.durationOfOs,
           },
-          { emitEvent: false }
+          { emitEvent: false },
         );
         // Se status for "Executado", recarrega a lista
         const updatedStatus = updated?.status ?? dto.status;
@@ -581,7 +581,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   private populateOrdersArray() {
     setTimeout(() => {
       const serviceOrderGroups = this.dataSource.map((order) =>
-        this.createServiceOrderGroup(order)
+        this.createServiceOrderGroup(order),
       );
       const newOrdersArray = this.fb.array(serviceOrderGroups);
       this.osGroup.setControl("orders", newOrdersArray);
@@ -600,7 +600,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   }
 
   private createServiceOrderGroup(
-    serviceOrder: ViewServiceOrderDto
+    serviceOrder: ViewServiceOrderDto,
   ): FormGroup {
     const isShopOs =
       serviceOrder.typeOfOs?.includes(TypeOfOs.INSTALLATION) &&
@@ -653,13 +653,16 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   getPeriodLabel = (period: Period) => PeriodLabels[period] || period;
 
   confirmDeleteServiceOrder(event: Event, os: ViewServiceOrderDto) {
-
-    if(os.responsibleSeller && (os.typeOfOs === TypeOfOs.INSTALLATION || os.typeOfOs === TypeOfOs.CHANGE_OF_ADDRESS)) {
+    if (
+      os.responsibleSeller &&
+      (os.typeOfOs === TypeOfOs.INSTALLATION ||
+        os.typeOfOs === TypeOfOs.CHANGE_OF_ADDRESS)
+    ) {
       this.messageService.add({
-          severity: "error",
-          summary: "Cancelado",
-          detail: "Não é possível excluir OS vinda da loja, apenas REAGENDAR.",
-        });
+        severity: "error",
+        summary: "Cancelado",
+        detail: "Não é possível excluir OS vinda da loja, apenas REAGENDAR.",
+      });
       return;
     }
 
@@ -796,56 +799,66 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   }
 
   confirmShopOs(): void {
-  if (this.shopOsForm.invalid) return;
-  if (this.isSubmittingShopOs) return; // trava clique duplo
+    if (this.shopOsForm.invalid) return;
+    if (this.isSubmittingShopOs) return; // trava clique duplo
 
-  this.isSubmittingShopOs = true;
+    this.isSubmittingShopOs = true;
 
-  const formValue = this.shopOsForm.value;
-  const hasEnd = !!formValue.endOfOs;
-
-  const dto: UpdateServiceOrderDto = {
-    scheduleDate: formValue.scheduleDate,
-    period: formValue.period,
-    technicianId: formValue.technician,
-    startOfOs: this.toLocalTime(formValue.startOfOs),
-    endOfOs: hasEnd ? this.toLocalTime(formValue.endOfOs) : undefined,
-    status: hasEnd
-      ? ServiceOrderStatus.EXECUTED
-      : ServiceOrderStatus.IN_PRODUCTION,
-  };
-
-  this.serviceOrderService
-    .update(this.selectedShopOs.id, dto)
-    .pipe(finalize(() => (this.isSubmittingShopOs = false)))
-    .subscribe({
-      next: () => {
-        this.messageService.add({
-          severity: "success",
-          summary: hasEnd ? "OS finalizada" : "OS iniciada",
-          detail: hasEnd
-            ? "Ordem de Serviço finalizada com sucesso."
-            : "Ordem de Serviço iniciada com sucesso.",
-        });
-
-        this.isShopOsDialogVisible = false;
-        this.loadServiceOrders();
-      },
-      error: () => {
-        this.messageService.add({
-          severity: "error",
-          summary: "Erro",
-          detail: "Falha ao atualizar a Ordem de Serviço.",
-        });
-      },
-    });
-}
-
-  updateScheduleDateShopOs(): void {
+    const formValue = this.shopOsForm.value;
+    const hasEnd = !!formValue.endOfOs;
 
     const dto: UpdateServiceOrderDto = {
-      status: ServiceOrderStatus.RESCHEDULED,
+      scheduleDate: formValue.scheduleDate,
+      period: formValue.period,
+      technicianId: formValue.technician,
+      startOfOs: this.toLocalTime(formValue.startOfOs),
+      endOfOs: hasEnd ? this.toLocalTime(formValue.endOfOs) : undefined,
+      status: hasEnd
+        ? ServiceOrderStatus.EXECUTED
+        : ServiceOrderStatus.IN_PRODUCTION,
     };
+
+    this.serviceOrderService
+      .update(this.selectedShopOs.id, dto)
+      .pipe(finalize(() => (this.isSubmittingShopOs = false)))
+      .subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: "success",
+            summary: hasEnd ? "OS finalizada" : "OS iniciada",
+            detail: hasEnd
+              ? "Ordem de Serviço finalizada com sucesso."
+              : "Ordem de Serviço iniciada com sucesso.",
+          });
+
+          this.isShopOsDialogVisible = false;
+          this.loadServiceOrders();
+        },
+        error: () => {
+          this.messageService.add({
+            severity: "error",
+            summary: "Erro",
+            detail: "Falha ao atualizar a Ordem de Serviço.",
+          });
+        },
+      });
+  }
+
+  updateScheduleDateShopOs(): void {
+    const dto: UpdateServiceOrderDto = {
+      status: ServiceOrderStatus.RESCHEDULED,
+      scheduleDate: this.shopOsForm.get("scheduleDate")?.value,
+    };
+
+    if (this.selectedShopOs.status === ServiceOrderStatus.EXECUTED) {
+      this.messageService.add({
+        severity: "error",
+        summary: "Erro",
+        detail:
+          "OS da loja com status EXECUTADA não pode ser reagendada, já encerrou o ciclo de vida.",
+      });
+      return;
+    }
 
     this.serviceOrderService.update(this.selectedShopOs.id, dto).subscribe({
       next: () => {
