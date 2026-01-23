@@ -861,6 +861,16 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
       return;
     }
 
+     if (this.selectedShopOs.status === ServiceOrderStatus.CANCELED) {
+      this.messageService.add({
+        severity: "error",
+        summary: "Erro",
+        detail:
+          "OS da loja com status CANCELADA não pode ser reagendada, já encerrou o ciclo de vida.",
+      });
+      return;
+    }
+
     this.serviceOrderService.update(this.selectedShopOs.id, dto).subscribe({
       next: () => {
         this.messageService.add({
