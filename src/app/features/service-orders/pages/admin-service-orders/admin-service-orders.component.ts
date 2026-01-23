@@ -848,6 +848,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
     const dto: UpdateServiceOrderDto = {
       status: ServiceOrderStatus.RESCHEDULED,
       scheduleDate: this.shopOsForm.get("scheduleDate")?.value,
+      period: this.shopOsForm.get('period')?.value
     };
 
     if (this.selectedShopOs.status === ServiceOrderStatus.EXECUTED) {
