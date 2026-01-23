@@ -443,7 +443,7 @@
                 appendTo="body"
                 class="min-w-full"
               >
-                <!-- ITENS DA LISTA -->
+                <!-- OPÇÕES DO DROPDOWN -->
                 <ng-template let-option pTemplate="item">
                   <div
                     class="status-option"
@@ -462,20 +462,22 @@
                   </div>
                 </ng-template>
 
-                <!-- ITEM SELECIONADO -->
-                <ng-template let-value pTemplate="selectedItem">
+                <!-- OPÇÃO SELECIONADA -->
+                <ng-template let-option pTemplate="selectedItem">
                   <div
                     class="status-option"
                     [ngClass]="{
-                      'status-executado': value === ServiceOrderStatus.EXECUTED,
+                      'status-executado':
+                        option?.value === ServiceOrderStatus.EXECUTED,
                       'status-andamento':
-                        value === ServiceOrderStatus.IN_PRODUCTION,
-                      'status-cancelado': value === ServiceOrderStatus.CANCELED,
+                        option?.value === ServiceOrderStatus.IN_PRODUCTION,
+                      'status-cancelado':
+                        option?.value === ServiceOrderStatus.CANCELED,
                       'status-reagendado':
-                        value === ServiceOrderStatus.RESCHEDULED,
+                        option?.value === ServiceOrderStatus.RESCHEDULED,
                     }"
                   >
-                    {{ getStatusLabel(value) }}
+                    {{ option?.label }}
                   </div>
                 </ng-template>
               </p-select>
