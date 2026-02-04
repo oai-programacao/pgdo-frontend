@@ -163,6 +163,7 @@ export class AdminServiceOrdersComponent implements OnInit, OnDestroy {
   isPostingObeservationTechDialogVisible = false;
   isDeleteTechDialogVisible = false;
   canEditEndOfOs: boolean = false;
+  TypeOfOs = TypeOfOs;
 
   constructor() {
     this.serviceOrderTypeOptions = this.mapLabelsToOptions(TypeOfOsLabels);

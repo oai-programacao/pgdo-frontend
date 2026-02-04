@@ -509,8 +509,12 @@
                   severity="contrast"
                   icon="pi pi-angle-right"
                   [rounded]="true"
-                  pTooltip="Iniciar OS de Venda"
                   [raised]="true"
+                  [disabled]="
+                    os.status === ServiceOrderStatus.CANCELED ||
+                    os.typeOfOs === TypeOfOs.INSTALLATION
+                  "
+                  pTooltip="Iniciar OS de Venda"
                   (click)="openShopOsDialog(os)"
                 ></button>
               </div>
