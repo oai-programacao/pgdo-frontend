@@ -511,7 +511,7 @@
                   [rounded]="true"
                   [raised]="true"
                   [disabled]="
-                    os.status === ServiceOrderStatus.CANCELED ||
+                    os.status === ServiceOrderStatus.CANCELED &&
                     os.typeOfOs === TypeOfOs.INSTALLATION
                   "
                   pTooltip="Iniciar OS de Venda"
