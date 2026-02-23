@@ -1,0 +1,99 @@
+<div class="page">
+  <!-- Background blobs -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div class="wrapper">
+
+    <!-- Brand bar -->
+    <div class="brand-bar">
+      <div class="brand-dot"></div>
+      <span class="brand-name">Geração de carne de clientes</span>
+    </div>
+
+    <div class="card">
+      <!-- Gradient strip -->
+      <div class="card-strip"></div>
+
+      <!-- Header -->
+      <div class="card-header">
+        <div class="icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+        <div class="header-text">
+          <h1>Consulta de Carnê</h1>
+          <p>
+            Geração de PDF via banco
+          </p>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="card-body">
+
+        <div class="form-label-row">
+          <span class="field-label">Número do Contrato</span>
+        </div>
+
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+          <input
+            type="text"
+            [(ngModel)]="contractNumber"
+            (keydown)="onKeyDown($event)"
+            placeholder="ex: 0001234567"
+            autocomplete="off"
+            spellcheck="false"
+            class="contract-input"
+          />
+        </div>
+
+        <button
+          class="btn"
+          [class.loading]="loading"
+          [disabled]="loading"
+          (click)="fetchCarne()"
+        >
+          <svg *ngIf="loading" class="spinner" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
+            <path fill="white" d="M4 12a8 8 0 018-8v8z"/>
+          </svg>
+          <span>{{ loading ? 'Consultando...' : 'Gerar Carnê PDF' }}</span>
+          <svg *ngIf="!loading" class="btn-icon" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </button>
+
+        <!-- Status feedback -->
+        <div *ngIf="statusType" class="status" [class]="statusType">
+          <span class="status-icon">{{ statusIcon }}</span>
+          <span class="status-text">{{ statusMessage }}</span>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="card-footer">
+        <div class="footer-badge">
+          <span class="footer-dot">✦</span>
+          <span>Santander Bank</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

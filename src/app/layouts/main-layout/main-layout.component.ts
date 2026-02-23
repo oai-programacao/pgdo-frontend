@@ -44,7 +44,7 @@ export class MainLayoutComponent implements OnDestroy {
           label: "Colaboradores",
           icon: "pi pi-users",
           route: "/app/colaboradores",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_ANALYST","ROLE_TOWER"],
+          allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_ANALYST", "ROLE_TOWER"],
           exactMatch: true,
         },
         {
@@ -111,7 +111,7 @@ export class MainLayoutComponent implements OnDestroy {
           label: "Gerenciar OS",
           icon: "pi pi-calendar",
           route: "/app/ordens-de-servico/gerenciar",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST", "ROLE_CDS","ROLE_TOWER"],
+          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST", "ROLE_CDS", "ROLE_TOWER"],
           exactMatch: true,
         },
         {
@@ -119,7 +119,7 @@ export class MainLayoutComponent implements OnDestroy {
           label: "Gerenciar Ofertas",
           icon: "pi pi-envelope",
           route: "/app/ordens-de-servico/ofertas",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST","ROLE_TOWER"],
+          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST", "ROLE_TOWER"],
           exactMatch: true,
         },
         {
@@ -127,7 +127,7 @@ export class MainLayoutComponent implements OnDestroy {
           label: "Bloqueio de Ofertas",
           icon: "pi pi-ban",
           route: "/app/ordens-de-servico/bloqueio-ofertas",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST","ROLE_TOWER"],
+          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST", "ROLE_TOWER"],
           exactMatch: true,
         },
         {
@@ -135,7 +135,7 @@ export class MainLayoutComponent implements OnDestroy {
           label: "Automação de Ofertas",
           icon: "pi pi-lightbulb",
           route: "/app/ordens-de-servico/automacao",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST","ROLE_TOWER"],
+          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST", "ROLE_TOWER"],
           exactMatch: true,
         },
         {
@@ -153,46 +153,6 @@ export class MainLayoutComponent implements OnDestroy {
         },
       ],
     },
-    // Vendas
-    // {
-    //   id: "sales",
-    //   label: "Vendas",
-    //   icon: "pi pi-dollar",
-    //   allowedRoles: ["ROLE_ADMIN", "ROLE_STORE_MANAGER", "ROLE_STORE_EMPLOYEE"],
-    //   expanded: false,
-    //   children: [
-    //     {
-    //       id: "sales-list",
-    //       label: "Minhas Vendas",
-    //       icon: "pi pi-list",
-    //       route: "/app/minhas-vendas",
-    //       exactMatch: true,
-    //       allowedRoles: ["ROLE_STORE_EMPLOYEE"],
-    //     },
-    //     {
-    //       id: "sales-manage",
-    //       label: "Gerenciar Todas Vendas",
-    //       icon: "pi pi-sliders-h",
-    //       route: "/app/vendas",
-    //       allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST"],
-    //       exactMatch: true,
-    //     },
-    //   ],
-    // },
-    // Pós Vendas
-    // {
-    //   id: "after-sales",
-    //   label: "Pós-Vendas",
-    //   icon: "pi pi-check-circle",
-    //   route: "/app/pos-vendas",
-    //   allowedRoles: [
-    //     "ROLE_ADMIN",
-    //     "ROLE_STORE_MANAGER",
-    //     "ROLE_ANALYST",
-    //     "ROLE_STORE_EMPLOYEE",
-    //   ],
-    // },
-    // ONUs
     {
       id: "olt",
       label: "Olt",
@@ -227,7 +187,7 @@ export class MainLayoutComponent implements OnDestroy {
           label: "Usuários de OLT",
           icon: "pi pi-users",
           route: "/app/olt/usuarios",
-          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST","ROLE_TOWER"],
+          allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST", "ROLE_TOWER"],
           exactMatch: true,
         },
       ],
@@ -266,6 +226,26 @@ export class MainLayoutComponent implements OnDestroy {
           allowedRoles: ["ROLE_ADMIN", "ROLE_ANALYST", "ROLE_MAINTENANCE", "ROLE_TOWER"],
           exactMatch: true,
         },
+      ],
+    },
+    {
+      id: "financial",
+      label: "Financeiro",
+      icon: "pi pi-wallet",
+      allowedRoles: [
+        "ROLE_ADMIN",
+        "ROLE_STORE_MANAGER",
+        "ROLE_STORE_EMPLOYEE"
+      ],
+      expanded: false,
+      children: [
+        {
+          id: "ticket-create",
+          label: "Imprimir carne",
+          icon: "pi pi-receipt",
+          route: "/app/financeiro/gerar-carne",
+          exactMatch: true,
+        }
       ],
     },
 
