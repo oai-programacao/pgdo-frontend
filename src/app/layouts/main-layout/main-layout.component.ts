@@ -232,11 +232,6 @@ export class MainLayoutComponent implements OnDestroy {
       id: "financial",
       label: "Financeiro",
       icon: "pi pi-wallet",
-      allowedRoles: [
-        "ROLE_ADMIN",
-        "ROLE_STORE_MANAGER",
-        "ROLE_STORE_EMPLOYEE"
-      ],
       expanded: false,
       children: [
         {

@@ -12,19 +12,31 @@ type StatusType = 'success' | 'error' | 'warn' | null;
   styleUrl: './financial.component.scss'
 })
 export class FinancialComponent {
+
+  // ── Carnê ────────────────────────────────────────────────
   contractNumber = '';
   loading = false;
-
   statusType: StatusType = null;
   statusMessage = '';
+
+  // ── Sync Dialog ──────────────────────────────────────────
+  syncDialogOpen = false;
+  syncCpf = '';
+  syncLoading = false;
+  syncStatusType: StatusType = null;
+  syncStatusMessage = '';
 
   get statusIcon(): string {
     return { success: '✓', error: '✕', warn: '⚠' }[this.statusType!] ?? '';
   }
 
-  constructor(private financialService: FinancialService) { }
+  get syncStatusIcon(): string {
+    return { success: '✓', error: '✕', warn: '⚠' }[this.syncStatusType!] ?? '';
+  }
 
+  constructor(private financialService: FinancialService) {}
 
+  // ── Gerar Carnê ──────────────────────────────────────────
   fetchCarne(): void {
     const value = this.contractNumber.trim();
 
@@ -47,32 +59,20 @@ export class FinancialComponent {
         this.setStatus('success', 'Carnê baixado com sucesso! Verifique seus downloads.');
         this.loading = false;
       },
-      error: (err) => {
+      error: async (err) => {
+        if (err.error instanceof Blob) {
+          await err.error.text();
+        }
         if (err.status === 504) {
-          this.setStatus(
-            'error',
-            'Não foi possível gerar o carnê. O serviço financeiro demorou para responder. Tente novamente em alguns instantes.'
-          );
+          this.setStatus('error', 'O serviço financeiro demorou para responder. Tente novamente em alguns instantes.');
         } else if (err.status === 502) {
-          this.setStatus(
-            'error',
-            'O serviço financeiro está temporariamente indisponível. Verifique sua conexão ou tente mais tarde.'
-          );
+          this.setStatus('error', 'O serviço financeiro está temporariamente indisponível. Tente mais tarde.');
         } else if (err.status === 404) {
-          this.setStatus(
-            'warn',
-            'Contrato não encontrado. Verifique o número informado e tente novamente.'
-          );
+          this.setStatus('warn', 'Contrato não encontrado. Verifique o número informado e tente novamente.');
         } else if (err.status === 0) {
-          this.setStatus(
-            'error',
-            'Sem conexão com o servidor. Verifique sua internet e tente novamente.'
-          );
+          this.setStatus('error', 'Sem conexão com o servidor. Verifique sua internet e tente novamente.');
         } else {
-          this.setStatus(
-            'error',
-            'Ocorreu um erro inesperado. Por favor, tente novamente ou contate o suporte.'
-          );
+          this.setStatus('error', 'Erro inesperado. Verifique se o cliente está sincronizado ou contate o suporte.');
         }
         this.loading = false;
       },
@@ -85,8 +85,58 @@ export class FinancialComponent {
     }
   }
 
+  // ── Dialog Sincronização ─────────────────────────────────
+  openSyncDialog(): void {
+    this.syncDialogOpen = true;
+    this.syncCpf = '';
+    this.syncStatusType = null;
+    this.syncStatusMessage = '';
+  }
+
+  closeSyncDialog(): void {
+    if (this.syncLoading) return;
+    this.syncDialogOpen = false;
+  }
+
+  syncClient(): void {
+    const cpf = this.syncCpf.trim();
+
+    if (!cpf) {
+      this.setSyncStatus('warn', 'Informe o CPF do cliente.');
+      return;
+    }
+
+    this.syncLoading = true;
+    this.syncStatusType = null;
+
+    this.financialService.searchAndRegisterClient(cpf).subscribe({
+      next: () => {
+        this.setSyncStatus('success', 'Cliente sincronizado com sucesso!');
+        this.syncLoading = false;
+      },
+      error: (err) => {
+        if (err.status === 404) {
+          this.setSyncStatus('warn', 'Cliente não encontrado. Verifique o CPF informado.');
+        } else if (err.status === 409) {
+          this.setSyncStatus('warn', 'Cliente já está sincronizado no sistema.');
+        } else if (err.status === 0) {
+          this.setSyncStatus('error', 'Sem conexão com o servidor.');
+        } else {
+          this.setSyncStatus('error', 'Não foi possível sincronizar. Tente novamente ou contate o suporte.');
+        }
+        this.syncLoading = false;
+      },
+    });
+  }
+
+  // ── Helpers ──────────────────────────────────────────────
   private setStatus(type: StatusType, message: string): void {
     this.statusType = type;
     this.statusMessage = message;
+  }
+
+  private setSyncStatus(type: StatusType, message: string): void {
+    this.syncStatusType = type;
+    this.syncStatusMessage = message;
   }
 }

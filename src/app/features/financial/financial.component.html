@@ -1,19 +1,14 @@
 <div class="page">
-  <!-- Background blobs -->
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
-  <div class="blob blob-3"></div>
 
   <div class="wrapper">
 
     <!-- Brand bar -->
     <div class="brand-bar">
       <div class="brand-dot"></div>
-      <span class="brand-name">Geração de carne de clientes</span>
+      <span class="brand-name">Geração de carnê de clientes</span>
     </div>
 
     <div class="card">
-      <!-- Gradient strip -->
       <div class="card-strip"></div>
 
       <!-- Header -->
@@ -29,14 +24,33 @@
         </div>
         <div class="header-text">
           <h1>Consulta de Carnê</h1>
-          <p>
-            Geração de PDF via banco
-          </p>
+          <p>Geração de PDF via banco</p>
         </div>
+
+        <!-- Botão sincronizar no canto direito do header -->
+        <button class="btn-sync" (click)="openSyncDialog()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"/>
+            <polyline points="1 20 1 14 7 14"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+          Sincronizar Cliente
+        </button>
       </div>
 
       <!-- Body -->
       <div class="card-body">
+
+        <div class="info-banner">
+          <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>O cliente deve estar <strong>sincronizado com o sistema da Loja</strong> para que o carnê seja gerado corretamente. Caso necessário, utilize o botão <strong>Sincronizar Cliente</strong>.</span>
+        </div>
 
         <div class="form-label-row">
           <span class="field-label">Número do Contrato</span>
@@ -59,12 +73,7 @@
           />
         </div>
 
-        <button
-          class="btn"
-          [class.loading]="loading"
-          [disabled]="loading"
-          (click)="fetchCarne()"
-        >
+        <button class="btn" [disabled]="loading" (click)="fetchCarne()">
           <svg *ngIf="loading" class="spinner" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
             <path fill="white" d="M4 12a8 8 0 018-8v8z"/>
@@ -78,8 +87,7 @@
           </svg>
         </button>
 
-        <!-- Status feedback -->
-        <div *ngIf="statusType" class="status" [class]="statusType">
+        <div *ngIf="statusType" class="status" [ngClass]="statusType">
           <span class="status-icon">{{ statusIcon }}</span>
           <span class="status-text">{{ statusMessage }}</span>
         </div>
@@ -93,6 +101,73 @@
           <span>Santander Bank</span>
         </div>
       </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Dialog de Sincronização ── -->
+<div class="dialog-overlay" *ngIf="syncDialogOpen" (click)="closeSyncDialog()">
+  <div class="dialog" (click)="$event.stopPropagation()">
+
+    <div class="dialog-header">
+      <div class="dialog-icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"/>
+          <polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+      </div>
+      <div>
+        <h2>Sincronizar Cliente</h2>
+        <p>Informe o CPF do cliente para sincronizar com o sistema da Loja.</p>
+      </div>
+      <button class="dialog-close" (click)="closeSyncDialog()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <label class="field-label">CPF do Cliente</label>
+      <div class="input-wrap" style="margin-top: 0.4rem;">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <input
+          type="text"
+          [(ngModel)]="syncCpf"
+          placeholder="000.000.000-00"
+          autocomplete="off"
+          class="contract-input"
+          [disabled]="syncLoading"
+          (keydown.enter)="syncClient()"
+        />
+      </div>
+
+      <div *ngIf="syncStatusType" class="status" [ngClass]="syncStatusType" style="margin-top: 0.75rem;">
+        <span class="status-icon">{{ syncStatusIcon }}</span>
+        <span class="status-text">{{ syncStatusMessage }}</span>
+      </div>
+    </div>
+
+    <div class="dialog-footer">
+      <button class="btn-outline" (click)="closeSyncDialog()" [disabled]="syncLoading">
+        Cancelar
+      </button>
+      <button class="btn btn-dialog" (click)="syncClient()" [disabled]="syncLoading">
+        <svg *ngIf="syncLoading" class="spinner" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
+          <path fill="white" d="M4 12a8 8 0 018-8v8z"/>
+        </svg>
+        <span>{{ syncLoading ? 'Sincronizando...' : 'Sincronizar' }}</span>
+      </button>
     </div>
 
   </div>

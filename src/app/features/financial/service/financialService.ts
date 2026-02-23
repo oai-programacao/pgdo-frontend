@@ -12,11 +12,10 @@ export class FinancialService {
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Consulta o carnê em PDF pelo número do contrato.
-   * Chama: GET /render?contractNumber={contractNumber}
-   * Retorna o PDF como Blob para abrir/download no frontend.
-   */
+  searchAndRegisterClient(documento: string): Observable<any> {
+    return this.http.post(`${this.BASE_URL}/client/rbx/searchAndRegister`, { documento });
+  }
+
   getCarne(contractNumber: string): Observable<Blob> {
     const url = `${this.BASE_URL}/carne/render`;
     const headers = new HttpHeaders({ Accept: 'application/pdf'});
