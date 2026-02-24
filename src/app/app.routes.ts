@@ -145,6 +145,14 @@ export const routes: Routes = [
         title: "Criar Chamado",
       },
       {
+        path: "financeiro/gerar-carne",
+        loadComponent: () =>
+          import(
+            "./features/financial/financial.component"
+          ).then((m) => m.FinancialComponent),
+        title: "Gerar carnes",
+      },
+      {
         path: "chamados/gerenciar",
         loadComponent: () =>
           import(

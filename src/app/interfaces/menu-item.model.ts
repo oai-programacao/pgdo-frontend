@@ -1,4 +1,3 @@
-// Crie em um arquivo, ex: src/app/core/models/menu-item.model.ts
 export interface MenuItem {
   id: string; // Identificador único para o item (útil para keys em *ngFor)
   label: string; // Texto exibido quando o menu está expandido
