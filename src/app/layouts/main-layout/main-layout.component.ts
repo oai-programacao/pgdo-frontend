@@ -311,6 +311,19 @@ export class MainLayoutComponent implements OnDestroy {
           ],
           exactMatch: true,
         },
+        {
+          id: "auditoria-vendedor",
+          label: "Auditoria Vendedor",
+          icon: "pi pi-compass",
+          route: "/app/vendedores/auditoria",
+          allowedRoles: [
+            "ROLE_ADMIN",
+            "ROLE_STORE_MANAGER",
+            "ROLE_ANALYST",
+            "ROLE_TOWER",
+          ],
+          exactMatch: true,
+        },
       ],
     },
   ];

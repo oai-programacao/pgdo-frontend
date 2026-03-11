@@ -1,7 +1,5 @@
-import { RegisterSellerComponent } from './features/register-seller/components/register-seller.component';
 import { Routes } from "@angular/router";
 import { loginGuard } from "./core/auth/login.guard";
-import { authGuard } from "./core/auth/auth.guard";
 import { MainLayoutComponent } from "./layouts/main-layout/main-layout.component";
 
 export const routes: Routes = [
@@ -192,6 +190,14 @@ export const routes: Routes = [
             (m) => m.RegisterSellerComponent,
           ),
         title: "Cadastrar Vendedor",
+      },
+      {
+        path: "vendedores/auditoria",
+        loadComponent: () =>
+          import("./features/audit-seller/audit-seller.component").then(
+            (m) => m.AuditSellerComponent,
+          ),
+        title: "Auditoria Vendedor",
       },
 
       { path: "", redirectTo: "home", pathMatch: "full" }, // Rota padrão dentro de /app
