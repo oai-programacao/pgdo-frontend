@@ -126,16 +126,17 @@
       </div>
 
       <p-table
-        *ngIf="!isLoading && auditorias.length > 0"
+        [hidden]="isLoading || auditorias.length === 0"
         [value]="auditorias"
         [paginator]="true"
         [rows]="pageSize"
         [rowsPerPageOptions]="[10, 20, 50]"
         [totalRecords]="totalRecords"
         [lazy]="true"
-        (onPage)="buscar($event.first / $event.rows)"
+        (onPage)="onPageChange($event)"
         styleClass="p-datatable-sm p-datatable-gridlines"
         [tableStyle]="{ 'min-width': '60rem' }"
+        [first]="currentPage * pageSize"
       >
         <ng-template pTemplate="header">
           <tr>

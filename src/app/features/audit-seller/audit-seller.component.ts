@@ -189,4 +189,11 @@ export class AuditSellerComponent {
     };
     return map[typeFlow] ?? "pi pi-circle";
   }
+
+  onPageChange(event: any) {
+    if (!this.searched) return; // ignora disparo inicial
+    this.pageSize = event.rows;
+    const page = Math.floor(event.first / event.rows);
+    this.buscar(page);
+  }
 }
