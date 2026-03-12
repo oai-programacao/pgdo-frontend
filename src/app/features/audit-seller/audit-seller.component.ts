@@ -189,4 +189,10 @@ export class AuditSellerComponent {
     };
     return map[typeFlow] ?? "pi pi-circle";
   }
+
+  onPageChange(event: any) {
+    const page = event.first / event.rows;
+    this.pageSize = event.rows;
+    this.buscar(page);
+  }
 }

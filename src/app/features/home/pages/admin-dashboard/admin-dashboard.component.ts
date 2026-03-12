@@ -1,9 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { WidgetTrend, CardWidgetComponent } from '../../../../shared/components/card-widget/card-widget.component';
-import { ContentPanelComponent } from "../../../../shared/components/content-panel/content-panel.component";
+import { WidgetTrend } from '../../../../shared/components/card-widget/card-widget.component';
 import { CommonModule } from '@angular/common';
 import { ChartData, ChartOptions } from 'chart.js';
-import { DashboardChartComponent } from '../../../../shared/chart/dashboard-chart/dashboard-chart.component';
 import { DashboardService } from '../../services/dashboard.service';
 import { TypeOfOs } from '../../../../interfaces/enums.model';
 import { HomeBodyComponent } from "../../components/home-body/home-body.component";
@@ -19,10 +17,7 @@ interface DashboardData {
 @Component({
   selector: "app-admin-dashboard",
   imports: [
-    CardWidgetComponent,
-    ContentPanelComponent,
     CommonModule,
-    DashboardChartComponent,
     HomeBodyComponent
 ],
   templateUrl: "./admin-dashboard.component.html",

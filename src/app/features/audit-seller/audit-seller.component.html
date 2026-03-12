@@ -133,7 +133,7 @@
         [rowsPerPageOptions]="[10, 20, 50]"
         [totalRecords]="totalRecords"
         [lazy]="true"
-        (onPage)="buscar($event.first / $event.rows)"
+        (onPage)="onPageChange($event)"
         styleClass="p-datatable-sm p-datatable-gridlines"
         [tableStyle]="{ 'min-width': '60rem' }"
       >
