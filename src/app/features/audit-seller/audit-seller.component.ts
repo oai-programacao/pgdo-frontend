@@ -191,8 +191,9 @@ export class AuditSellerComponent {
   }
 
   onPageChange(event: any) {
-  this.pageSize = event.rows;
-  const page = Math.floor(event.first / event.rows);
-  this.buscar(page);
-}
+    if (!this.searched) return; // ignora disparo inicial
+    this.pageSize = event.rows;
+    const page = Math.floor(event.first / event.rows);
+    this.buscar(page);
+  }
 }
