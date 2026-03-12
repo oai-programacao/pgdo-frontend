@@ -273,17 +273,27 @@ export class MainLayoutComponent implements OnDestroy {
       route: "/app/avisos",
       allowedRoles: ["ROLE_ADMIN"],
     },
-    // Diagnósticos
+    // Relatórios
     {
-      id: "diagnostics",
-      label: "Diagnósticos",
+      id: "reports",
+      label: "Relatórios",
       icon: "pi pi-chart-bar",
-      route: "/app/diagnosticos",
-      allowedRoles: [
-        "ROLE_ADMIN",
-        "ROLE_STORE_MANAGER",
-        "ROLE_ANALYST",
-        "ROLE_TOWER",
+      expanded: false,
+      children: [
+        {
+          id: "report-pgdo",
+          label: "Relatório PGDO",
+          icon: "pi pi-truck",
+          route: "/app/relatorios/pgdo",
+          exactMatch: true,
+        },
+        {
+          id: "report-loja",
+          label: "Relatório Loja",
+          icon: "pi pi-shopping-bag",
+          route: "/app/relatorios/loja",
+          exactMatch: true,
+        },
       ],
     },
     {

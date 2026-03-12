@@ -1,0 +1,397 @@
+@use 'sass:color';
+
+// ─── Tokens ────────────────────────────────────────────────────────────────
+$blue:        #2563eb;
+$blue-light:  #dbeafe;
+$blue-mid:    #bfdbfe;
+$blue-dark:   #1d4ed8;
+$text-dark:   #1e293b;
+$text-mid:    #475569;
+$text-light:  #64748b;
+$border:      #e2e8f0;
+$bg-page:     #f0f4ff;
+$bg-card:     #ffffff;
+$bg-header:   #fafbff;
+$red:         #dc2626;
+$green:       #059669;
+$green-light: #d1fae5;
+$orange:      #ea580c;
+$orange-light:#ffedd5;
+$radius-card: 14px;
+$radius-btn:  8px;
+
+// ─── Root ───────────────────────────────────────────────────────────────────
+.report-store {
+  min-height: 100vh;
+  background: linear-gradient(160deg, $bg-page 0%, #e8eeff 100%);
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+// ─── Header ─────────────────────────────────────────────────────────────────
+.rs-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(250,251,255,0.96); backdrop-filter: blur(10px);
+  border-bottom: 1px solid $blue-mid;
+  box-shadow: 0 1px 4px rgba(37,99,235,0.08);
+
+  &__inner {
+    max-width: 1400px; margin: 0 auto; padding: 0 1.5rem;
+    height: 64px; display: flex; align-items: center; justify-content: space-between;
+  }
+
+  &__title {
+    display: flex; align-items: center; gap: 0.85rem;
+    h1 { font-size: 1.05rem; font-weight: 700; color: $text-dark; margin: 0; }
+    p  { font-size: 0.75rem; color: $text-light; margin: 0; }
+  }
+
+  &__icon {
+    width: 40px; height: 40px; background: $blue; color: white;
+    border-radius: 9px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; box-shadow: 0 2px 8px rgba($blue,0.3);
+  }
+}
+
+.rs-btn-back {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.45rem 1rem; font-size: 0.8rem; font-weight: 500;
+  color: $blue; background: $blue-light; border: 1px solid $blue-mid;
+  border-radius: $radius-btn; cursor: pointer; text-decoration: none;
+  transition: background 0.2s, box-shadow 0.2s;
+  &:hover { background: $blue-mid; box-shadow: 0 2px 8px rgba($blue,0.15); }
+}
+
+// ─── Main ────────────────────────────────────────────────────────────────────
+.rs-main {
+  max-width: 1400px; margin: 0 auto;
+  padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;
+}
+
+// ─── Card base ───────────────────────────────────────────────────────────────
+.rs-card {
+  background: $bg-card; border-radius: $radius-card;
+  border: 1px solid $blue-mid;
+  box-shadow: 0 2px 12px rgba(37,99,235,0.07);
+  overflow: visible;
+
+  &__header {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 1.1rem 1.5rem; border-bottom: 1px solid $blue-mid;
+    background: linear-gradient(90deg, #f5f8ff 0%, #ffffff 100%);
+    border-radius: $radius-card $radius-card 0 0;
+    h2 { font-size: 0.9rem; font-weight: 700; color: $text-dark; margin: 0; }
+  }
+
+  &__header-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: $blue; flex-shrink: 0; box-shadow: 0 0 0 3px $blue-light;
+    &--green  { background: $green;  box-shadow: 0 0 0 3px $green-light; }
+    &--orange { background: $orange; box-shadow: 0 0 0 3px $orange-light; }
+  }
+
+  &--viewer  { min-height: 400px; display: flex; flex-direction: column; overflow: hidden; }
+  &--history { overflow: hidden; }
+  &--compare { overflow: hidden; }
+}
+
+// ─── Seções do card de filtros ────────────────────────────────────────────────
+.rs-section {
+  padding: 1.5rem;
+
+  &--compare {
+    background: #fffbf7;
+    border-radius: 0 0 $radius-card $radius-card;
+  }
+
+  &__title {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    h3 { font-size: 0.9rem; font-weight: 700; color: $text-dark; margin: 0 0 0.2rem 0; }
+    p  { font-size: 0.75rem; color: $text-light; margin: 0; }
+  }
+
+  &__icon {
+    width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    &--blue   { background: $blue-light; color: $blue; border: 1px solid $blue-mid; }
+    &--orange { background: $orange-light; color: $orange; border: 1px solid color.adjust($orange-light, $lightness: -8%); }
+  }
+}
+
+.rs-divider {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0 1.5rem; margin: 0;
+  border-top: 1px solid $blue-mid;
+  border-bottom: 1px solid $blue-mid;
+  background: linear-gradient(90deg, #f5f8ff 0%, #fffbf7 100%);
+
+  &::before, &::after { content: ''; flex: 1; height: 1px; background: $border; }
+
+  span {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: $text-light;
+    padding: 0.6rem 0.75rem;
+    background: white; border: 1px solid $border; border-radius: 12px;
+  }
+}
+
+// ─── Filtros ─────────────────────────────────────────────────────────────────
+.rs-filters { display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
+
+.rs-filter-group {
+  display: flex; flex-direction: column; gap: 0.4rem;
+  flex: 1; min-width: 180px;
+  &--wide   { flex: 2; min-width: 260px; }
+  &--action { flex: 0 0 auto; min-width: unset; }
+}
+
+.rs-label {
+  font-size: 0.7rem; font-weight: 700; color: $blue;
+  display: flex; align-items: center; gap: 0.3rem;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  &--invisible { opacity: 0; pointer-events: none; user-select: none; }
+}
+
+.rs-field-error {
+  font-size: 0.75rem; color: $red;
+  display: flex; align-items: center; gap: 0.3rem; margin-top: 0.2rem;
+  &::before { content: '⚠'; font-size: 0.7rem; }
+}
+
+// ─── Botões ───────────────────────────────────────────────────────────────────
+.rs-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+  padding: 0.6rem 1.25rem; font-size: 0.875rem; font-weight: 600;
+  border-radius: $radius-btn; border: none; cursor: pointer;
+  white-space: nowrap; text-decoration: none;
+  transition: background 0.2s, box-shadow 0.2s, opacity 0.2s;
+  line-height: 1;
+
+  &--primary {
+    background: $blue; color: white;
+    &:hover:not(:disabled) { background: $blue-dark; box-shadow: 0 4px 14px rgba($blue,0.35); }
+  }
+
+  &--orange {
+    background: $orange-light; color: $orange;
+    border: 1px solid color.adjust($orange-light, $lightness: -10%);
+    &:hover:not(:disabled) { background: color.adjust($orange-light, $lightness: -8%); box-shadow: 0 4px 14px rgba($orange,0.2); }
+  }
+
+  &--ghost {
+    background: $blue-light; color: $blue; border: 1px solid $blue-mid;
+    &:hover:not(:disabled) { background: $blue-mid; }
+  }
+
+  &--clear {
+    background: transparent; color: $text-light; border: 1px solid $border;
+    padding: 0.6rem 0.9rem;
+    &:hover:not(:disabled) { color: $red; border-color: $red; background: #fff1f1; }
+  }
+
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+  &--loading { opacity: 0.8; cursor: not-allowed; }
+  &__spinner { display: flex; align-items: center; animation: spin 0.9s linear infinite; }
+}
+
+.rs-filter-action-row { display: flex; align-items: center; gap: 0.5rem; }
+
+.rs-btn-sm {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.35rem 0.75rem; font-size: 0.75rem; font-weight: 500;
+  border-radius: $radius-btn; cursor: pointer; text-decoration: none;
+  white-space: nowrap; border: none;
+  transition: background 0.2s, box-shadow 0.2s; line-height: 1;
+
+  &--ghost   { background: $blue-light; color: $blue; border: 1px solid $blue-mid; &:hover { background: $blue-mid; } }
+  &--primary { background: $blue; color: white; &:hover { background: $blue-dark; box-shadow: 0 3px 10px rgba($blue,0.3); } }
+}
+
+// ─── Pill de períodos ─────────────────────────────────────────────────────────
+.rs-compare-pill {
+  display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.25rem;
+
+  &__item {
+    display: flex; align-items: center; gap: 0.35rem;
+    font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.7rem; border-radius: 10px;
+    &--blue   { background: $blue-light;   color: $blue;   border: 1px solid $blue-mid; }
+    &--orange { background: $orange-light; color: $orange; border: 1px solid color.adjust($orange-light, $lightness: -8%); }
+  }
+}
+
+// ─── PrimeNG overrides ────────────────────────────────────────────────────────
+::ng-deep {
+  .rs-calendar {
+    width: 100%;
+    .p-inputtext { width: 100%; border-radius: $radius-btn; border-color: $blue-mid; background: $bg-header; font-size: 0.875rem;
+      &:focus { border-color: $blue; box-shadow: 0 0 0 3px rgba($blue,0.12); } }
+    .p-button { background: $blue-light; border-color: $blue-mid; color: $blue; &:hover { background: $blue-mid; } }
+  }
+
+  .rs-multiselect, .rs-dropdown {
+    width: 100%; border-radius: $radius-btn; border-color: $blue-mid; background: $bg-header; font-size: 0.875rem;
+    &:not(.p-disabled):hover { border-color: $blue; }
+    &.p-focus { border-color: $blue; box-shadow: 0 0 0 3px rgba($blue,0.12); }
+  }
+
+  .p-datepicker, .p-datepicker-panel, .p-overlay, .p-overlay-panel,
+  .p-dropdown-panel, .p-multiselect-panel { z-index: 9999 !important; }
+}
+
+// ─── Histórico ────────────────────────────────────────────────────────────────
+.rs-history-count {
+  margin-left: auto; font-size: 0.72rem; font-weight: 600;
+  color: $green; background: $green-light; padding: 0.15rem 0.55rem; border-radius: 10px;
+}
+
+.rs-btn-clear-history {
+  display: flex; align-items: center; gap: 0.3rem;
+  padding: 0.3rem 0.7rem; font-size: 0.75rem; font-weight: 500;
+  color: $text-light; background: transparent;
+  border: 1px solid $border; border-radius: 6px; cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  &:hover { color: $red; border-color: $red; }
+}
+
+.rs-history-list { display: flex; flex-wrap: wrap; gap: 0.6rem; padding: 1rem 1.5rem; background: #fafcff; }
+
+.rs-history-item {
+  display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.85rem;
+  background: white; border: 1px solid $blue-mid; border-radius: 20px;
+  cursor: pointer; font-size: 0.8rem; font-weight: 500; color: $text-dark;
+  transition: background 0.15s, box-shadow 0.15s, border-color 0.15s;
+  &:hover { background: $blue-light; border-color: $blue; box-shadow: 0 2px 8px rgba($blue,0.12); color: $blue; }
+  &__icon  { color: $red; display: flex; align-items: center; }
+  &__label { white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+  &__arrow { color: $text-light; flex-shrink: 0; }
+}
+
+// ─── Comparativo ─────────────────────────────────────────────────────────────
+.rs-btn-close-compare {
+  margin-left: auto; display: flex; align-items: center; gap: 0.3rem;
+  padding: 0.3rem 0.7rem; font-size: 0.75rem; font-weight: 500;
+  color: $text-light; background: transparent;
+  border: 1px solid $border; border-radius: 6px; cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  &:hover { color: $red; border-color: $red; }
+}
+
+.rs-compare-mobile { display: flex; flex-direction: column; }
+
+.rs-compare-mobile-card {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.25rem 1.5rem; gap: 1rem; border-bottom: 1px solid $blue-mid;
+  &:last-child { border-bottom: none; }
+}
+
+.rs-compare-mobile-actions { display: flex; gap: 0.6rem; }
+
+.rs-compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+
+.rs-compare-panel {
+  display: flex; flex-direction: column;
+  border-right: 1px solid $blue-mid; &:last-child { border-right: none; }
+}
+
+.rs-compare-label {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(90deg, #fafcff 0%, #ffffff 100%);
+  border-bottom: 1px solid $blue-mid; gap: 0.75rem;
+}
+
+.rs-compare-badge {
+  font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.7rem; border-radius: 10px;
+  &--current  { background: $blue-light;   color: $blue;   border: 1px solid $blue-mid; }
+  &--previous { background: $orange-light; color: $orange; border: 1px solid color.adjust($orange-light, $lightness: -8%); }
+}
+
+.rs-compare-iframe { flex: 1; width: 100%; min-height: 600px; border: none; display: block; }
+
+// ─── PDF ─────────────────────────────────────────────────────────────────────
+.rs-pdf-actions { display: flex; align-items: center; gap: 0.5rem; }
+
+.rs-pdf-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.5rem; }
+
+.rs-pdf-card {
+  background: $bg-card; border-radius: $radius-card;
+  border: 1px solid $blue-mid; box-shadow: 0 2px 12px rgba(37,99,235,0.07);
+  overflow: hidden; display: flex; flex-direction: column;
+  animation: fadeIn 0.3s ease;
+
+  &__header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.85rem 1.25rem; border-bottom: 1px solid $blue-mid;
+    background: linear-gradient(90deg, #f0f6ff 0%, #fafcff 100%);
+    gap: 0.75rem; flex-wrap: wrap;
+  }
+}
+
+.rs-pdf-info {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.82rem; font-weight: 600; color: $text-dark;
+  svg { color: $red; flex-shrink: 0; }
+}
+
+.rs-pdf-period {
+  font-weight: 400; color: $blue; font-size: 0.75rem;
+  padding: 0.15rem 0.55rem;
+  background: $blue-light; border: 1px solid $blue-mid; border-radius: 10px;
+}
+
+.rs-pdf-iframe { flex: 1; width: 100%; min-height: 560px; border: none; display: block; }
+
+.rs-pdf-mobile-fallback {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 1rem; padding: 3rem 2rem; text-align: center;
+  background: #fafcff; color: $text-light;
+  svg { color: $blue-mid; }
+  p { font-size: 0.875rem; margin: 0; max-width: 280px; line-height: 1.5; }
+  &__actions { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; }
+}
+
+// ─── States ──────────────────────────────────────────────────────────────────
+.rs-empty {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 4rem 2rem; gap: 0.75rem; text-align: center;
+  background: linear-gradient(180deg, #fafcff 0%, #ffffff 100%);
+
+  &__icon {
+    width: 84px; height: 84px; background: $blue-light;
+    border: 2px solid $blue-mid; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: $blue; margin-bottom: 0.5rem;
+  }
+
+  h3 { font-size: 1.05rem; font-weight: 700; color: $text-dark; margin: 0; }
+  p  { font-size: 0.875rem; color: $text-light; margin: 0; max-width: 380px; line-height: 1.6; }
+}
+
+.rs-loading {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 1rem; padding: 4rem; background: #fafcff;
+  &__spinner { color: $blue; animation: spin 1s linear infinite; svg { display: block; } }
+  p { font-size: 0.875rem; color: $text-light; margin: 0; }
+}
+
+// ─── Animations ──────────────────────────────────────────────────────────────
+@keyframes spin    { from { transform: rotate(0deg); }   to { transform: rotate(360deg); } }
+@keyframes fadeIn  { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+// ─── Responsive ──────────────────────────────────────────────────────────────
+@media (max-width: 1024px) {
+  .rs-pdf-grid     { grid-template-columns: 1fr; }
+  .rs-compare-grid { grid-template-columns: 1fr; }
+  .rs-compare-panel { border-right: none; border-bottom: 1px solid $blue-mid; &:last-child { border-bottom: none; } }
+}
+
+@media (max-width: 768px) {
+  .rs-filters { flex-direction: column; }
+  .rs-filter-group { min-width: 100%; &--wide { min-width: 100%; } &--action { width: 100%; .rs-btn { width: 100%; } } }
+  .rs-header__title p { display: none; }
+  .rs-section { padding: 1.25rem; }
+  .rs-compare-pill { margin-top: 0.5rem; }
+}

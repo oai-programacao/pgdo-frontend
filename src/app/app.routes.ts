@@ -168,12 +168,20 @@ export const routes: Routes = [
         title: "Avisos do Sistema",
       },
       {
-        path: "diagnosticos",
+        path: "relatorios/pgdo",
         loadComponent: () =>
           import("./features/diagnosis/pages/diagnostic/diagnostic.component").then(
             (m) => m.DiagnosticComponent,
           ),
-        title: "Diagnósticos",
+        title: "Relatório Pgdo",
+      },
+      {
+        path: "relatorios/loja",
+        loadComponent: () =>
+          import("./features/report-store/report-store.component").then(
+            (m) => m.ReportStoreComponent
+          ),
+        title: "Relatório Loja",
       },
       {
         path: "configuracoes",
